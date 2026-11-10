@@ -3,6 +3,29 @@
 All notable changes to Flow-tracker are recorded here. Versions follow
 [Semantic Versioning](https://semver.org/), and each release is tagged `vX.Y.Z`.
 
+## 1.4.0 — the selection lens
+
+### Changed
+
+- The active destination is now a **lens**: an opaque glass bead with a bright
+  rim that sits above the bar and overhangs it by 4 dp, instead of a tinted
+  rectangle tucked inside the pill. It casts a soft drop shadow and a whisper of
+  the accent colour, so the selection reads as glass resting on glass.
+- Only the selected destination is named. Inactive destinations are icon-only,
+  which quiets the bar and gives the lens the weight; the name still reaches
+  screen readers on every destination through its semantics label.
+- The bar is slightly shallower (58 dp, 48 dp folded) so the lens reads wider
+  than tall, matching the reference rather than looking like a circle.
+
+### Fixed
+
+- The destination label no longer falls back to the platform font.
+  `AnimatedDefaultTextStyle` was given a bare `TextStyle`, which dropped the
+  app's family; it now inherits `DefaultTextStyle`, so the label is set in
+  Figtree, Google Sans Rounded or the express face as the style requires.
+- The lens is positioned by slot offset with the inset in the maths; it no
+  longer drifts off its destination.
+
 ## 1.3.0 — liquid glass navigation
 
 ### Changed

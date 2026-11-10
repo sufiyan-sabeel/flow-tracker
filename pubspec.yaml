@@ -3,7 +3,7 @@ description: "Flow-tracker: a private, offline habit tracker that helps you buil
 
 publish_to: 'none'
 
-version: 1.3.0+4
+version: 1.4.0+5
 
 environment:
   sdk: ^3.9.2

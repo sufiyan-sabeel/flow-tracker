@@ -14,17 +14,20 @@ class LiquidNavItem {
   final String label;
 }
 
-/// A floating, translucent navigation dock with a sliding glass capsule behind
-/// the active destination.
-///
-/// The accent colour is never hardcoded: the capsule, the selected icon and the
-/// selected label all read [ColorScheme.primary], so switching the accent in
-/// Settings repaints the dock immediately. When `glassEffects` is off — or the
-/// platform asks for reduced motion — the blur is dropped and the transitions
-/// collapse to a cross-fade, which keeps the dock cheap on low-end devices.
-/// Identifies the sliding capsule, so tests can measure it.
+/// Identifies the sliding lens, so tests can measure it.
 const capsuleKey = ValueKey('liquid-nav-capsule');
 
+/// A floating, translucent navigation dock.
+///
+/// The bar itself is a blurred glass pill; the selection is a *lens* that sits
+/// above that glass and overhangs it slightly, the way a real glass bead would
+/// catch the light on a surface. Only the selected destination carries a label,
+/// which keeps the bar quiet and gives the active item the weight.
+///
+/// The accent is never hardcoded: the lens glow, the selected icon and its label
+/// all read [ColorScheme.primary], so changing the accent in Settings repaints
+/// the dock immediately. With `glassEffects` off the blur node is skipped
+/// entirely; with animations off every transition collapses to zero duration.
 class LiquidGlassNavBar extends StatefulWidget {
   const LiquidGlassNavBar({
     super.key,
@@ -38,7 +41,7 @@ class LiquidGlassNavBar extends StatefulWidget {
   final int index;
   final ValueChanged<int> onSelect;
 
-  /// Folds the labels away while the user scrolls, as the classic bar does.
+  /// Folds the bar down while the user scrolls, as the old bar did.
   final ValueListenable<bool> compact;
 
   @override
@@ -46,9 +49,11 @@ class LiquidGlassNavBar extends StatefulWidget {
 }
 
 class _LiquidGlassNavBarState extends State<LiquidGlassNavBar> {
-  static const _radius = 30.0;
-  static const _tall = 68.0;
-  static const _short = 54.0;
+  static const _radius = 32.0;
+  static const _tall = 58.0;
+  static const _short = 48.0;
+  static const _overhang = 4.0;
+  static const _inset = 2.0;
   static const _slide = Duration(milliseconds: 340);
   static const _ink = Duration(milliseconds: 210);
   static const _curve = Curves.easeInOutCubic;
@@ -94,6 +99,7 @@ class _LiquidGlassNavBarState extends State<LiquidGlassNavBar> {
     final glass = settings.glassEffects;
     final dark = Theme.of(context).brightness == Brightness.dark;
     final amoled = dark && settings.amoled;
+    final scheme = Theme.of(context).colorScheme;
 
     final height = _folded ? _short : _tall;
     final count = widget.items.length;
@@ -106,72 +112,71 @@ class _LiquidGlassNavBarState extends State<LiquidGlassNavBar> {
           duration: slide,
           curve: _curve,
           height: height,
-          decoration: _shell(dark: dark, amoled: amoled),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(_radius),
-            child: glass
-                ? BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                    child: _surface(
+          // The lens overhangs the pill, so nothing here may clip.
+          child: LayoutBuilder(
+            builder: (context, box) {
+              final slot = box.maxWidth / count;
+              return Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Positioned.fill(
+                    child: _pill(
                       context,
                       dark: dark,
                       amoled: amoled,
-                      count: count,
-                      slide: slide,
-                      ink: ink,
+                      glass: glass,
                     ),
-                  )
-                : _surface(
-                    context,
-                    dark: dark,
-                    amoled: amoled,
-                    count: count,
-                    slide: slide,
-                    ink: ink,
                   ),
+                  // Positioned by slot: the inset is part of the maths, or the
+                  // lens drifts off its destination.
+                  AnimatedPositioned(
+                    left: widget.index * slot + _inset,
+                    top: -_overhang,
+                    bottom: -_overhang,
+                    width: slot - _inset * 2,
+                    duration: slide,
+                    curve: _curve,
+                    child: DecoratedBox(
+                      key: capsuleKey,
+                      decoration: _lens(
+                        dark: dark,
+                        amoled: amoled,
+                        scheme: scheme,
+                      ),
+                    ),
+                  ),
+                  Positioned.fill(
+                    child: Row(
+                      children: [
+                        for (var i = 0; i < count; i++)
+                          Expanded(
+                            child: _NavButton(
+                              item: widget.items[i],
+                              active: i == widget.index,
+                              folded: _folded,
+                              ink: ink,
+                              onTap: () => widget.onSelect(i),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
     );
   }
 
-  /// Outer shadow only: the tint and the hairline border live on [_surface] so
-  /// the blur sits behind them instead of washing them out.
-  BoxDecoration _shell({required bool dark, required bool amoled}) {
-    return BoxDecoration(
-      borderRadius: BorderRadius.circular(_radius),
-      boxShadow: [
-        if (amoled)
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.55),
-            blurRadius: 22,
-            offset: const Offset(0, 8),
-          )
-        else if (dark)
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.32),
-            blurRadius: 26,
-            offset: const Offset(0, 10),
-          )
-        else
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.10),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-      ],
-    );
-  }
-
-  Widget _surface(
+  /// The glass pill: shadow outside, blur and tint inside the clip.
+  Widget _pill(
     BuildContext context, {
     required bool dark,
     required bool amoled,
-    required int count,
-    required Duration slide,
-    required Duration ink,
+    required bool glass,
   }) {
-    final scheme = Theme.of(context).colorScheme;
     final tint = amoled
         ? [
             Colors.white.withValues(alpha: 0.07),
@@ -192,7 +197,7 @@ class _LiquidGlassNavBarState extends State<LiquidGlassNavBar> {
         ? Colors.white.withValues(alpha: 0.12)
         : Colors.black.withValues(alpha: 0.07);
 
-    return Container(
+    final surface = Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -204,80 +209,80 @@ class _LiquidGlassNavBarState extends State<LiquidGlassNavBar> {
         borderRadius: BorderRadius.circular(_radius),
         border: Border.all(color: edge),
       ),
-      child: LayoutBuilder(
-        builder: (context, box) {
-          final slot = box.maxWidth / count;
-          return Stack(
-            children: [
-              // Positioned by slot rather than by Alignment: the inset has to be
-              // part of the maths, or the capsule drifts off its destination.
-              AnimatedPositioned(
-                left: widget.index * slot + 5,
-                top: 11,
-                bottom: 11,
-                width: slot - 10,
-                duration: slide,
-                curve: _curve,
-                child: DecoratedBox(
-                  key: capsuleKey,
-                  decoration: _capsule(
-                    dark: dark,
-                    amoled: amoled,
-                    scheme: scheme,
-                  ),
-                ),
-              ),
-              Row(
-                children: [
-                  for (var i = 0; i < count; i++)
-                    Expanded(
-                      child: _NavButton(
-                        item: widget.items[i],
-                        active: i == widget.index,
-                        folded: _folded,
-                        ink: ink,
-                        onTap: () => widget.onSelect(i),
-                      ),
-                    ),
-                ],
-              ),
-            ],
-          );
-        },
+    );
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(_radius),
+        boxShadow: [
+          if (amoled)
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.55),
+              blurRadius: 22,
+              offset: const Offset(0, 8),
+            )
+          else if (dark)
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.32),
+              blurRadius: 26,
+              offset: const Offset(0, 10),
+            )
+          else
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.10),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(_radius),
+        child: glass
+            ? BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                child: surface,
+              )
+            : surface,
       ),
     );
   }
 
-  BoxDecoration _capsule({
+  /// The selection lens: an opaque glass bead with a bright rim that lifts off
+  /// the bar and carries a whisper of the accent in its glow.
+  BoxDecoration _lens({
     required bool dark,
     required bool amoled,
     required ColorScheme scheme,
   }) {
+    final fill = amoled
+        ? [const Color(0xFF17171A), const Color(0xFF0A0A0C)]
+        : dark
+        ? [const Color(0xFF26262B), const Color(0xFF151518)]
+        : [Colors.white, const Color(0xFFF1F1F6)];
+    final rim = amoled
+        ? Colors.white.withValues(alpha: 0.34)
+        : dark
+        ? Colors.white.withValues(alpha: 0.46)
+        : Colors.white;
+
     return BoxDecoration(
       borderRadius: BorderRadius.circular(_radius),
       gradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: amoled
-            ? [
-                Colors.white.withValues(alpha: 0.13),
-                Colors.white.withValues(alpha: 0.06),
-              ]
-            : dark
-            ? [
-                Colors.white.withValues(alpha: 0.17),
-                Colors.white.withValues(alpha: 0.09),
-              ]
-            : [Colors.white, Colors.white.withValues(alpha: 0.86)],
+        colors: fill,
       ),
-      border: Border.all(
-        color: scheme.primary.withValues(alpha: dark ? 0.34 : 0.30),
-      ),
+      border: Border.all(color: rim, width: 1.4),
       boxShadow: [
         BoxShadow(
-          color: scheme.primary.withValues(alpha: 0.16),
-          blurRadius: 6,
-          offset: const Offset(0, 1),
+          color: scheme.primary.withValues(alpha: dark ? 0.30 : 0.22),
+          blurRadius: 14,
+          offset: const Offset(0, 4),
+        ),
+        BoxShadow(
+          color: Colors.black.withValues(alpha: dark ? 0.45 : 0.16),
+          blurRadius: 16,
+          offset: const Offset(0, 6),
         ),
       ],
     );
@@ -305,6 +310,7 @@ class _NavButton extends StatelessWidget {
     final colour = active
         ? scheme.primary
         : scheme.onSurfaceVariant.withValues(alpha: 0.86);
+    final showLabel = active && !folded;
 
     return Semantics(
       button: true,
@@ -320,35 +326,36 @@ class _NavButton extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 AnimatedScale(
-                  scale: active ? 1.08 : 1,
+                  scale: active ? 1.06 : 1,
                   duration: ink,
-                  curve: Curves.easeInOutCubic,
+                  curve: _LiquidGlassNavBarState._curve,
                   child: TweenAnimationBuilder<Color?>(
                     tween: ColorTween(end: colour),
                     duration: ink,
                     builder: (context, value, _) => Icon(
                       item.icon,
-                      size: 22,
+                      size: 21,
                       color: value ?? colour,
                     ),
                   ),
                 ),
+                // Only the selected destination is named: it keeps the bar
+                // quiet and gives the lens something to hold.
                 AnimatedSize(
                   duration: ink,
-                  curve: Curves.easeInOutCubic,
-                  child: folded
-                      ? const SizedBox(width: 0, height: 0)
-                      : Padding(
-                          padding: const EdgeInsets.only(top: 3),
+                  curve: _LiquidGlassNavBarState._curve,
+                  child: showLabel
+                      ? Padding(
+                          padding: const EdgeInsets.only(top: 1),
                           child: AnimatedDefaultTextStyle(
                             duration: ink,
-                            curve: Curves.easeInOutCubic,
-                            style: TextStyle(
-                              fontSize: 10.5,
+                            curve: _LiquidGlassNavBarState._curve,
+                            // Inherit the app's font: a bare TextStyle here
+                            // would fall back to the platform default.
+                            style: DefaultTextStyle.of(context).style.copyWith(
+                              fontSize: 10,
                               height: 1.1,
-                              fontWeight: active
-                                  ? FontWeight.w700
-                                  : FontWeight.w500,
+                              fontWeight: FontWeight.w700,
                               letterSpacing: 0.2,
                               color: colour,
                             ),
@@ -358,7 +365,8 @@ class _NavButton extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                        ),
+                        )
+                      : const SizedBox(width: 0, height: 0),
                 ),
               ],
             ),

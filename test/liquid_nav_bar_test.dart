@@ -75,13 +75,15 @@ void main() {
 
     expect(find.byType(LiquidGlassNavBar), findsOneWidget);
     for (final item in _items) {
-      expect(find.text(item.label), findsOneWidget);
       expect(
         find.bySemanticsLabel(item.label),
         findsOneWidget,
         reason: item.label,
       );
     }
+    // only the selected destination carries a visible label
+    expect(find.text('Today'), findsOneWidget);
+    expect(find.text('Stats'), findsNothing);
   });
 
   testWidgets('tapping each destination reports its own index', (
@@ -91,7 +93,7 @@ void main() {
     await pumpDock(tester, onSelect: taps.add);
 
     for (var i = 0; i < _items.length; i++) {
-      await tester.tap(find.text(_items[i].label));
+      await tester.tap(find.byIcon(_items[i].icon));
       await tester.pump();
     }
     expect(taps, [0, 1, 2, 3, 4]);
@@ -113,11 +115,13 @@ void main() {
         closeTo(expected, 1),
         reason: 'index $i',
       );
-      // and it never leaves the dock
-      expect(capsule.top, greaterThanOrEqualTo(dock.top));
-      expect(capsule.bottom, lessThanOrEqualTo(dock.bottom));
+      // it stays within the dock horizontally, and overhangs it only slightly
       expect(capsule.left, greaterThanOrEqualTo(dock.left));
       expect(capsule.right, lessThanOrEqualTo(dock.right));
+      expect(capsule.top, lessThanOrEqualTo(dock.top));
+      expect(dock.top - capsule.top, lessThanOrEqualTo(8));
+      expect(capsule.bottom, greaterThanOrEqualTo(dock.bottom));
+      expect(capsule.bottom - dock.bottom, lessThanOrEqualTo(8));
     }
   });
 
@@ -185,6 +189,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Today'), findsNothing);
     expect(find.byIcon(Icons.home_outlined), findsOneWidget);
+    expect(find.byType(LiquidGlassNavBar), findsOneWidget);
   });
 
   testWidgets('it fits a 320dp phone with five destinations', (tester) async {
@@ -202,7 +207,7 @@ void main() {
     final taps = <int>[];
     await pumpDock(tester, settings: {'animations': false}, onSelect: taps.add);
 
-    await tester.tap(find.text('Stats'));
+    await tester.tap(find.byIcon(Icons.bar_chart));
     await tester.pump();
 
     expect(taps, [3]);
