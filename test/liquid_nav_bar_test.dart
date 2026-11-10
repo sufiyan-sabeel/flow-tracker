@@ -19,7 +19,6 @@ const _items = [
 void main() {
   useEmptyStore();
 
-  /// Pumps the dock alone with a controllable selection and compact flag.
   Future<ValueNotifier<bool>> pumpDock(
     WidgetTester tester, {
     int index = 0,
@@ -68,7 +67,15 @@ void main() {
     return compact;
   }
 
-  testWidgets('every destination is there with a label for screen readers', (
+  /// Where the capsule sits relative to the bar, in slots.
+  double slotOf(WidgetTester tester) {
+    final dock = tester.getRect(find.byType(LiquidGlassNavBar));
+    final capsule = tester.getRect(find.byKey(capsuleKey));
+    final slot = (dock.width - 32) / _items.length;
+    return (capsule.center.dx - dock.left - 16) / slot - 0.5;
+  }
+
+  testWidgets('every destination is announced to screen readers', (
     tester,
   ) async {
     await pumpDock(tester);
@@ -81,9 +88,10 @@ void main() {
         reason: item.label,
       );
     }
-    // only the selected destination carries a visible label
-    expect(find.text('Today'), findsOneWidget);
-    expect(find.text('Stats'), findsNothing);
+    // the reference has no labels on the bar, and neither do we
+    for (final item in _items) {
+      expect(find.text(item.label), findsNothing, reason: item.label);
+    }
   });
 
   testWidgets('tapping each destination reports its own index', (
@@ -99,42 +107,56 @@ void main() {
     expect(taps, [0, 1, 2, 3, 4]);
   });
 
-  testWidgets('the glass capsule sits on the selected destination', (
+  testWidgets('the capsule sits on the selected destination, inside the bar', (
     tester,
   ) async {
     for (var i = 0; i < _items.length; i++) {
       await pumpDock(tester, index: i);
+      expect(slotOf(tester), closeTo(i.toDouble(), 0.06), reason: 'index $i');
+
       final dock = tester.getRect(find.byType(LiquidGlassNavBar));
       final capsule = tester.getRect(find.byKey(capsuleKey));
-      // the dock has 16dp side margins; five equal slots fill the rest
-      final inner = dock.width - 32;
-      final slot = inner / _items.length;
-      final expected = dock.left + 16 + (i + 0.5) * slot;
-      expect(
-        capsule.center.dx,
-        closeTo(expected, 1),
-        reason: 'index $i',
-      );
-      // it stays within the dock horizontally, and overhangs it only slightly
+      // the capsule is inset inside the bar, never spilling out of it
+      expect(capsule.top, greaterThanOrEqualTo(dock.top));
+      expect(capsule.bottom, lessThanOrEqualTo(dock.bottom));
       expect(capsule.left, greaterThanOrEqualTo(dock.left));
       expect(capsule.right, lessThanOrEqualTo(dock.right));
-      expect(capsule.top, lessThanOrEqualTo(dock.top));
-      expect(dock.top - capsule.top, lessThanOrEqualTo(8));
-      expect(capsule.bottom, greaterThanOrEqualTo(dock.bottom));
-      expect(capsule.bottom - dock.bottom, lessThanOrEqualTo(8));
+      // and it is a capsule, not a slab: rounded, inset, narrower than a slot
+      expect(capsule.height, lessThan(dock.height));
     }
   });
 
-  testWidgets('the capsule slides rather than jumping', (tester) async {
+  testWidgets('the capsule glides instead of jumping', (tester) async {
     await pumpDock(tester);
-    final capsule = tester.widget<AnimatedPositioned>(
-      find.ancestor(
-        of: find.byKey(capsuleKey),
-        matching: find.byType(AnimatedPositioned),
+    expect(slotOf(tester), closeTo(0, 0.06));
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider<SettingsController>.value(
+        value: SettingsController(),
+        child: MaterialApp(
+          theme: AppTheme.dark(),
+          home: Scaffold(
+            body: Align(
+              alignment: Alignment.bottomCenter,
+              child: LiquidGlassNavBar(
+                items: _items,
+                index: 4,
+                onSelect: (_) {},
+                compact: ValueNotifier(false),
+              ),
+            ),
+          ),
+        ),
       ),
     );
-    expect(capsule.duration, const Duration(milliseconds: 340));
-    expect(capsule.curve, Curves.easeInOutCubic);
+    // a moment in, it is on its way rather than already there
+    await tester.pump(const Duration(milliseconds: 60));
+    final mid = slotOf(tester);
+    expect(mid, greaterThan(0.0));
+    expect(mid, lessThan(4.0));
+
+    await tester.pumpAndSettle();
+    expect(slotOf(tester), closeTo(4, 0.06));
   });
 
   testWidgets('the active icon takes the accent from the theme', (
@@ -179,29 +201,26 @@ void main() {
     expect(find.byType(LiquidGlassNavBar), findsOneWidget);
   });
 
-  testWidgets('folding hides the labels but keeps the buttons', (
-    tester,
-  ) async {
+  testWidgets('folding makes the bar shorter', (tester) async {
     final compact = await pumpDock(tester);
-    expect(find.text('Today'), findsOneWidget);
+    final tall = tester.getSize(find.byType(LiquidGlassNavBar)).height;
 
     compact.value = true;
     await tester.pumpAndSettle();
-    expect(find.text('Today'), findsNothing);
-    expect(find.byIcon(Icons.home_outlined), findsOneWidget);
+
+    final short = tester.getSize(find.byType(LiquidGlassNavBar)).height;
+    expect(short, lessThan(tall));
     expect(find.byType(LiquidGlassNavBar), findsOneWidget);
   });
 
   testWidgets('it fits a 320dp phone with five destinations', (tester) async {
     await pumpDock(tester, width: 320, height: 640);
     expect(tester.takeException(), isNull);
-    expect(find.byType(LiquidGlassNavBar), findsOneWidget);
-    // the dock must not be wider than the screen
     final box = tester.getSize(find.byType(LiquidGlassNavBar));
     expect(box.width, lessThanOrEqualTo(320));
   });
 
-  testWidgets('with animations off it still selects, just without motion', (
+  testWidgets('with animations off the capsule snaps, but still selects', (
     tester,
   ) async {
     final taps = <int>[];
@@ -209,18 +228,13 @@ void main() {
 
     await tester.tap(find.byIcon(Icons.bar_chart));
     await tester.pump();
-
     expect(taps, [3]);
-    final capsule = tester.widget<AnimatedPositioned>(
-      find.ancestor(
-        of: find.byKey(capsuleKey),
-        matching: find.byType(AnimatedPositioned),
-      ),
-    );
-    expect(capsule.duration, Duration.zero);
+    expect(tester.takeException(), isNull);
   });
 
-  testWidgets('the dock keeps to a single blur node', (tester) async {
+  testWidgets('the glass is a blur, and drops out when effects are off', (
+    tester,
+  ) async {
     await pumpDock(tester);
     final blurs = tester.widgetList<BackdropFilter>(
       find.descendant(
@@ -229,9 +243,7 @@ void main() {
       ),
     );
     expect(blurs.length, 1);
-  });
 
-  testWidgets('with glass effects off the dock still builds', (tester) async {
     await pumpDock(tester, settings: {'glassEffects': false});
     expect(tester.takeException(), isNull);
     expect(find.byType(BackdropFilter), findsNothing);

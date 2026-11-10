@@ -13,8 +13,9 @@ import 'support/app_harness.dart';
 void main() {
   useEmptyStore();
 
-  testWidgets('classic holds the three tabs and the floating bar',
-      (tester) async {
+  testWidgets('classic holds the three tabs and the floating bar', (
+    tester,
+  ) async {
     await seedHabits(tester, [
       testHabit(id: 'a', name: 'Read', done: lastDays(5)),
     ]);
@@ -25,16 +26,28 @@ void main() {
 
     await tester.tap(find.byIcon(LucideIcons.chartColumn).last);
     await tester.pumpAndSettle();
-    expect(find.text('Stats'), findsOneWidget);
+    // the dock is icon-only now, so the destination is proven by its page and
+    // by the bar marking it selected rather than by a text label
     expect(find.byType(StatisticsPage), findsOneWidget);
+    expect(
+      tester.getSemantics(find.bySemanticsLabel('Stats')),
+      matchesSemantics(
+        label: 'Stats',
+        isButton: true,
+        hasTapAction: true,
+        hasSelectedState: true,
+        isSelected: true,
+      ),
+    );
 
     await tester.tap(find.byIcon(LucideIcons.settings).last);
     await tester.pumpAndSettle();
     expect(find.byType(SettingsPage), findsOneWidget);
   });
 
-  testWidgets('the stats tab only does its counting once it is opened',
-      (tester) async {
+  testWidgets('the stats tab only does its counting once it is opened', (
+    tester,
+  ) async {
     await seedHabits(tester, [
       testHabit(id: 'a', name: 'Read', done: lastDays(5)),
     ]);
@@ -49,14 +62,17 @@ void main() {
 
     await tester.tap(find.byIcon(LucideIcons.chartColumn).last);
     await tester.pumpAndSettle();
-    final page = tester.state<State<StatisticsPage>>(
-      find.byType(StatisticsPage),
-    ) as dynamic;
+    final page =
+        tester.state<State<StatisticsPage>>(
+              find.byType(StatisticsPage),
+            )
+            as dynamic;
     expect(page.debugStats.total, 5, reason: 'cuenta al abrirla');
   });
 
-  testWidgets('the to-do tab stays hidden while the setting is off',
-      (tester) async {
+  testWidgets('the to-do tab stays hidden while the setting is off', (
+    tester,
+  ) async {
     await seedHabits(tester, [testHabit(id: 'a', name: 'Read')]);
     await pumpScreen(
       tester,
@@ -95,8 +111,9 @@ void main() {
     expect(find.byType(TodosPage), findsNothing);
   });
 
-  testWidgets('a wide window gives minimal a rail and a detail pane',
-      (tester) async {
+  testWidgets('a wide window gives minimal a rail and a detail pane', (
+    tester,
+  ) async {
     await seedHabits(tester, [
       testHabit(id: 'a', name: 'Read', done: lastDays(5)),
     ]);

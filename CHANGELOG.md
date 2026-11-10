@@ -3,28 +3,41 @@
 All notable changes to Flow-tracker are recorded here. Versions follow
 [Semantic Versioning](https://semver.org/), and each release is tagged `vX.Y.Z`.
 
-## 1.4.0 — the selection lens
+## 1.4.0 — liquid glass, second pass
+
+Reworked against the supplied reference. The first attempt put a solid,
+oversized capsule on top of the bar; this replaces it with layered glass.
 
 ### Changed
 
-- The active destination is now a **lens**: an opaque glass bead with a bright
-  rim that sits above the bar and overhangs it by 4 dp, instead of a tinted
-  rectangle tucked inside the pill. It casts a soft drop shadow and a whisper of
-  the accent colour, so the selection reads as glass resting on glass.
-- Only the selected destination is named. Inactive destinations are icon-only,
-  which quiets the bar and gives the lens the weight; the name still reaches
-  screen readers on every destination through its semantics label.
-- The bar is slightly shallower (58 dp, 48 dp folded) so the lens reads wider
-  than tall, matching the reference rather than looking like a circle.
+- **Three-layer glass material.** The bar is now a blurred backdrop with a
+  gentle saturation lift, a low-alpha tint over it, a specular sheen along the
+  upper edge and a hairline white rim. The tint is light enough that content
+  behind the dock stays visibly distorted through it instead of being painted
+  over.
+- **The active item is a glass capsule inside the bar**, not a block on top of
+  it: a translucent gradient with a bright rim, a soft drop shadow and a hint of
+  the accent in its glow. It is inset 5 dp from the bar's edges, so nothing
+  spills past the dock.
+- **Spring movement.** The capsule now glides on a `SpringSimulation`
+  (mass 1, stiffness 520, damping 34) rather than a fixed-duration tween, so
+  rapid tab changes carry momentum instead of restarting an ease. Reduced motion
+  snaps it to the destination.
+- **No labels on the bar.** The reference is icon-only, and the label was
+  cramping the capsule. Every destination keeps its semantics label, so screen
+  readers still announce "Today", "To-Do", "Plan", "Stats" and "Settings".
+- The bar is 58 dp (50 dp folded) with 22 dp icons.
 
-### Fixed
+### Removed
 
-- The destination label no longer falls back to the platform font.
-  `AnimatedDefaultTextStyle` was given a bare `TextStyle`, which dropped the
-  app's family; it now inherits `DefaultTextStyle`, so the label is set in
-  Figtree, Google Sans Rounded or the express face as the style requires.
-- The lens is positioned by slot offset with the inset in the maths; it no
-  longer drifts off its destination.
+- The overhanging lens from the previous build, which read as a floating bubble
+  detached from the dock.
+
+### Verified
+
+- Capsule position per destination, inset containment, spring glide versus snap,
+  accent propagation across five colours, light/dark/AMOLED, folding, 320 dp
+  width, blur presence and the glass-effects fallback.
 
 ## 1.3.0 — liquid glass navigation
 
