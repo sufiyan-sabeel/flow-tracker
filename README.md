@@ -83,6 +83,20 @@ the same app rather than a stranger wearing its clothes.
 - Restore, import and export, with integrity checks and safe migrations
 - Optional app lock behind biometrics or a PIN
 
+## Platforms
+
+| Platform | Status | Download |
+| --- | --- | --- |
+| Android | released, signed with the project key when configured | APK per ABI, AAB |
+| iOS | builds in CI, **unsigned** | IPA for validation, needs your team to install |
+| Windows | builds in CI, unsigned | EXE and MSI installers |
+| Linux | builds in CI | AppImage and DEB |
+| macOS | builds in CI, **unsigned and not notarized** | DMG and PKG |
+
+Every tag builds all five platforms and publishes one release with checksums.
+See [docs/RELEASE.md](docs/RELEASE.md) for how the pipeline works and which
+secrets enable signed builds.
+
 ## Install
 
 1. Open the [latest release](https://github.com/sufiyan-sabeel/flow-tracker/releases/latest).

@@ -374,9 +374,13 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
+          # gstreamer is required by the audio plugin on Linux; without these the
+          # CMake configure step fails before a single line is compiled
           sudo apt-get install -y --no-install-recommends \
             clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev \
-            libstdc++-12-dev libfuse2 file
+            libstdc++-12-dev libfuse2 file \
+            libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+            gstreamer1.0-plugins-base gstreamer1.0-plugins-good
 
       - name: Resolve dependencies
         run: flutter pub get
