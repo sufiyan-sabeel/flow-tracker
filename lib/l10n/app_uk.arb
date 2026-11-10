@@ -183,7 +183,6 @@
   "appearance": "Вигляд",
   "empty_title": "Розпочніть першу серію",
   "strength": "Сила",
-  "default_user": "Inlitx",
   "description": "Опис",
   "count_days": "{count, plural, one {{count} день} few {{count} дні} many {{count} днів} other {{count} днів}}",
   "@count_days": {

@@ -50,7 +50,6 @@ void main() {
       'appStyle',
       int.parse(Platform.environment['DEMO_STYLE'] ?? '0'),
     );
-    await LocalStore.writeSetting('profileName', 'InlitX');
     await LocalStore.writeSetting('focusEnabled', true);
     await LocalStore.writeSetting('notesEnabled', true);
     await LocalStore.writeSetting('todosEnabled', true);

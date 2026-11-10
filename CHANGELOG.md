@@ -3,6 +3,33 @@
 All notable changes to Flow-tracker are recorded here. Versions follow
 [Semantic Versioning](https://semver.org/), and each release is tagged `vX.Y.Z`.
 
+## 1.5.0 — creator identity and settings polish
+
+### Changed
+
+- **Creator identity is now Umaiz Sufiyan throughout.** The About screen credits
+  read "Created by Umaiz Sufiyan", the developer line shows the name rather than
+  a handle, and the app style formerly labelled "Express" is now "Modern" to
+  match the Classic / Modern / Minimal wording.
+- The profile placeholder was the previous author's name. It is now a neutral
+  "You", so a fresh install never presents someone else's name as the user's own.
+  The placeholder was dropped from the other locales rather than translated,
+  because it was never a translation.
+
+### Fixed
+
+- Removed the last hardcoded occurrence of the previous author's name, which sat
+  in the demo-seed test as a profile name. The profile name still defaults to
+  empty and stays fully editable, independently of the developer credit.
+
+### Unchanged, on purpose
+
+- "Based on Streak by InlitX" stays on the About screen, in the licence notice,
+  in `NOTICE.md` and in `ADDITIONAL_TERMS.md`. The GPL section 7 additional terms
+  require that attribution on any work derived from Streak; removing it would
+  break the licence this project is distributed under. It is an upstream credit,
+  not a creator credit, and it is the only place the name still appears.
+
 ## 1.4.0 — liquid glass, second pass
 
 Reworked against the supplied reference. The first attempt put a solid,
