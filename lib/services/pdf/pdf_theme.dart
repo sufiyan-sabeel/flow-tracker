@@ -140,23 +140,37 @@ class PdfStyle {
   pw.ThemeData get documentTheme =>
       pw.ThemeData.withFont(base: _base, bold: _bold);
 
-  pw.TextStyle get title => pw.TextStyle(
+  pw.TextStyle get coverTitle => pw.TextStyle(
     font: _bold,
-    fontSize: 26,
+    fontSize: 30,
     color: theme.ink,
-    lineSpacing: 2,
+    lineSpacing: 3,
+  );
+
+  pw.TextStyle get wordmark => pw.TextStyle(
+    font: _bold,
+    fontSize: 15,
+    color: theme.ink,
+    letterSpacing: 0.2,
+  );
+
+  pw.TextStyle get lead => pw.TextStyle(
+    font: _base,
+    fontSize: 11,
+    color: theme.muted,
+    lineSpacing: 3,
   );
 
   pw.TextStyle get h1 => pw.TextStyle(
     font: _bold,
-    fontSize: 17,
+    fontSize: 18.5,
     color: theme.ink,
-    lineSpacing: 1.5,
+    lineSpacing: 2,
   );
 
   pw.TextStyle get h2 => pw.TextStyle(
     font: _bold,
-    fontSize: 12.5,
+    fontSize: 13,
     color: theme.ink,
   );
 
@@ -164,16 +178,36 @@ class PdfStyle {
     font: _base,
     fontSize: 10,
     color: theme.ink,
-    lineSpacing: 1.4,
+    lineSpacing: 1.6,
   );
 
   pw.TextStyle get small => pw.TextStyle(
     font: _base,
-    fontSize: 8.5,
+    fontSize: 9,
     color: theme.muted,
+    lineSpacing: 1.4,
+  );
+
+  pw.TextStyle get table => pw.TextStyle(
+    font: _base,
+    fontSize: 8.5,
+    color: theme.ink,
   );
 
   pw.TextStyle get caption => pw.TextStyle(
+    font: _base,
+    fontSize: 8,
+    color: theme.muted,
+  );
+
+  pw.TextStyle get metaLabel => pw.TextStyle(
+    font: _bold,
+    fontSize: 7.5,
+    color: theme.muted,
+    letterSpacing: 0.6,
+  );
+
+  pw.TextStyle get footer => pw.TextStyle(
     font: _base,
     fontSize: 7.5,
     color: theme.muted,
@@ -181,13 +215,13 @@ class PdfStyle {
 
   pw.TextStyle get stat => pw.TextStyle(
     font: _bold,
-    fontSize: 18,
+    fontSize: 19,
     color: theme.ink,
   );
 
   pw.TextStyle get accentStat => pw.TextStyle(
     font: _bold,
-    fontSize: 18,
+    fontSize: 20,
     color: theme.accent,
   );
 }

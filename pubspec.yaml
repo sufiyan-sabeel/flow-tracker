@@ -3,7 +3,7 @@ description: "Flow-tracker: a private, offline habit tracker that helps you buil
 
 publish_to: 'none'
 
-version: 1.6.0+8
+version: 1.7.0+9
 
 environment:
   sdk: ^3.9.2
@@ -74,6 +74,7 @@ flutter:
   assets:
     - assets/profile_default.jpg
     - assets/icon.png
+    - assets/icon_foreground.png
     - assets/sounds/
     - assets/backgrounds/
     - assets/island/

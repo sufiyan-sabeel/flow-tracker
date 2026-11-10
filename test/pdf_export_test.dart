@@ -299,4 +299,96 @@ void main() {
       }
     }
   });
+  group('the calculation bugs from the reported screenshot', () {
+    testWidgets(
+      'all history starts at the first real record, not the year 2000',
+      (
+        tester,
+      ) async {
+        await seedHabits(tester, [
+          testHabit(id: 'a', name: 'Read', daysOld: 5, done: lastDays(2)),
+        ]);
+        final data = ReportData.load(
+          from: DateTime(2000),
+          to: today,
+          today: today,
+        );
+        // a habit created five days ago cannot have a 9,000-day denominator
+        expect(data.from.isAfter(DateTime(2000)), isTrue);
+        expect(data.from, today.subtract(const Duration(days: 5)));
+        expect(data.scheduledTotal, lessThan(30));
+      },
+    );
+
+    testWidgets('a habit is only counted from the day it was created', (
+      tester,
+    ) async {
+      await seedHabits(tester, [
+        testHabit(id: 'new', name: 'New habit', daysOld: 3, done: lastDays(1)),
+      ]);
+      final data = ReportData.load(
+        from: today.subtract(const Duration(days: 29)),
+        to: today,
+        today: today,
+      );
+      // 4 days exist (creation day to today), not 30
+      expect(data.habits.single.scheduled, 4);
+      expect(data.habits.single.completed, 1);
+    });
+
+    testWidgets('one completion is not reported as 0%', (tester) async {
+      await seedHabits(tester, [
+        testHabit(id: 'a', name: 'Read', daysOld: 0, done: lastDays(1)),
+      ]);
+      final data = ReportData.load(from: today, to: today, today: today);
+      expect(data.scheduledTotal, 1);
+      expect(data.completedTotal, 1);
+      expect(data.percent, 1.0);
+      expect(data.trackedDays, 1);
+      expect(data.days, 1);
+    });
+
+    testWidgets('tracked days never exceed the days in the period', (
+      tester,
+    ) async {
+      await seedHabits(tester, [
+        testHabit(id: 'a', name: 'Read', daysOld: 90, done: lastDays(40)),
+      ]);
+      final data = ReportData.load(
+        from: today.subtract(const Duration(days: 9)),
+        to: today,
+        today: today,
+      );
+      expect(data.trackedDays, lessThanOrEqualTo(data.days));
+      expect(data.trackedDays, 10);
+    });
+
+    testWidgets('completions on unscheduled days are counted as entries only', (
+      tester,
+    ) async {
+      // a Monday-only habit completed on a day that is not Monday
+      var otherDay = today;
+      while (otherDay.weekday == DateTime.monday) {
+        otherDay = otherDay.subtract(const Duration(days: 1));
+      }
+      await seedHabits(tester, [
+        testHabit(
+          id: 'w',
+          name: 'Weekly review',
+          daysOld: 60,
+          interval: HabitInterval.weekdays,
+          scheduleWeekdays: const [1],
+          done: [otherDay],
+        ),
+      ]);
+      final data = ReportData.load(
+        from: today.subtract(const Duration(days: 6)),
+        to: today,
+        today: today,
+      );
+      expect(data.entries, 1);
+      expect(data.completedTotal, 0);
+      expect(data.habits.single.entries, 1);
+    });
+  });
 }

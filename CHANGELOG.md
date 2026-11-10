@@ -3,6 +3,42 @@
 All notable changes to Flow-tracker are recorded here. Versions follow
 [Semantic Versioning](https://semver.org/), and each release is tagged `vX.Y.Z`.
 
+## 1.7.0 — brand identity and report corrections
+
+### Fixed
+
+- **The reported statistics are correct now.** "All history" no longer starts at
+  the year 2000: it starts at your earliest real record, so a report no longer
+  divides one completion by nine thousand scheduled days and prints 0%. A habit
+  is also only counted from the day it was created, so a habit added last week
+  is not marked down for the weeks before it existed.
+- Completions logged on a day a habit was not scheduled are reported as
+  *entries*, separately from scheduled wins, instead of distorting the rate.
+- The statistics labels no longer read "Best current streak"; the cards are
+  Current streak, Best streak, Scheduled days done, Completions logged, Days
+  tracked and Consistency.
+- The date range shown on the export screen no longer prints a placeholder year
+  for "all history".
+
+### Changed
+
+- **PDF covers are redesigned**: the official Flow-tracker mark, wordmark and a
+  report category chip at the top; a 30 pt title with a descriptive subtitle;
+  reporting period, generation time and design in a metadata row; headline
+  numbers; an "Inside this report" contents strip; a short note explaining how
+  the figures are calculated; and a footer with the creator credit and version.
+- **The real logo replaces the orange square** in every PDF, in the header of
+  every content page as well as the cover. The transparent mark is now bundled
+  with the app so the document can embed it offline.
+- **Typography and spacing follow a documented scale**: 30 pt cover title,
+  18.5 pt section titles, 13 pt subsections, 10 pt body, 8.5 pt tables, 8 pt
+  metadata, 7.5 pt footers, with 44 pt margins and consistent card and cell
+  padding.
+- **Tables alternate row shading and repeat their header** every 20 rows, so a
+  long table is readable across pages instead of continuing headless.
+- Charts gained a habit-completion bar set alongside daily activity and category
+  breakdowns.
+
 ## 1.6.0 — offline PDF reports
 
 ### Added

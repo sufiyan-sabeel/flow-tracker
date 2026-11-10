@@ -24,6 +24,39 @@ extension PdfExportTypeInfo on PdfExportType {
     PdfExportType.yearly => 'Yearly summary',
   };
 
+  /// Short label for the cover, e.g. "HABITS".
+  String get category => switch (this) {
+    PdfExportType.complete => 'COMPLETE',
+    PdfExportType.habitProgress => 'HABITS',
+    PdfExportType.habitHistory => 'HISTORY',
+    PdfExportType.statistics => 'STATISTICS',
+    PdfExportType.todos => 'TO-DOS',
+    PdfExportType.focus => 'FOCUS',
+    PdfExportType.monthly => 'MONTHLY',
+    PdfExportType.yearly => 'YEARLY',
+  };
+
+  /// The one-line description printed under the cover title.
+  String get blurb => switch (this) {
+    PdfExportType.complete =>
+      'Every habit, to-do and focus session in the period, with the numbers '
+          'behind them.',
+    PdfExportType.habitProgress =>
+      'How each habit is progressing: scheduled days, completions and streaks.',
+    PdfExportType.habitHistory =>
+      'A dated record of what was logged, day by day, with an activity map.',
+    PdfExportType.statistics =>
+      'Completion rates, consistency, streaks and the shape of your activity.',
+    PdfExportType.todos =>
+      'The tasks that were planned in this period, and which of them closed.',
+    PdfExportType.focus =>
+      'Focus sessions with duration, target and whether each ran to the end.',
+    PdfExportType.monthly =>
+      'A month at a glance: progress, streaks and activity.',
+    PdfExportType.yearly =>
+      'The year so far: consistency, streaks and momentum.',
+  };
+
   /// Used in the file name, e.g. `FlowTracker_Habit_Progress_2026-11-10.pdf`.
   String get fileStem => switch (this) {
     PdfExportType.complete => 'Complete_Report',

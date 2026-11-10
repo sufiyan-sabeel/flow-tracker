@@ -14,16 +14,28 @@ class HabitLine {
     required this.category,
     required this.scheduled,
     required this.completed,
+    required this.entries,
     required this.currentStreak,
     required this.bestStreak,
+    required this.firstDay,
   });
 
   final String name;
   final String category;
+
+  /// Days this habit was scheduled *and* the habit already existed.
   final int scheduled;
+
+  /// Scheduled days that were actually completed.
   final int completed;
+
+  /// Completion records logged, including any on unscheduled days.
+  final int entries;
   final int currentStreak;
   final int bestStreak;
+
+  /// First day this habit counted towards the report (creation, or window start).
+  final DateTime firstDay;
 
   double get percent => scheduled == 0 ? 0 : completed / scheduled;
 }
@@ -41,8 +53,15 @@ class HistoryRow {
   final double count;
 }
 
-/// Everything a report needs, calculated from the local database once, so the
-/// document builder never touches storage and never re-queries.
+/// Everything a report needs, calculated once from the local database.
+///
+/// Two rules keep the numbers honest, and both were wrong in the first version:
+///
+/// 1. A habit only counts from the day it was created. A habit made last week is
+///    not "missing" for the previous three weeks.
+/// 2. The "all history" range starts at the earliest real record, not at a
+///    hard-coded year. Otherwise the denominator becomes thousands of days and
+///    every completion rate collapses to 0%.
 class ReportData {
   ReportData({
     required this.from,
@@ -53,6 +72,8 @@ class ReportData {
     required this.notes,
     required this.dailyCounts,
     required this.categoryTotals,
+    required this.entries,
+    required this.historyStart,
   });
 
   final DateTime from;
@@ -62,11 +83,17 @@ class ReportData {
   final List<FocusSession> focus;
   final List<HabitNote> notes;
 
-  /// dayKey → completions logged that day, inside the window.
+  /// dayKey → scheduled completions logged that day, inside the window.
   final Map<String, int> dailyCounts;
 
   /// Category name → completions, inside the window.
   final Map<String, int> categoryTotals;
+
+  /// Every completion record in the window, including unscheduled days.
+  final int entries;
+
+  /// The earliest record in the whole database; the floor for "all history".
+  final DateTime? historyStart;
 
   int get days => to.difference(from).inDays + 1;
 
@@ -103,14 +130,10 @@ class ReportData {
   bool get isEmpty =>
       habits.isEmpty && todos.isEmpty && focus.isEmpty && notes.isEmpty;
 
-  /// The heaviest day in the window, used to scale charts.
   int get peakDay =>
       dailyCounts.isEmpty ? 0 : dailyCounts.values.reduce(math.max);
 
   /// Reads the real database and aggregates [from]..[to] (inclusive).
-  ///
-  /// Habits are counted only on days they are scheduled for, so a weekly habit
-  /// is not marked down for the other six days.
   static ReportData load({
     required DateTime from,
     required DateTime to,
@@ -124,35 +147,73 @@ class ReportData {
       for (final category in LocalStore.readCategories()) category.id: category,
     };
 
-    final start = DateTime(from.year, from.month, from.day);
-    final end = DateTime(to.year, to.month, to.day);
-    final todayDay = today ?? DateTime.now();
-    final now = DateTime(todayDay.year, todayDay.month, todayDay.day);
+    DateTime day(DateTime d) => DateTime(d.year, d.month, d.day);
+    final todayDay = day(today ?? DateTime.now());
+    var start = day(from);
+    final end = day(to).isAfter(todayDay) ? todayDay : day(to);
+
+    // The earliest thing that actually exists, so "all history" cannot start
+    // before the user's first record.
+    DateTime? earliest;
+    void consider(DateTime? candidate) {
+      if (candidate == null) return;
+      final d = day(candidate);
+      if (d.isAfter(todayDay)) return;
+      if (earliest == null || d.isBefore(earliest!)) earliest = d;
+    }
+
+    for (final habit in store.values) {
+      consider(habit.createdAt);
+      for (final key in habit.completions.keys) {
+        consider(DateTime.tryParse(key));
+      }
+    }
+    for (final todo in todos) {
+      consider(DateTime.tryParse(todo.date));
+    }
+    for (final session in focus) {
+      consider(session.startedAt);
+    }
+
+    if (earliest != null && start.isBefore(earliest!)) start = earliest!;
+    if (start.isAfter(end)) start = end;
 
     final lines = <HabitLine>[];
     final daily = <String, int>{};
     final byCategory = <String, int>{};
+    var entries = 0;
 
     for (final habit in store.values) {
+      final created = day(habit.createdAt);
+      // a habit cannot be scheduled before it existed
+      var cursor = created.isAfter(start) ? created : start;
+      final firstDay = cursor;
       var scheduled = 0;
       var completed = 0;
-      var day = start;
-      while (!day.isAfter(end)) {
-        if (!day.isAfter(now) && habit.isScheduledOn(day)) {
+      var habitEntries = 0;
+
+      while (!cursor.isAfter(end)) {
+        final key = cursor.dayKey;
+        final record = habit.completions[key];
+        if (record != null) {
+          habitEntries++;
+          entries++;
+        }
+        if (habit.isScheduledOn(cursor)) {
           scheduled++;
-          final done = habit.completions.containsKey(day.dayKey);
-          if (done) {
+          if (record != null) {
             completed++;
-            daily.update(day.dayKey, (n) => n + 1, ifAbsent: () => 1);
+            daily.update(key, (n) => n + 1, ifAbsent: () => 1);
             final name = habit.category.isEmpty
                 ? 'Uncategorised'
                 : categories[habit.category]?.name ?? 'Uncategorised';
             byCategory.update(name, (n) => n + 1, ifAbsent: () => 1);
           }
         }
-        day = day.add(const Duration(days: 1));
+        cursor = cursor.add(const Duration(days: 1));
       }
-      if (scheduled == 0 && completed == 0) continue;
+
+      if (scheduled == 0 && habitEntries == 0) continue;
       lines.add(
         HabitLine(
           name: habit.name,
@@ -161,8 +222,10 @@ class ReportData {
               : categories[habit.category]?.name ?? '—',
           scheduled: scheduled,
           completed: completed,
+          entries: habitEntries,
           currentStreak: habit.currentStreak,
           bestStreak: habit.longestStreak,
+          firstDay: firstDay,
         ),
       );
     }
@@ -172,24 +235,20 @@ class ReportData {
     final todosInRange = todos.where((todo) {
       final parsed = DateTime.tryParse(todo.date);
       if (parsed == null) return false;
-      final day = DateTime(parsed.year, parsed.month, parsed.day);
-      return !day.isBefore(start) && !day.isAfter(end);
+      final d = day(parsed);
+      return !d.isBefore(start) && !d.isAfter(end);
     }).toList()..sort((a, b) => b.date.compareTo(a.date));
 
     final focusInRange = focus.where((session) {
-      final day = DateTime(
-        session.startedAt.year,
-        session.startedAt.month,
-        session.startedAt.day,
-      );
-      return !day.isBefore(start) && !day.isAfter(end);
+      final d = day(session.startedAt);
+      return !d.isBefore(start) && !d.isAfter(end);
     }).toList()..sort((a, b) => b.startedAt.compareTo(a.startedAt));
 
     final notesInRange = notes.where((note) {
       final parsed = DateTime.tryParse(note.date);
       if (parsed == null) return false;
-      final day = DateTime(parsed.year, parsed.month, parsed.day);
-      return !day.isBefore(start) && !day.isAfter(end);
+      final d = day(parsed);
+      return !d.isBefore(start) && !d.isAfter(end);
     }).toList()..sort((a, b) => b.date.compareTo(a.date));
 
     return ReportData(
@@ -201,6 +260,8 @@ class ReportData {
       notes: notesInRange,
       dailyCounts: daily,
       categoryTotals: byCategory,
+      entries: entries,
+      historyStart: earliest,
     );
   }
 
@@ -208,8 +269,7 @@ class ReportData {
   /// a sensible size.
   List<HistoryRow> history({int limit = 400}) {
     final rows = <HistoryRow>[];
-    final store = LocalStore.readHabits();
-    for (final habit in store.values) {
+    for (final habit in LocalStore.readHabits().values) {
       for (final entry in habit.completions.entries) {
         final parsed = DateTime.tryParse(entry.key);
         if (parsed == null) continue;

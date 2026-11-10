@@ -38,6 +38,12 @@ class PdfExportService {
       await rootBundle.load('fonts/Figtree-Regular.ttf'),
     );
     final bold = pw.Font.ttf(await rootBundle.load('fonts/Figtree-Bold.ttf'));
+    // the same mark as the launcher icon, so the report carries the product
+    final logo = pw.MemoryImage(
+      (await rootBundle.load(
+        'assets/icon_foreground.png',
+      )).buffer.asUint8List(),
+    );
     final style = PdfStyle(
       PdfTheme.of(options.theme, options.accent),
       base: base,
@@ -49,6 +55,7 @@ class PdfExportService {
       style: style,
       generatedAt: today ?? DateTime.now(),
       version: version,
+      logo: logo,
     );
     return builder.build().save();
   }

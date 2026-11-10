@@ -181,7 +181,9 @@ class _PdfExportPageState extends State<PdfExportPage> {
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
-                            '${_fmt(resolved.from)} → ${_fmt(resolved.to)}',
+                            _range == PdfDateRange.all
+                                ? 'All history, from your first record'
+                                : '${_fmt(resolved.from)} → ${_fmt(resolved.to)}',
                             style: TextStyle(
                               fontSize: 12.5,
                               fontWeight: FontWeight.w600,
