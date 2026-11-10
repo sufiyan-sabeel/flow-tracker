@@ -3,6 +3,26 @@
 All notable changes to Flow-tracker are recorded here. Versions follow
 [Semantic Versioning](https://semver.org/), and each release is tagged `vX.Y.Z`.
 
+## 1.2.0 — new app icon
+
+### Changed
+
+- New Flow-tracker logo: a woven ribbon that runs from blue through green and
+  violet into orange and red, finished with a check mark. It replaces the
+  earlier placeholder mark everywhere it appears — launcher icon, adaptive and
+  monochrome icon, splash screen, the About screen, share cards, the README
+  banner and the social preview.
+- The launcher icon now ships as a full-bleed dark tile (#0D0D0D) matching the
+  splash background, so the app has no white flash between tapping the icon and
+  the first frame.
+
+### Notes
+
+- The artwork was supplied as a single 2048 px PNG with a white surround; the
+  white was keyed out, the tile was cropped to its rounded square and the mark
+  was lifted onto transparency for the adaptive foreground. No other part of the
+  interface changed.
+
 ## 1.1.0 — colour customisation
 
 ### Added
