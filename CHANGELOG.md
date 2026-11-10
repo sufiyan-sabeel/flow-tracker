@@ -3,6 +3,42 @@
 All notable changes to Flow-tracker are recorded here. Versions follow
 [Semantic Versioning](https://semver.org/), and each release is tagged `vX.Y.Z`.
 
+## 1.3.0 — liquid glass navigation
+
+### Changed
+
+- The bottom navigation bar is now a floating liquid-glass dock: a rounded,
+  translucent pill with a backdrop blur, a hairline border and a soft ambient
+  shadow. It sits above the system navigation bar and keeps the same five
+  destinations — Today, To-Do, Plan, Stats, Settings.
+- The active destination is marked by a glass capsule that slides between slots
+  over 340 ms with `easeInOutCubic`; the icon tints, scales to 1.08 and its label
+  gains weight over 210 ms, so colour and size settle together instead of
+  snapping.
+- The dock reads its accent from `ColorScheme.primary`, so it follows the accent
+  chosen in Appearance & Personalization — presets, hex colours and the AMOLED
+  surface — with no hardcoded colour anywhere in the component.
+- Glass is drawn once per dock. When the existing "glass effects" setting is off
+  the blur node is skipped entirely and the tint carries the surface; when
+  animations are disabled in-app or by the platform, the capsule jumps instead of
+  sliding and the labels fold instantly.
+
+### Removed
+
+- `lib/app/classic_nav_bar.dart`, replaced by `lib/app/liquid_nav_bar.dart`.
+
+### Fixed
+
+- The navigation buttons expose a tap action to screen readers again: the new
+  semantics wrapper is a button with a selected state *and* an action, which
+  `accessibility_test.dart` checks.
+
+### Notes
+
+- 11 new tests cover destination taps, capsule position and timing, accent
+  propagation across five colours, light/dark/AMOLED, label folding, a 320 dp
+  screen, reduced motion, the blur fallback and the single-blur-node budget.
+
 ## 1.2.0 — new app icon
 
 ### Changed

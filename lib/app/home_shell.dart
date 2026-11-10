@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:flow_tracker/app/theme/app_tokens.dart';
-import 'package:flow_tracker/app/classic_nav_bar.dart';
+import 'package:flow_tracker/app/liquid_nav_bar.dart';
 import 'package:flow_tracker/core/express/express_nav.dart';
 import 'package:flow_tracker/core/express/express_shapes.dart';
 import 'package:flow_tracker/core/express/express_surface.dart';
@@ -394,10 +394,13 @@ class _HomeShellState extends State<HomeShell>
                         index: tabs.indexOf(current),
                         onSelect: (i) => _select(tabs, tabs[i]),
                       )
-                    : ClassicNavBar(
+                    : LiquidGlassNavBar(
                         items: [
                           for (final tab in tabs)
-                            (icon: _iconOf(tab), label: _labelOf(context, tab)),
+                            LiquidNavItem(
+                              icon: _iconOf(tab),
+                              label: _labelOf(context, tab),
+                            ),
                         ],
                         index: tabs.indexOf(current),
                         onSelect: (i) => _select(tabs, tabs[i]),

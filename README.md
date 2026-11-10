@@ -70,6 +70,8 @@ the same app rather than a stranger wearing its clothes.
   preview of buttons, progress, switches and a habit card before you commit
 - Reset to the shipped colour in one tap
 - Full colour themes and a custom per-surface palette for people who want more
+- A floating liquid-glass navigation dock with a sliding capsule, drawn from
+  the theme accent and backed by a single blur node
 - 28 languages, adjustable text size, and animation controls
 
 **Your data**
@@ -140,7 +142,7 @@ lib/
   services/     notifications, backup, import/export, widgets, folder sync
   l10n/         ARB sources and generated localisations
 android/        Flutter Android host, Kotlin/Glance home-screen widgets
-test/           70 test files covering logic, widgets and storage
+test/           71 test files covering logic, widgets and storage
 ```
 
 - **State**: `provider` with `ChangeNotifier` controllers per feature.
