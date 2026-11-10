@@ -449,7 +449,11 @@ jobs:
           # with "tar: stdout: write error" before the package is finished
           dpkg-deb -Zgzip --build --root-owner-group "$root" \
             "out/Flow-Tracker-${version}-Linux-amd64.deb"
-          dpkg-deb --info "out/Flow-Tracker-${version}-Linux-amd64.deb" | head -20
+          # no pipe to head here: SIGPIPE from head plus `set -o pipefail` fails
+          # the step even though the package was built correctly
+          dpkg-deb --info "out/Flow-Tracker-${version}-Linux-amd64.deb" > /dev/null
+          dpkg-deb --field "out/Flow-Tracker-${version}-Linux-amd64.deb" \
+            Package Version Architecture
           dpkg-deb --contents "out/Flow-Tracker-${version}-Linux-amd64.deb" | grep -q 'opt/flow-tracker/flow-tracker' \
             || { echo "::error::DEB is missing the app binary"; exit 1; }
 
