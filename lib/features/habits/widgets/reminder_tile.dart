@@ -43,7 +43,9 @@ class ReminderTile extends StatelessWidget {
 
   String _dayNames(BuildContext context) {
     if (followsHabit) return context.l10n.reminder_habit_days;
-    if (reminder.isInterval) return context.l10n.every_n_days(reminder.everyDays);
+    if (reminder.isInterval) {
+      return context.l10n.every_n_days(reminder.everyDays);
+    }
     if (reminder.days.length == 7) return context.l10n.every_day;
     if (reminder.days.isEmpty) return context.l10n.no_days;
     final names = WeekdayLabels.shortMonFirst(
@@ -98,7 +100,11 @@ class ReminderTile extends StatelessWidget {
             onPressed: onEdit,
           ),
           IconButton(
-            icon: Icon(LucideIcons.trash2, color: context.tokens.danger, size: 18),
+            icon: Icon(
+              LucideIcons.trash2,
+              color: context.tokens.danger,
+              size: 18,
+            ),
             onPressed: onDelete,
           ),
         ],

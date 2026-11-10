@@ -128,45 +128,55 @@ class ShareMonthPage extends StatelessWidget {
                       child: Row(
                         children: [
                           for (var d = 0; d < 7; d++)
-                            Builder(builder: (_) {
-                              final date = first.add(Duration(days: w * 7 + d));
-                              final inMonth = date.month == month.month &&
-                                  date.year == month.year;
-                              final fill = inMonth
-                                  ? shareDayFill(habit, date, accent)
-                                  : Colors.transparent;
-                              final filled = fill != Colors.transparent;
-                              return SizedBox(
-                                width: column,
-                                child: Center(
-                                  child: Container(
-                                    width: side,
-                                    height: side,
-                                    alignment: Alignment.center,
-                                    decoration: BoxDecoration(
-                                      color: fill,
-                                      borderRadius:
-                                          BorderRadius.circular(side * 0.3),
-                                    ),
-                                    child: Text(
-                                      inMonth ? '${date.day}' : '',
-                                      style: TextStyle(
-                                        fontSize: (side * 0.44).clamp(8.0, 16.0),
-                                        fontWeight: filled
-                                            ? FontWeight.w700
-                                            : FontWeight.w500,
-                                        color: filled
-                                            ? (fill.computeLuminance() > 0.6
-                                                ? Colors.black
-                                                : Colors.white)
-                                            : Colors.white
-                                                .withValues(alpha: 0.4),
+                            Builder(
+                              builder: (_) {
+                                final date = first.add(
+                                  Duration(days: w * 7 + d),
+                                );
+                                final inMonth =
+                                    date.month == month.month &&
+                                    date.year == month.year;
+                                final fill = inMonth
+                                    ? shareDayFill(habit, date, accent)
+                                    : Colors.transparent;
+                                final filled = fill != Colors.transparent;
+                                return SizedBox(
+                                  width: column,
+                                  child: Center(
+                                    child: Container(
+                                      width: side,
+                                      height: side,
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                        color: fill,
+                                        borderRadius: BorderRadius.circular(
+                                          side * 0.3,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        inMonth ? '${date.day}' : '',
+                                        style: TextStyle(
+                                          fontSize: (side * 0.44).clamp(
+                                            8.0,
+                                            16.0,
+                                          ),
+                                          fontWeight: filled
+                                              ? FontWeight.w700
+                                              : FontWeight.w500,
+                                          color: filled
+                                              ? (fill.computeLuminance() > 0.6
+                                                    ? Colors.black
+                                                    : Colors.white)
+                                              : Colors.white.withValues(
+                                                  alpha: 0.4,
+                                                ),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              );
-                            }),
+                                );
+                              },
+                            ),
                         ],
                       ),
                     ),
@@ -212,7 +222,8 @@ class ShareWeekPage extends StatelessWidget {
       children: [
         SharePanelHeader(
           habit: habit,
-          title: '${start.day} – ${end.day} '
+          title:
+              '${start.day} – ${end.day} '
               '${DateFormat.MMM(locale).format(end)}',
           subtitle: '${end.year}',
           width: width,
@@ -222,8 +233,9 @@ class ShareWeekPage extends StatelessWidget {
           child: LayoutBuilder(
             builder: (context, box) {
               final column = box.maxWidth / 7;
-              final side =
-                  (column * 0.8).clamp(0.0, box.maxHeight * 0.62).toDouble();
+              final side = (column * 0.8)
+                  .clamp(0.0, box.maxHeight * 0.62)
+                  .toDouble();
 
               return Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -243,35 +255,38 @@ class ShareWeekPage extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: side * 0.24),
-                          Builder(builder: (_) {
-                            final date = start.add(Duration(days: i));
-                            final fill = shareDayFill(habit, date, accent);
-                            final filled = fill != Colors.transparent;
-                            return Container(
-                              width: side,
-                              height: side,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: filled
-                                    ? fill
-                                    : Colors.white.withValues(alpha: 0.07),
-                                borderRadius:
-                                    BorderRadius.circular(side * 0.3),
-                              ),
-                              child: Text(
-                                '${date.day}',
-                                style: TextStyle(
-                                  fontSize: side * 0.36,
-                                  fontWeight: FontWeight.w700,
+                          Builder(
+                            builder: (_) {
+                              final date = start.add(Duration(days: i));
+                              final fill = shareDayFill(habit, date, accent);
+                              final filled = fill != Colors.transparent;
+                              return Container(
+                                width: side,
+                                height: side,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
                                   color: filled
-                                      ? (fill.computeLuminance() > 0.6
-                                          ? Colors.black
-                                          : Colors.white)
-                                      : Colors.white.withValues(alpha: 0.45),
+                                      ? fill
+                                      : Colors.white.withValues(alpha: 0.07),
+                                  borderRadius: BorderRadius.circular(
+                                    side * 0.3,
+                                  ),
                                 ),
-                              ),
-                            );
-                          }),
+                                child: Text(
+                                  '${date.day}',
+                                  style: TextStyle(
+                                    fontSize: side * 0.36,
+                                    fontWeight: FontWeight.w700,
+                                    color: filled
+                                        ? (fill.computeLuminance() > 0.6
+                                              ? Colors.black
+                                              : Colors.white)
+                                        : Colors.white.withValues(alpha: 0.45),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                         ],
                       ),
                     ),
@@ -373,24 +388,34 @@ class ShareYearPage extends StatelessWidget {
                                   padding: EdgeInsets.only(
                                     bottom: r == 6 ? 0 : gap,
                                   ),
-                                  child: Builder(builder: (_) {
-                                    final date = anchor.subtract(
-                                      Duration(days: 7 * (columns - 1 - c) - r),
-                                    );
-                                    final fill = shareDayFill(habit, date, accent);
-                                    return Container(
-                                      width: cell,
-                                      height: cell,
-                                      decoration: BoxDecoration(
-                                        color: fill == Colors.transparent
-                                            ? Colors.white
-                                                .withValues(alpha: 0.06)
-                                            : fill,
-                                        borderRadius:
-                                            BorderRadius.circular(cell * 0.32),
-                                      ),
-                                    );
-                                  }),
+                                  child: Builder(
+                                    builder: (_) {
+                                      final date = anchor.subtract(
+                                        Duration(
+                                          days: 7 * (columns - 1 - c) - r,
+                                        ),
+                                      );
+                                      final fill = shareDayFill(
+                                        habit,
+                                        date,
+                                        accent,
+                                      );
+                                      return Container(
+                                        width: cell,
+                                        height: cell,
+                                        decoration: BoxDecoration(
+                                          color: fill == Colors.transparent
+                                              ? Colors.white.withValues(
+                                                  alpha: 0.06,
+                                                )
+                                              : fill,
+                                          borderRadius: BorderRadius.circular(
+                                            cell * 0.32,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
                             ],
                           ),

@@ -44,7 +44,11 @@ class MinimalDetailHeader extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 4),
-            child: HabitGlyph(glyph: habit.icon, color: habit.color.shownIn(context), size: 24),
+            child: HabitGlyph(
+              glyph: habit.icon,
+              color: habit.color.shownIn(context),
+              size: 24,
+            ),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -75,7 +79,11 @@ class MinimalDetailHeader extends StatelessWidget {
 }
 
 class MinimalStreakTiles extends StatelessWidget {
-  const MinimalStreakTiles({super.key, required this.habit, required this.mode});
+  const MinimalStreakTiles({
+    super.key,
+    required this.habit,
+    required this.mode,
+  });
 
   final Habit habit;
   final HeatmapMode mode;
@@ -99,16 +107,16 @@ class MinimalStreakTiles extends StatelessWidget {
             value: lastCheckLabel(context, habit, withTime: false),
           )
         else ...[
-        MinimalTile(
-          icon: LucideIcons.flame,
-          label: context.l10n.current_streak,
-          value: _format(context, habit.currentStreak),
-        ),
-        MinimalTile(
-          icon: LucideIcons.trophy,
-          label: context.l10n.best_streak,
-          value: _format(context, habit.longestStreak),
-        ),
+          MinimalTile(
+            icon: LucideIcons.flame,
+            label: context.l10n.current_streak,
+            value: _format(context, habit.currentStreak),
+          ),
+          MinimalTile(
+            icon: LucideIcons.trophy,
+            label: context.l10n.best_streak,
+            value: _format(context, habit.longestStreak),
+          ),
         ],
         MinimalTile(
           icon: negative ? LucideIcons.triangleAlert : LucideIcons.check,
@@ -181,8 +189,7 @@ class MinimalFocusRow extends StatelessWidget {
               _PlayButton(habit: habit, active: focus.isActive),
             ],
           ),
-          onTap: () =>
-              AppNavigator.push(FocusStatsPage(habitId: habit.id)),
+          onTap: () => AppNavigator.push(FocusStatsPage(habitId: habit.id)),
           last: true,
         ),
       ],
@@ -225,7 +232,11 @@ class _PlayButton extends StatelessWidget {
             color: minimalRaised(context),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(LucideIcons.play, size: 15, color: habit.color.shownIn(context)),
+          child: Icon(
+            LucideIcons.play,
+            size: 15,
+            color: habit.color.shownIn(context),
+          ),
         ),
       ),
     );
@@ -244,9 +255,7 @@ class MinimalVacationRow extends StatelessWidget {
         MinimalRow(
           label: context.l10n.vacation_mode,
           value: vacationSummary(context, habit),
-          tint: habit.isOnVacation
-              ? context.tokens.info
-              : context.tokens.muted,
+          tint: habit.isOnVacation ? context.tokens.info : context.tokens.muted,
           onTap: () => showVacationSheet(context, habit: habit),
           last: true,
         ),

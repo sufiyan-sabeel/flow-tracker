@@ -71,7 +71,8 @@ Future<void> showColorThemeSheet(BuildContext context) {
                     ),
                   _ThemeCard(
                     name: context.l10n.color_theme_custom,
-                    colors: (s.customTheme ?? current)?.of(brightness) ??
+                    colors:
+                        (s.customTheme ?? current)?.of(brightness) ??
                         _defaultColors(brightness, s.accentColor),
                     selected: current?.id == ColorTheme.customId,
                     editable: true,

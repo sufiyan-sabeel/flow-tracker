@@ -137,8 +137,9 @@ class IslandEntry extends StatelessWidget {
                                 value: done,
                                 minHeight: 5,
                                 color: _ink(dark),
-                                backgroundColor:
-                                    _ink(dark).withValues(alpha: 0.22),
+                                backgroundColor: _ink(
+                                  dark,
+                                ).withValues(alpha: 0.22),
                               ),
                             ),
                           ),

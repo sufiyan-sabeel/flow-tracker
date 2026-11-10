@@ -14,8 +14,9 @@ void announcePastCheck(
   bool wasDone,
 ) {
   if (!date.atMidnight.isBefore(AppClock.today())) return;
-  final day = DateFormat.MMMd(Localizations.localeOf(context).toString())
-      .format(date);
+  final day = DateFormat.MMMd(
+    Localizations.localeOf(context).toString(),
+  ).format(date);
   final l10n = context.l10n;
   AppSnackbar.action(
     context,

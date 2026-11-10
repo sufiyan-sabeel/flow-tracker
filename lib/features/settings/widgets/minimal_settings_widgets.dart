@@ -3,8 +3,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flow_tracker/app/theme/app_tokens.dart';
 import 'package:flow_tracker/core/extensions/inset_extensions.dart';
 import 'package:flow_tracker/core/widgets/sheet_type.dart';
-export 'package:flow_tracker/core/minimal/minimal_kit.dart'
-    show MinimalTitle;
+export 'package:flow_tracker/core/minimal/minimal_kit.dart' show MinimalTitle;
 
 import 'package:flow_tracker/core/minimal/minimal_kit.dart';
 import 'package:flow_tracker/core/utils/responsive.dart';
@@ -232,8 +231,11 @@ Future<void> showOptionSheet(
                                   ),
                                 ),
                                 if (i == index)
-                                  Icon(LucideIcons.check,
-                                      size: 18, color: context.colors.primary),
+                                  Icon(
+                                    LucideIcons.check,
+                                    size: 18,
+                                    color: context.colors.primary,
+                                  ),
                               ],
                             ),
                           ),

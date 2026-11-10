@@ -73,39 +73,39 @@ class _SwipeCheckState extends State<SwipeCheck>
   @override
   Widget build(BuildContext context) {
     if (widget.onSwipe == null) return widget.child;
-        return GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onHorizontalDragStart: _start,
-          onHorizontalDragUpdate: _drag,
-          onHorizontalDragEnd: _release,
-          onHorizontalDragCancel: () => _offset.animateTo(0),
-          child: AnimatedBuilder(
-            animation: _offset,
-            child: widget.child,
-            builder: (context, child) {
-              final moving = _offset.value != 0;
-              final armed = _armed;
-              return Stack(
-                children: [
-                  Positioned.fill(
-                    child: moving
-                        ? _Reveal(
-                            done: _wasDone,
-                            armed: armed,
-                            tint: widget.tint,
-                            corners: widget.corners,
-                          )
-                        : const SizedBox.shrink(),
-                  ),
-                  FractionalTranslation(
-                    translation: Offset(_offset.value, 0),
-                    child: child,
-                  ),
-                ],
-              );
-            },
-          ),
-        );
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onHorizontalDragStart: _start,
+      onHorizontalDragUpdate: _drag,
+      onHorizontalDragEnd: _release,
+      onHorizontalDragCancel: () => _offset.animateTo(0),
+      child: AnimatedBuilder(
+        animation: _offset,
+        child: widget.child,
+        builder: (context, child) {
+          final moving = _offset.value != 0;
+          final armed = _armed;
+          return Stack(
+            children: [
+              Positioned.fill(
+                child: moving
+                    ? _Reveal(
+                        done: _wasDone,
+                        armed: armed,
+                        tint: widget.tint,
+                        corners: widget.corners,
+                      )
+                    : const SizedBox.shrink(),
+              ),
+              FractionalTranslation(
+                translation: Offset(_offset.value, 0),
+                child: child,
+              ),
+            ],
+          );
+        },
+      ),
+    );
   }
 }
 

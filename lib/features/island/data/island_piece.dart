@@ -66,11 +66,12 @@ class IslandPiece {
   IslandSprite get sprite => islandSprites[art]!;
 
   String get kind => art.split('__').first;
-
 }
 
-final int islandTotalPrice =
-    islandPieces.fold(0, (sum, piece) => sum + piece.price);
+final int islandTotalPrice = islandPieces.fold(
+  0,
+  (sum, piece) => sum + piece.price,
+);
 
 List<IslandPiece> islandGroupPieces(IslandGroup group) =>
     islandPieces.where((piece) => piece.group == group).toList()
@@ -144,7 +145,8 @@ class IslandSpot {
   }
 
   Offset get footing {
-    var y = (gx + cols / 2 + gy + rows / 2) * islandTileH / 2 -
+    var y =
+        (gx + cols / 2 + gy + rows / 2) * islandTileH / 2 -
         piece.level * islandStep;
     if (art.flat) y += (cols + rows) * islandTileH / 4;
     return Offset((gx + cols / 2 - gy - rows / 2) * islandTileW / 2, y);

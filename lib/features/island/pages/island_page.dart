@@ -102,8 +102,9 @@ class _IslandPageState extends State<IslandPage> {
   Widget build(BuildContext context) {
     final island = context.watch<IslandController>();
     final habits = context.watch<HabitsController>();
-    final sessions =
-        context.select<FocusController, List<FocusSession>>((f) => f.sessions);
+    final sessions = context.select<FocusController, List<FocusSession>>(
+      (f) => f.sessions,
+    );
     final todos = context.read<TodosController>();
     _ledger = island.ledgerFor(
       habits.withArchived,
@@ -398,7 +399,9 @@ class _Footer extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
             ),
             child: Text(
-              complete ? context.l10n.island_complete : context.l10n.island_empty,
+              complete
+                  ? context.l10n.island_complete
+                  : context.l10n.island_empty,
               textAlign: TextAlign.center,
               style: sheetBodyStyle(context, size: 12.5),
             ),
@@ -474,7 +477,9 @@ class _NextChip extends StatelessWidget {
               const SizedBox(height: 2),
               IslandPrice(
                 value: piece.price,
-                tint: affordable ? context.colors.primary : context.tokens.muted,
+                tint: affordable
+                    ? context.colors.primary
+                    : context.tokens.muted,
               ),
             ],
           ),

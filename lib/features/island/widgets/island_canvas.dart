@@ -44,7 +44,11 @@ List<IslandCell> _cellsFor(int turn) {
     final gx = entry.key ~/ 1000;
     final gy = entry.key % 1000;
     var drop = 0.0;
-    for (final step in const [[1, 1], [1, 0], [0, 1]]) {
+    for (final step in const [
+      [1, 1],
+      [1, 0],
+      [0, 1],
+    ]) {
       final side = levels[(gx + step[0]) * 1000 + gy + step[1]];
       drop = math.max(drop, entry.value - (side ?? entry.value - 0.75));
     }
@@ -344,7 +348,8 @@ class IslandCanvasState extends State<IslandCanvas>
     for (final cell in islandCells[_turn]) {
       final kind = cell.tile.substring(0, cell.tile.lastIndexOf('_'));
       final cx = (cell.gx - cell.gy) * islandTileW / 2;
-      final top = (cell.gx + cell.gy) * islandTileH / 2 - cell.level * islandStep;
+      final top =
+          (cell.gx + cell.gy) * islandTileH / 2 - cell.level * islandStep;
       final half = islandTileW / 2;
       final mid = top + islandTileH / 2;
       final foot = top + islandTileH + cell.wall;
@@ -478,7 +483,8 @@ class IslandCanvasState extends State<IslandCanvas>
     return LayoutBuilder(
       builder: (context, constraints) {
         _layout(constraints.biggest);
-        final key = '${widget.owned.length}.${widget.ghost.toARGB32()}'
+        final key =
+            '${widget.owned.length}.${widget.ghost.toARGB32()}'
             '.${_rising?.id ?? ''}.$_turn';
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
@@ -602,7 +608,9 @@ class _IslandPainter extends CustomPainter {
         Paint()
           ..style = PaintingStyle.stroke
           ..strokeWidth = 6 * (1 - ring) + 1
-          ..color = const Color(0xFFFFE08A).withValues(alpha: 0.75 * (1 - ring)),
+          ..color = const Color(
+            0xFFFFE08A,
+          ).withValues(alpha: 0.75 * (1 - ring)),
       );
       canvas.restore();
       final bounds = spot.bounds;

@@ -52,14 +52,20 @@ class _ReminderEditorSheetState extends State<ReminderEditorSheet> {
     final initial = widget.initial;
     _time = initial != null
         ? TimeOfDay(hour: initial.hour, minute: initial.minute)
-        : TimeOfDay.fromDateTime(DateTime.now().add(const Duration(minutes: 1)));
+        : TimeOfDay.fromDateTime(
+            DateTime.now().add(const Duration(minutes: 1)),
+          );
     _days = initial != null ? {...initial.days} : {1, 2, 3, 4, 5, 6, 7};
     _message = TextEditingController(text: initial?.message ?? '');
     _intervalMode = !widget.followsHabit && (initial?.isInterval ?? false);
-    _everyDays = (initial != null && initial.isInterval) ? initial.everyDays : 2;
+    _everyDays = (initial != null && initial.isInterval)
+        ? initial.everyDays
+        : 2;
     _everyMinutes = initial?.everyMinutes ?? 0;
     final until = initial?.untilMinute;
-    if (until != null) _until = TimeOfDay(hour: until ~/ 60, minute: until % 60);
+    if (until != null) {
+      _until = TimeOfDay(hour: until ~/ 60, minute: until % 60);
+    }
     _snooze = initial?.snoozeMinutes ?? Reminder.defaultSnoozeMinutes;
   }
 
@@ -129,19 +135,22 @@ class _ReminderEditorSheetState extends State<ReminderEditorSheet> {
     final picked = await showDialog<int>(
       context: context,
       builder: (dialogContext) {
-        Widget field(TextEditingController c, String unit, {bool focus = false}) =>
-            Expanded(
-              child: TextField(
-                controller: c,
-                autofocus: focus,
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: InputDecoration(
-                  hintText: '0',
-                  suffixText: unit,
-                ),
-              ),
-            );
+        Widget field(
+          TextEditingController c,
+          String unit, {
+          bool focus = false,
+        }) => Expanded(
+          child: TextField(
+            controller: c,
+            autofocus: focus,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            decoration: InputDecoration(
+              hintText: '0',
+              suffixText: unit,
+            ),
+          ),
+        );
         return AlertDialog(
           title: Text(dialogContext.l10n.repeat_hours),
           content: Row(
@@ -277,8 +286,7 @@ class _ReminderEditorSheetState extends State<ReminderEditorSheet> {
                           label: mode.$2,
                           selected: _intervalMode == mode.$1,
                           expand: true,
-                          onTap: () =>
-                              setState(() => _intervalMode = mode.$1),
+                          onTap: () => setState(() => _intervalMode = mode.$1),
                         ),
                       ),
                     ],
@@ -309,33 +317,36 @@ class _ReminderEditorSheetState extends State<ReminderEditorSheet> {
                       )
               else ...[
                 if (!widget.followsHabit)
-                Wrap(
-                  spacing: minimal ? 7 : 8,
-                  runSpacing: minimal ? 7 : 8,
-                  children: [
-                    for (final preset in [
-                      (context.l10n.every_day, {1, 2, 3, 4, 5, 6, 7}),
-                      (context.l10n.weekdays, {1, 2, 3, 4, 5}),
-                      (context.l10n.weekends, {6, 7}),
-                    ])
-                      minimal
-                          ? CompactPill(
-                              label: preset.$1,
-                              selected: _days.length == preset.$2.length &&
-                                  _days.containsAll(preset.$2),
-                              onTap: () => _applyPreset(preset.$2),
-                            )
-                          : _PresetChip(
-                              label: preset.$1,
-                              onTap: () => _applyPreset(preset.$2),
-                            ),
-                  ],
-                ),
+                  Wrap(
+                    spacing: minimal ? 7 : 8,
+                    runSpacing: minimal ? 7 : 8,
+                    children: [
+                      for (final preset in [
+                        (context.l10n.every_day, {1, 2, 3, 4, 5, 6, 7}),
+                        (context.l10n.weekdays, {1, 2, 3, 4, 5}),
+                        (context.l10n.weekends, {6, 7}),
+                      ])
+                        minimal
+                            ? CompactPill(
+                                label: preset.$1,
+                                selected:
+                                    _days.length == preset.$2.length &&
+                                    _days.containsAll(preset.$2),
+                                onTap: () => _applyPreset(preset.$2),
+                              )
+                            : _PresetChip(
+                                label: preset.$1,
+                                onTap: () => _applyPreset(preset.$2),
+                              ),
+                    ],
+                  ),
                 if (!widget.followsHabit) ...[
-                const SizedBox(height: 16),
-                Text(context.l10n.days,
-                    style: sheetBodyStyle(context, size: 13)),
-                const SizedBox(height: 8),
+                  const SizedBox(height: 16),
+                  Text(
+                    context.l10n.days,
+                    style: sheetBodyStyle(context, size: 13),
+                  ),
+                  const SizedBox(height: 8),
                 ],
                 if (widget.followsHabit)
                   const SizedBox.shrink()
@@ -349,53 +360,59 @@ class _ReminderEditorSheetState extends State<ReminderEditorSheet> {
                     }),
                   )
                 else
-                Row(
-                  children: List.generate(7, (i) {
-                    final day = i + 1;
-                    final active = _days.contains(day);
-                    return Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.only(right: i == 6 ? 0 : 6),
-                        child: Semantics(
-                          button: true,
-                          selected: active,
-                          child: GestureDetector(
-                            onTap: () => setState(() {
-                              active ? _days.remove(day) : _days.add(day);
-                            }),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 160),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              decoration: BoxDecoration(
-                                color: active
-                                    ? scheme.primary
-                                    : scheme.surfaceContainerHighest,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  WeekdayLabels.shortMonFirst(
-                                    Localizations.localeOf(context).languageCode,
-                                  )[i],
-                                  style: TextStyle(
-                                    color: active
-                                        ? scheme.onPrimary
-                                        : context.tokens.muted,
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 12,
+                  Row(
+                    children: List.generate(7, (i) {
+                      final day = i + 1;
+                      final active = _days.contains(day);
+                      return Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(right: i == 6 ? 0 : 6),
+                          child: Semantics(
+                            button: true,
+                            selected: active,
+                            child: GestureDetector(
+                              onTap: () => setState(() {
+                                active ? _days.remove(day) : _days.add(day);
+                              }),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 160),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: active
+                                      ? scheme.primary
+                                      : scheme.surfaceContainerHighest,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    WeekdayLabels.shortMonFirst(
+                                      Localizations.localeOf(
+                                        context,
+                                      ).languageCode,
+                                    )[i],
+                                    style: TextStyle(
+                                      color: active
+                                          ? scheme.onPrimary
+                                          : context.tokens.muted,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 12,
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  }),
-                ),
+                      );
+                    }),
+                  ),
                 const SizedBox(height: 16),
-                Text(context.l10n.repeat_hours,
-                    style: sheetBodyStyle(context, size: 13)),
+                Text(
+                  context.l10n.repeat_hours,
+                  style: sheetBodyStyle(context, size: 13),
+                ),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: minimal ? 7 : 8,
@@ -419,89 +436,94 @@ class _ReminderEditorSheetState extends State<ReminderEditorSheet> {
                   ],
                 ),
               ],
-            const SizedBox(height: 20),
-            Text(context.l10n.time,
-                style: sheetBodyStyle(context, size: 13)),
-            const SizedBox(height: 8),
-            _TimeField(
-              label: _time.format(context),
-              minimal: minimal,
-              onTap: _pickTime,
-            ),
-            if (!_intervalMode && _everyMinutes > 0) ...[
               const SizedBox(height: 20),
-              Text(context.l10n.repeat_until,
-                  style: sheetBodyStyle(context, size: 13)),
+              Text(context.l10n.time, style: sheetBodyStyle(context, size: 13)),
               const SizedBox(height: 8),
               _TimeField(
-                label: _until?.format(context) ?? context.l10n.end_of_day,
+                label: _time.format(context),
                 minimal: minimal,
-                onTap: _pickUntil,
+                onTap: _pickTime,
               ),
-            ],
-            const SizedBox(height: 20),
-            Text(context.l10n.snooze_duration,
-                style: sheetBodyStyle(context, size: 13)),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: minimal ? 7 : 8,
-              runSpacing: minimal ? 7 : 8,
-              children: [
-                for (final minutes in Reminder.snoozeChoices)
-                  minimal
-                      ? CompactPill(
-                          label: context.l10n.minutes_short('$minutes'),
-                          selected: _snooze == minutes,
-                          onTap: () => setState(() => _snooze = minutes),
-                        )
-                      : _SnoozeChip(
-                          label: context.l10n.minutes_short('$minutes'),
-                          selected: _snooze == minutes,
-                          onTap: () => setState(() => _snooze = minutes),
-                        ),
-                if (minimal)
-                  CompactPill(
-                    label: _customSnooze
-                        ? context.l10n.minutes_short('$_snooze')
-                        : context.l10n.snooze_custom,
-                    selected: _customSnooze,
-                    onTap: _pickCustomSnooze,
-                  )
-                else
-                  _SnoozeChip(
-                    label: _customSnooze
-                        ? context.l10n.minutes_short('$_snooze')
-                        : context.l10n.snooze_custom,
-                    selected: _customSnooze,
-                    onTap: _pickCustomSnooze,
-                  ),
+              if (!_intervalMode && _everyMinutes > 0) ...[
+                const SizedBox(height: 20),
+                Text(
+                  context.l10n.repeat_until,
+                  style: sheetBodyStyle(context, size: 13),
+                ),
+                const SizedBox(height: 8),
+                _TimeField(
+                  label: _until?.format(context) ?? context.l10n.end_of_day,
+                  minimal: minimal,
+                  onTap: _pickUntil,
+                ),
               ],
-            ),
-            const SizedBox(height: 20),
-            Text(context.l10n.reminder_message,
-                style: sheetBodyStyle(context, size: 13)),
-            const SizedBox(height: 8),
-            AppTextField(
-              controller: _message,
-              hint: context.l10n.reminder_message_hint,
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              height: minimal ? 48 : 54,
-              child: FilledButton(
-                onPressed: (_needsDays && _days.isEmpty) ? null : _save,
-                style: FilledButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(minimal ? 13 : 16),
+              const SizedBox(height: 20),
+              Text(
+                context.l10n.snooze_duration,
+                style: sheetBodyStyle(context, size: 13),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: minimal ? 7 : 8,
+                runSpacing: minimal ? 7 : 8,
+                children: [
+                  for (final minutes in Reminder.snoozeChoices)
+                    minimal
+                        ? CompactPill(
+                            label: context.l10n.minutes_short('$minutes'),
+                            selected: _snooze == minutes,
+                            onTap: () => setState(() => _snooze = minutes),
+                          )
+                        : _SnoozeChip(
+                            label: context.l10n.minutes_short('$minutes'),
+                            selected: _snooze == minutes,
+                            onTap: () => setState(() => _snooze = minutes),
+                          ),
+                  if (minimal)
+                    CompactPill(
+                      label: _customSnooze
+                          ? context.l10n.minutes_short('$_snooze')
+                          : context.l10n.snooze_custom,
+                      selected: _customSnooze,
+                      onTap: _pickCustomSnooze,
+                    )
+                  else
+                    _SnoozeChip(
+                      label: _customSnooze
+                          ? context.l10n.minutes_short('$_snooze')
+                          : context.l10n.snooze_custom,
+                      selected: _customSnooze,
+                      onTap: _pickCustomSnooze,
+                    ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Text(
+                context.l10n.reminder_message,
+                style: sheetBodyStyle(context, size: 13),
+              ),
+              const SizedBox(height: 8),
+              AppTextField(
+                controller: _message,
+                hint: context.l10n.reminder_message_hint,
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                height: minimal ? 48 : 54,
+                child: FilledButton(
+                  onPressed: (_needsDays && _days.isEmpty) ? null : _save,
+                  style: FilledButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(minimal ? 13 : 16),
+                    ),
+                  ),
+                  child: Text(
+                    context.l10n.save_reminder,
+                    style: sheetActionStyle(context, size: minimal ? 15 : 16),
                   ),
                 ),
-                child: Text(
-                  context.l10n.save_reminder,
-                  style: sheetActionStyle(context, size: minimal ? 15 : 16),
-                ),
               ),
-            ),
             ],
           ),
         ),
@@ -615,11 +637,13 @@ class _IntervalStepper extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = context.colors;
     Widget btn(IconData icon, VoidCallback? onTap) => IconButton(
-          onPressed: onTap,
-          icon: Icon(icon,
-              size: 20,
-              color: onTap == null ? context.tokens.muted : scheme.primary),
-        );
+      onPressed: onTap,
+      icon: Icon(
+        icon,
+        size: 20,
+        color: onTap == null ? context.tokens.muted : scheme.primary,
+      ),
+    );
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 4, 4, 4),
       decoration: BoxDecoration(
@@ -634,8 +658,14 @@ class _IntervalStepper extends StatelessWidget {
               style: sheetOptionStyle(context, size: 14, selected: true),
             ),
           ),
-          btn(LucideIcons.minus, value > min ? () => onChanged(value - 1) : null),
-          btn(LucideIcons.plus, value < max ? () => onChanged(value + 1) : null),
+          btn(
+            LucideIcons.minus,
+            value > min ? () => onChanged(value - 1) : null,
+          ),
+          btn(
+            LucideIcons.plus,
+            value < max ? () => onChanged(value + 1) : null,
+          ),
         ],
       ),
     );

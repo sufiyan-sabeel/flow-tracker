@@ -81,7 +81,8 @@ class _TodayFilterSheetState extends State<_TodayFilterSheet> {
       (habits) => habits.habits.any((habit) => habit.tracking),
     );
     final avoids = context.select<HabitsController, bool>(
-      (habits) => habits.habits.any((habit) => habit.kind == HabitKind.negative),
+      (habits) =>
+          habits.habits.any((habit) => habit.kind == HabitKind.negative),
     );
     return SafeArea(
       top: false,
@@ -241,7 +242,11 @@ class TodayAllDone extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Icon(LucideIcons.circleCheckBig, size: 36, color: context.tokens.muted),
+          Icon(
+            LucideIcons.circleCheckBig,
+            size: 36,
+            color: context.tokens.muted,
+          ),
           const SizedBox(height: 12),
           Text(
             context.l10n.all_done_today,

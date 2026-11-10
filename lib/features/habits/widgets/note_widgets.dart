@@ -16,14 +16,15 @@ PhotoShot noteShot(BuildContext context, HabitNote note, String path) {
   );
 }
 
-List<PhotoShot> notePhotoShots(BuildContext context, HabitNote note) =>
-    [for (final path in note.photos) noteShot(context, note, path)];
+List<PhotoShot> notePhotoShots(BuildContext context, HabitNote note) => [
+  for (final path in note.photos) noteShot(context, note, path),
+];
 
 String noteTypeLabel(BuildContext context, NoteType type) => switch (type) {
-      NoteType.note => context.l10n.note_kind_note,
-      NoteType.planned => context.l10n.note_kind_planned,
-      NoteType.completed => context.l10n.note_kind_completed,
-    };
+  NoteType.note => context.l10n.note_kind_note,
+  NoteType.planned => context.l10n.note_kind_planned,
+  NoteType.completed => context.l10n.note_kind_completed,
+};
 
 class NoteDots extends StatelessWidget {
   const NoteDots({super.key, required this.types, this.size = 5});

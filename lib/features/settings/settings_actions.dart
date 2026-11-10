@@ -87,13 +87,13 @@ class SettingsActions {
   }
 
   static List<String> planOptions(BuildContext context) => [
-        context.l10n.off,
-        context.l10n.plan_show_habits,
-        if (context.read<SettingsController>().todosEnabled) ...[
-          context.l10n.plan_show_todos,
-          context.l10n.plan_show_both,
-        ],
-      ];
+    context.l10n.off,
+    context.l10n.plan_show_habits,
+    if (context.read<SettingsController>().todosEnabled) ...[
+      context.l10n.plan_show_todos,
+      context.l10n.plan_show_both,
+    ],
+  ];
 
   static Future<void> pickPlan(BuildContext context) {
     final settings = context.read<SettingsController>();
@@ -107,9 +107,9 @@ class SettingsActions {
   }
 
   static List<String> todoStyles(BuildContext context) => [
-        context.l10n.todo_view_list,
-        context.l10n.todo_view_papers,
-      ];
+    context.l10n.todo_view_list,
+    context.l10n.todo_view_papers,
+  ];
 
   static Future<void> pickTodoStyle(BuildContext context) {
     final settings = context.read<SettingsController>();
@@ -171,11 +171,14 @@ class SettingsActions {
       if (context.mounted) AppSnackbar.error(context, e.message);
     } catch (e) {
       debugPrint('Import from another app failed: $e');
-      if (context.mounted) AppSnackbar.error(context, context.l10n.import_failed);
+      if (context.mounted) {
+        AppSnackbar.error(context, context.l10n.import_failed);
+      }
     }
   }
 
-  static String autoBackupLabel(BuildContext context, int value) => switch (value) {
+  static String autoBackupLabel(BuildContext context, int value) =>
+      switch (value) {
         1 => context.l10n.auto_backup_daily,
         2 => context.l10n.auto_backup_weekly,
         _ => context.l10n.auto_backup_off,
@@ -238,7 +241,10 @@ class SettingsActions {
                   context.l10n.auto_backup,
                   subtitle: context.l10n.auto_backup_where,
                   trailing: IconButton(
-                    icon: Icon(LucideIcons.circleHelp, color: context.tokens.muted),
+                    icon: Icon(
+                      LucideIcons.circleHelp,
+                      color: context.tokens.muted,
+                    ),
                     tooltip: context.l10n.sync_guide,
                     onPressed: () => openUrl(
                       context,
@@ -266,26 +272,29 @@ class SettingsActions {
                   ),
                 const Divider(height: 20),
                 if (!Platform.isIOS)
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: Icon(LucideIcons.folder, color: context.tokens.muted),
-                  title: Text(
-                    context.l10n.auto_backup_folder,
-                    style: sheetOptionStyle(sheetContext, size: 15),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(
+                      LucideIcons.folder,
+                      color: context.tokens.muted,
+                    ),
+                    title: Text(
+                      context.l10n.auto_backup_folder,
+                      style: sheetOptionStyle(sheetContext, size: 15),
+                    ),
+                    subtitle: Text(
+                      backupFolderLabel(context, s.autoBackupFolder),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    trailing: s.autoBackupFolder.isEmpty
+                        ? null
+                        : IconButton(
+                            icon: const Icon(LucideIcons.x, size: 18),
+                            onPressed: () => settings.setAutoBackupFolder(''),
+                          ),
+                    onTap: () => chooseBackupFolder(sheetContext),
                   ),
-                  subtitle: Text(
-                    backupFolderLabel(context, s.autoBackupFolder),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  trailing: s.autoBackupFolder.isEmpty
-                      ? null
-                      : IconButton(
-                          icon: const Icon(LucideIcons.x, size: 18),
-                          onPressed: () => settings.setAutoBackupFolder(''),
-                        ),
-                  onTap: () => chooseBackupFolder(sheetContext),
-                ),
                 SwitchListTile(
                   dense: true,
                   contentPadding: EdgeInsets.zero,
@@ -302,24 +311,24 @@ class SettingsActions {
                   onChanged: settings.setReadableCopy,
                 ),
                 if (s.autoBackupFolder.isNotEmpty)
-                SwitchListTile(
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
-                  secondary: Icon(
-                    LucideIcons.refreshCw,
-                    color: context.tokens.muted,
+                  SwitchListTile(
+                    dense: true,
+                    contentPadding: EdgeInsets.zero,
+                    secondary: Icon(
+                      LucideIcons.refreshCw,
+                      color: context.tokens.muted,
+                    ),
+                    title: Text(
+                      context.l10n.auto_sync,
+                      style: sheetOptionStyle(sheetContext, size: 15),
+                    ),
+                    subtitle: Text(context.l10n.auto_sync_sub),
+                    value: s.autoSync,
+                    onChanged: (value) async {
+                      await settings.setAutoSync(value);
+                      if (value) AutoSync.changed();
+                    },
                   ),
-                  title: Text(
-                    context.l10n.auto_sync,
-                    style: sheetOptionStyle(sheetContext, size: 15),
-                  ),
-                  subtitle: Text(context.l10n.auto_sync_sub),
-                  value: s.autoSync,
-                  onChanged: (value) async {
-                    await settings.setAutoSync(value);
-                    if (value) AutoSync.changed();
-                  },
-                ),
                 const SizedBox(height: 4),
                 SizedBox(
                   width: double.infinity,
@@ -330,9 +339,13 @@ class SettingsActions {
                       Navigator.of(sheet).pop();
                       ok
                           ? AppSnackbar.success(
-                              context, context.l10n.backup_saved)
+                              context,
+                              context.l10n.backup_saved,
+                            )
                           : AppSnackbar.error(
-                              context, context.l10n.auto_backup_folder_failed);
+                              context,
+                              context.l10n.auto_backup_folder_failed,
+                            );
                     },
                     icon: const Icon(LucideIcons.play, size: 16),
                     label: Text(context.l10n.auto_backup_run_now),
@@ -488,7 +501,9 @@ class SettingsActions {
         sharePositionOrigin: shareOrigin(context),
       );
     } catch (_) {
-      if (context.mounted) AppSnackbar.error(context, context.l10n.share_failed);
+      if (context.mounted) {
+        AppSnackbar.error(context, context.l10n.share_failed);
+      }
     }
   }
 
@@ -601,30 +616,30 @@ class SettingsActions {
   }
 
   static List<String> appLockDelayLabels(BuildContext context) => [
-        context.l10n.app_lock_delay_instant,
-        context.l10n.app_lock_delay_seconds('30'),
-        context.l10n.minutes_short('1'),
-        context.l10n.minutes_short('5'),
-      ];
+    context.l10n.app_lock_delay_instant,
+    context.l10n.app_lock_delay_seconds('30'),
+    context.l10n.minutes_short('1'),
+    context.l10n.minutes_short('5'),
+  ];
 
   static List<String> startViewLabels(BuildContext context) => [
-        context.l10n.start_view_last,
-        context.l10n.week,
-        context.l10n.month,
-        context.l10n.year,
-      ];
+    context.l10n.start_view_last,
+    context.l10n.week,
+    context.l10n.month,
+    context.l10n.year,
+  ];
 
   static List<String> celebrationLabels(BuildContext context) => [
-        context.l10n.celebration_confetti,
-        context.l10n.celebration_fireworks,
-        context.l10n.celebration_surprise,
-        context.l10n.celebration_none,
-      ];
+    context.l10n.celebration_confetti,
+    context.l10n.celebration_fireworks,
+    context.l10n.celebration_surprise,
+    context.l10n.celebration_none,
+  ];
 
   static List<String> dayStartLabels(BuildContext context) => [
-        context.l10n.day_start_midnight,
-        for (var h = 1; h <= 6; h++) context.l10n.day_start_hour('$h'),
-      ];
+    context.l10n.day_start_midnight,
+    for (var h = 1; h <= 6; h++) context.l10n.day_start_hour('$h'),
+  ];
 
   static String backgroundLabel(BuildContext context, int index) =>
       switch (index) {
@@ -663,7 +678,8 @@ class SettingsActions {
       'sv': 'Svenska',
       'vi': 'Tiếng Việt',
     };
-    final base = names[locale.languageCode] ?? locale.languageCode.toUpperCase();
+    final base =
+        names[locale.languageCode] ?? locale.languageCode.toUpperCase();
     return locale.countryCode == null ? base : '$base (${locale.countryCode})';
   }
 }
@@ -678,8 +694,9 @@ class _NameDialog extends StatefulWidget {
 }
 
 class _NameDialogState extends State<_NameDialog> {
-  late final TextEditingController _controller =
-      TextEditingController(text: widget.initial);
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.initial,
+  );
 
   @override
   void dispose() {

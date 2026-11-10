@@ -113,7 +113,9 @@ class IslandLedger {
   }
 
   static _Share _cleanShare(Habit habit, DateTime today, int milestones) {
-    final relapses = {for (final key in habit.completions.keys) dayKeyEpoch(key)};
+    final relapses = {
+      for (final key in habit.completions.keys) dayKeyEpoch(key),
+    };
     final last = _lastDay(habit, today);
     final clean = <int>{
       for (var day = habit.startedAt.epochDay; day <= last; day++)
@@ -145,12 +147,11 @@ class IslandLedger {
   }
 
   static bool _everyDay(Habit habit) => switch (habit.interval) {
-        HabitInterval.daily ||
-        HabitInterval.weekly ||
-        HabitInterval.monthly =>
-          true,
-        HabitInterval.weekdays || HabitInterval.everyXDays => false,
-      };
+    HabitInterval.daily ||
+    HabitInterval.weekly ||
+    HabitInterval.monthly => true,
+    HabitInterval.weekdays || HabitInterval.everyXDays => false,
+  };
 }
 
 class _Share {

@@ -87,7 +87,9 @@ class _VacationSheet extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              on ? context.l10n.vacation_on_desc : context.l10n.vacation_off_desc,
+              on
+                  ? context.l10n.vacation_on_desc
+                  : context.l10n.vacation_off_desc,
               style: sheetBodyStyle(context, size: 13),
             ),
             const SizedBox(height: 22),

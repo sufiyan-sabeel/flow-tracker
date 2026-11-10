@@ -37,10 +37,10 @@ class _CompactSubstepsEditorState extends State<CompactSubstepsEditor> {
   }
 
   void _emit() => widget.onChanged(
-        _steps
-            .map((s) => Substep(id: s.id, title: s.controller.text.trim()))
-            .toList(),
-      );
+    _steps
+        .map((s) => Substep(id: s.id, title: s.controller.text.trim()))
+        .toList(),
+  );
 
   void _add() {
     setState(() {
@@ -57,13 +57,16 @@ class _CompactSubstepsEditorState extends State<CompactSubstepsEditor> {
   void _remove(int index) {
     final removed = _steps[index];
     setState(() => _steps.removeAt(index));
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => removed.controller.dispose());
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => removed.controller.dispose(),
+    );
     _emit();
   }
 
   void _move(int from, int to) {
-    setState(() => _steps.insert(to > from ? to - 1 : to, _steps.removeAt(from)));
+    setState(
+      () => _steps.insert(to > from ? to - 1 : to, _steps.removeAt(from)),
+    );
     _emit();
   }
 
@@ -82,43 +85,49 @@ class _CompactSubstepsEditorState extends State<CompactSubstepsEditor> {
           proxyDecorator: (child, _, __) =>
               Material(type: MaterialType.transparency, child: child),
           children: [
-        for (var i = 0; i < _steps.length; i++)
-          Padding(
-            key: ValueKey(_steps[i].id),
-            padding: const EdgeInsets.only(top: 8),
-            child: Row(
-              children: [
-                ReorderableDragStartListener(
-                  index: i,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 10, 8, 10),
-                    child: Icon(LucideIcons.gripVertical,
-                        size: 17, color: context.tokens.muted),
-                  ),
-                ),
-                Expanded(
-                  child: AppTextField(
-                    hint: context.l10n.step_hint,
-                    controller: _steps[i].controller,
-                    onChanged: (_) => _emit(),
-                  ),
-                ),
-                Semantics(
-                  button: true,
-                  label: context.l10n.delete,
-                  child: GestureDetector(
-                    onTap: () => _remove(i),
-                    behavior: HitTestBehavior.opaque,
-                    child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Icon(LucideIcons.x,
-                          size: 17, color: context.tokens.muted),
+            for (var i = 0; i < _steps.length; i++)
+              Padding(
+                key: ValueKey(_steps[i].id),
+                padding: const EdgeInsets.only(top: 8),
+                child: Row(
+                  children: [
+                    ReorderableDragStartListener(
+                      index: i,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 10, 8, 10),
+                        child: Icon(
+                          LucideIcons.gripVertical,
+                          size: 17,
+                          color: context.tokens.muted,
+                        ),
+                      ),
                     ),
-                  ),
+                    Expanded(
+                      child: AppTextField(
+                        hint: context.l10n.step_hint,
+                        controller: _steps[i].controller,
+                        onChanged: (_) => _emit(),
+                      ),
+                    ),
+                    Semantics(
+                      button: true,
+                      label: context.l10n.delete,
+                      child: GestureDetector(
+                        onTap: () => _remove(i),
+                        behavior: HitTestBehavior.opaque,
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Icon(
+                            LucideIcons.x,
+                            size: 17,
+                            color: context.tokens.muted,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
           ],
         ),
         const SizedBox(height: 10),

@@ -33,12 +33,12 @@ class ReadingBooks extends StatelessWidget {
   }
 
   Widget _leaning(double angle, Alignment anchor, Widget child) => Transform(
-        alignment: anchor,
-        transform: Matrix4.identity()
-          ..setEntry(3, 2, 0.0014)
-          ..rotateY(angle),
-        child: child,
-      );
+    alignment: anchor,
+    transform: Matrix4.identity()
+      ..setEntry(3, 2, 0.0014)
+      ..rotateY(angle),
+    child: child,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -64,16 +64,16 @@ class ReadingBooks extends StatelessWidget {
 
 class _Book extends StatelessWidget {
   const _Book.reference({required this.habit, required this.onEditCover})
-      : ratio = 0,
-        count = 0,
-        isProgress = false;
+    : ratio = 0,
+      count = 0,
+      isProgress = false;
 
   const _Book.progress({
     required this.habit,
     required this.ratio,
     required this.count,
-  })  : onEditCover = null,
-        isProgress = true;
+  }) : onEditCover = null,
+       isProgress = true;
 
   final Habit habit;
   final double ratio;
@@ -118,11 +118,21 @@ class _Book extends StatelessWidget {
                   child: CustomPaint(
                     size: const Size(17, 60),
                     painter: _RibbonPainter(
-                      Color.lerp(habit.color.shownIn(context), Colors.black, 0.28)!,
+                      Color.lerp(
+                        habit.color.shownIn(context),
+                        Colors.black,
+                        0.28,
+                      )!,
                     ),
                   ),
                 ),
-              Positioned(left: 0, right: 0, top: 0, bottom: 7, child: _body(context)),
+              Positioned(
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: 7,
+                child: _body(context),
+              ),
               if (done)
                 Positioned(
                   right: -2,
@@ -181,7 +191,10 @@ class _Book extends StatelessWidget {
                 else if (_hasPhoto)
                   CoverImage(path: habit.bookCoverPath)
                 else
-                  _JacketCover(color: habit.color.shownIn(context), title: habit.name),
+                  _JacketCover(
+                    color: habit.color.shownIn(context),
+                    title: habit.name,
+                  ),
                 Positioned(
                   left: 0,
                   top: 0,
@@ -203,8 +216,9 @@ class _Book extends StatelessWidget {
                   top: 5,
                   bottom: 5,
                   width: 1,
-                  child:
-                      ColoredBox(color: Colors.white.withValues(alpha: 0.25)),
+                  child: ColoredBox(
+                    color: Colors.white.withValues(alpha: 0.25),
+                  ),
                 ),
                 if (onEditCover != null)
                   Positioned(
@@ -250,18 +264,18 @@ class _JacketCover extends StatelessWidget {
   Widget build(BuildContext context) {
     final band = Colors.white.withValues(alpha: 0.5);
     Widget rule(double top) => Positioned(
-          left: 22,
-          right: 12,
-          top: top < 0 ? null : top,
-          bottom: top < 0 ? -top : null,
-          child: Column(
-            children: [
-              Container(height: 1.4, color: band),
-              const SizedBox(height: 2.5),
-              Container(height: 0.8, color: band),
-            ],
-          ),
-        );
+      left: 22,
+      right: 12,
+      top: top < 0 ? null : top,
+      bottom: top < 0 ? -top : null,
+      child: Column(
+        children: [
+          Container(height: 1.4, color: band),
+          const SizedBox(height: 2.5),
+          Container(height: 0.8, color: band),
+        ],
+      ),
+    );
     return DecoratedBox(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -324,44 +338,44 @@ class _ProgressCover extends StatelessWidget {
   final String unit;
 
   Widget _count(Color c) => Padding(
-        padding: const EdgeInsets.fromLTRB(18, 14, 10, 14),
-        child: Align(
-          alignment: const Alignment(0, -0.1),
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  formatAmount(count),
-                  style: TextStyle(
-                    fontFamily: 'Nunito',
-                    fontSize: 46,
-                    fontVariations: const [FontVariation('wght', 900)],
-                    height: 1,
-                    letterSpacing: -1,
-                    color: c,
-                  ),
-                ),
-                if (unit.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    unit.toUpperCase(),
-                    maxLines: 1,
-                    style: TextStyle(
-                      fontFamily: 'Nunito',
-                      fontSize: 10,
-                      fontVariations: const [FontVariation('wght', 800)],
-                      letterSpacing: 1.4,
-                      color: c.withValues(alpha: 0.8),
-                    ),
-                  ),
-                ],
-              ],
+    padding: const EdgeInsets.fromLTRB(18, 14, 10, 14),
+    child: Align(
+      alignment: const Alignment(0, -0.1),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              formatAmount(count),
+              style: TextStyle(
+                fontFamily: 'Nunito',
+                fontSize: 46,
+                fontVariations: const [FontVariation('wght', 900)],
+                height: 1,
+                letterSpacing: -1,
+                color: c,
+              ),
             ),
-          ),
+            if (unit.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                unit.toUpperCase(),
+                maxLines: 1,
+                style: TextStyle(
+                  fontFamily: 'Nunito',
+                  fontSize: 10,
+                  fontVariations: const [FontVariation('wght', 800)],
+                  letterSpacing: 1.4,
+                  color: c.withValues(alpha: 0.8),
+                ),
+              ),
+            ],
+          ],
         ),
-      );
+      ),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -499,7 +513,8 @@ class _RibbonPainter extends CustomPainter {
     final h = size.height;
     final half = w * 0.36;
     final notch = w * 0.55;
-    double mid(double y) => w / 2 - half * 0.25 + half * 0.6 * math.sin(math.pi * 0.5 * y / h);
+    double mid(double y) =>
+        w / 2 - half * 0.25 + half * 0.6 * math.sin(math.pi * 0.5 * y / h);
 
     const steps = 12;
     final ribbon = Path()..moveTo(mid(0) - half, 0);

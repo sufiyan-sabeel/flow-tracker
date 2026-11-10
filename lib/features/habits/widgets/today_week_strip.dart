@@ -32,8 +32,8 @@ class _TodayWeekStripState extends State<TodayWeekStrip> {
   DateTime get _earliest => widget.habits.isEmpty
       ? AppClock.today()
       : widget.habits
-          .map((habit) => habit.startedAt)
-          .reduce((a, b) => a.isBefore(b) ? a : b);
+            .map((habit) => habit.startedAt)
+            .reduce((a, b) => a.isBefore(b) ? a : b);
 
   void _swipe(DragEndDetails details, DateTime first) {
     final velocity = details.primaryVelocity ?? 0;
@@ -163,8 +163,9 @@ class _Day extends StatelessWidget {
                             '${day.day}',
                             style: TextStyle(
                               fontSize: 14,
-                              fontWeight:
-                                  isToday ? FontWeight.w800 : FontWeight.w600,
+                              fontWeight: isToday
+                                  ? FontWeight.w800
+                                  : FontWeight.w600,
                               color: isToday || due > 0
                                   ? scheme.onSurface
                                   : muted,

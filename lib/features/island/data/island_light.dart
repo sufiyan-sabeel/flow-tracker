@@ -43,16 +43,34 @@ class IslandLight {
 
   static List<double>? matrixFor(DateTime now) {
     final (r, g, b, desat) = _toneAt(hourOf(now));
-    if (desat < 0.005 && (r - 1).abs() < 0.02 && (g - 1).abs() < 0.02 &&
+    if (desat < 0.005 &&
+        (r - 1).abs() < 0.02 &&
+        (g - 1).abs() < 0.02 &&
         (b - 1).abs() < 0.02) {
       return null;
     }
     final keep = 1 - desat;
     return [
-      r * (keep + desat * _luma[0]), r * desat * _luma[1], r * desat * _luma[2], 0, 0,
-      g * desat * _luma[0], g * (keep + desat * _luma[1]), g * desat * _luma[2], 0, 0,
-      b * desat * _luma[0], b * desat * _luma[1], b * (keep + desat * _luma[2]), 0, 0,
-      0, 0, 0, 1, 0,
+      r * (keep + desat * _luma[0]),
+      r * desat * _luma[1],
+      r * desat * _luma[2],
+      0,
+      0,
+      g * desat * _luma[0],
+      g * (keep + desat * _luma[1]),
+      g * desat * _luma[2],
+      0,
+      0,
+      b * desat * _luma[0],
+      b * desat * _luma[1],
+      b * (keep + desat * _luma[2]),
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
     ];
   }
 

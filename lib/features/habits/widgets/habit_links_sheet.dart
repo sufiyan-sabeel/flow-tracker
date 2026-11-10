@@ -31,14 +31,17 @@ class _HabitLinksSheet extends StatelessWidget {
   List<(String, String)> _links(BuildContext context, bool focus) {
     final l10n = context.l10n;
     final negative = habit.kind == HabitKind.negative;
-    final adds = habit.kind == HabitKind.quantitative && !habit.needsFocusSession;
+    final adds =
+        habit.kind == HabitKind.quantitative && !habit.needsFocusSession;
     return [
       if (negative) (l10n.habit_link_relapse, HabitLinks.relapse(habit)),
       if (adds)
         (
-          l10n.habit_link_add(habit.isTimeAmount
-              ? formatMinutes(habit.incrementAmount)
-              : formatAmount(habit.incrementAmount)),
+          l10n.habit_link_add(
+            habit.isTimeAmount
+                ? formatMinutes(habit.incrementAmount)
+                : formatAmount(habit.incrementAmount),
+          ),
           HabitLinks.add(habit),
         ),
       if (!negative && !habit.needsFocusSession)
@@ -100,7 +103,10 @@ class _HabitLinksSheet extends StatelessWidget {
             ),
             if (on) ...[
               const SizedBox(height: 16),
-              for (final (label, link) in _links(context, settings.focusEnabled))
+              for (final (label, link) in _links(
+                context,
+                settings.focusEnabled,
+              ))
                 _LinkRow(label: label, link: link),
               const SizedBox(height: 10),
               Text(

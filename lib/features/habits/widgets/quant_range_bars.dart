@@ -11,8 +11,8 @@ import 'package:flow_tracker/core/extensions/color_extensions.dart';
 
 String amountWithUnit(Habit habit, double value) =>
     habit.isTimeAmount || habit.unitLabel.isEmpty
-        ? habit.amountText(value)
-        : '${formatAmount(value)} ${habit.unitLabel}';
+    ? habit.amountText(value)
+    : '${formatAmount(value)} ${habit.unitLabel}';
 
 class QuantRangeBars extends StatelessWidget {
   const QuantRangeBars({
@@ -61,7 +61,9 @@ class QuantRangeBars extends StatelessWidget {
       color: habit.color.shownIn(context),
       height: height,
       barWidth: _barWidth,
-      goal: range == QuantRange.year || !habit.hasGoal ? null : habit.perDayTarget,
+      goal: range == QuantRange.year || !habit.hasGoal
+          ? null
+          : habit.perDayTarget,
       label: (index) => _label(context, index),
       tooltip: (value) => amountWithUnit(habit, value),
       axisFormat: (value) => habit.amountText(value),

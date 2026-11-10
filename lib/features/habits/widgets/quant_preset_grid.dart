@@ -42,11 +42,11 @@ class _QuantPresetGridState extends State<QuantPresetGrid> {
   }
 
   _Preset get _current => switch (widget.quantKind) {
-        QuantKind.water => _Preset.water,
-        QuantKind.reading => _Preset.reading,
-        QuantKind.time => _Preset.time,
-        QuantKind.generic => widget.steps ? _Preset.steps : _Preset.generic,
-      };
+    QuantKind.water => _Preset.water,
+    QuantKind.reading => _Preset.reading,
+    QuantKind.time => _Preset.time,
+    QuantKind.generic => widget.steps ? _Preset.steps : _Preset.generic,
+  };
 
   Future<void> _pickSteps() async {
     if (await HealthSteps.request()) {
@@ -64,28 +64,28 @@ class _QuantPresetGridState extends State<QuantPresetGrid> {
   }
 
   void _pick(_Preset preset) => switch (preset) {
-        _Preset.water => widget.onSelected(QuantKind.water),
-        _Preset.reading => widget.onSelected(QuantKind.reading),
-        _Preset.time => widget.onSelected(QuantKind.time),
-        _Preset.steps => _pickSteps(),
-        _Preset.generic => widget.onSelected(QuantKind.generic),
-      };
+    _Preset.water => widget.onSelected(QuantKind.water),
+    _Preset.reading => widget.onSelected(QuantKind.reading),
+    _Preset.time => widget.onSelected(QuantKind.time),
+    _Preset.steps => _pickSteps(),
+    _Preset.generic => widget.onSelected(QuantKind.generic),
+  };
 
   String _label(_Preset preset) => switch (preset) {
-        _Preset.water => context.l10n.quant_preset_water,
-        _Preset.reading => context.l10n.quant_preset_reading,
-        _Preset.time => context.l10n.quant_preset_time,
-        _Preset.steps => context.l10n.quant_preset_steps,
-        _Preset.generic => context.l10n.quant_preset_generic,
-      };
+    _Preset.water => context.l10n.quant_preset_water,
+    _Preset.reading => context.l10n.quant_preset_reading,
+    _Preset.time => context.l10n.quant_preset_time,
+    _Preset.steps => context.l10n.quant_preset_steps,
+    _Preset.generic => context.l10n.quant_preset_generic,
+  };
 
   String? _unit(_Preset preset) => switch (preset) {
-        _Preset.water => context.l10n.quant_unit_ml,
-        _Preset.reading => context.l10n.quant_unit_pages,
-        _Preset.time => context.l10n.unit_min_short,
-        _Preset.steps => context.l10n.health_unit_steps,
-        _Preset.generic => null,
-      };
+    _Preset.water => context.l10n.quant_unit_ml,
+    _Preset.reading => context.l10n.quant_unit_pages,
+    _Preset.time => context.l10n.unit_min_short,
+    _Preset.steps => context.l10n.health_unit_steps,
+    _Preset.generic => null,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -98,14 +98,14 @@ class _QuantPresetGridState extends State<QuantPresetGrid> {
     ];
     final gap = widget.plain ? 7.0 : 8.0;
     Widget tile(_Preset preset) => _PresetTile(
-          preset: preset,
-          label: _label(preset),
-          unit: _unit(preset),
-          color: widget.color,
-          selected: preset == _current,
-          plain: widget.plain,
-          onTap: () => _pick(preset),
-        );
+      preset: preset,
+      label: _label(preset),
+      unit: _unit(preset),
+      color: widget.color,
+      selected: preset == _current,
+      plain: widget.plain,
+      onTap: () => _pick(preset),
+    );
     return Column(
       children: [
         for (var i = 0; i < presets.length; i += 2) ...[
@@ -169,7 +169,9 @@ class _PresetTile extends StatelessWidget {
                 : context.colors.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(plain ? 10 : 14),
             border: Border.all(
-              color: selected ? color.withValues(alpha: 0.8) : Colors.transparent,
+              color: selected
+                  ? color.withValues(alpha: 0.8)
+                  : Colors.transparent,
               width: 1.4,
             ),
           ),
@@ -201,8 +203,9 @@ class _PresetTile extends StatelessWidget {
                         maxLines: 1,
                         style: TextStyle(
                           fontSize: plain ? 12.5 : 13.5,
-                          fontWeight:
-                              selected ? FontWeight.w700 : FontWeight.w600,
+                          fontWeight: selected
+                              ? FontWeight.w700
+                              : FontWeight.w600,
                           fontVariations: [FontVariation('wght', weight)],
                           color: selected ? color : context.colors.onSurface,
                         ),
@@ -241,25 +244,25 @@ class _PresetArt extends StatelessWidget {
   Widget build(BuildContext context) {
     final art = switch (preset) {
       _Preset.water => CustomPaint(
-          size: const Size(26, 34),
-          painter: WaterCupPainter(fill: fill),
-        ),
+        size: const Size(26, 34),
+        painter: WaterCupPainter(fill: fill),
+      ),
       _Preset.reading => CustomPaint(
-          size: const Size(26, 33),
-          painter: BookPainter(fill: fill, color: color),
-        ),
+        size: const Size(26, 33),
+        painter: BookPainter(fill: fill, color: color),
+      ),
       _Preset.time => CustomPaint(
-          size: const Size(30, 34),
-          painter: StopwatchPainter(fill: fill, color: color),
-        ),
+        size: const Size(30, 34),
+        painter: StopwatchPainter(fill: fill, color: color),
+      ),
       _Preset.steps => CustomPaint(
-          size: const Size(25, 34),
-          painter: FootPainter(fill: fill, color: color),
-        ),
+        size: const Size(25, 34),
+        painter: FootPainter(fill: fill, color: color),
+      ),
       _Preset.generic => CustomPaint(
-          size: const Size(32, 32),
-          painter: DialPainter(fill: fill, color: color),
-        ),
+        size: const Size(32, 32),
+        painter: DialPainter(fill: fill, color: color),
+      ),
     };
     return SizedBox(width: 34, height: 36, child: Center(child: art));
   }

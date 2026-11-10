@@ -24,13 +24,13 @@ bool canMissOn(Habit habit, DateTime date) {
 }
 
 List<String> _presets(BuildContext context) => [
-      context.l10n.miss_overslept,
-      context.l10n.miss_busy,
-      context.l10n.miss_traveling,
-      context.l10n.miss_sick,
-      context.l10n.miss_tired,
-      context.l10n.miss_forgot,
-    ];
+  context.l10n.miss_overslept,
+  context.l10n.miss_busy,
+  context.l10n.miss_traveling,
+  context.l10n.miss_sick,
+  context.l10n.miss_tired,
+  context.l10n.miss_forgot,
+];
 
 Map<String, int> missedTally(Habit habit) {
   final tally = <String, int>{};
@@ -45,7 +45,11 @@ Map<String, int> missedTally(Habit habit) {
 }
 
 class MissReasonPicker extends StatefulWidget {
-  const MissReasonPicker({super.key, required this.habitId, required this.date});
+  const MissReasonPicker({
+    super.key,
+    required this.habitId,
+    required this.date,
+  });
 
   final String habitId;
   final DateTime date;
@@ -64,8 +68,9 @@ class _MissReasonPickerState extends State<MissReasonPicker> {
     super.dispose();
   }
 
-  Future<void> _pick(String? reason) =>
-      context.read<HabitsController>().setMissReason(widget.habitId, widget.date.dayKey, reason);
+  Future<void> _pick(String? reason) => context
+      .read<HabitsController>()
+      .setMissReason(widget.habitId, widget.date.dayKey, reason);
 
   Future<void> _saveTyped() async {
     final text = _field.text.trim();
@@ -77,7 +82,9 @@ class _MissReasonPickerState extends State<MissReasonPicker> {
   @override
   Widget build(BuildContext context) {
     final habit = context.watch<HabitsController>().byId(widget.habitId);
-    if (habit == null || !canMissOn(habit, widget.date)) return const SizedBox.shrink();
+    if (habit == null || !canMissOn(habit, widget.date)) {
+      return const SizedBox.shrink();
+    }
     final color = habit.color.shownIn(context);
     final chosen = habit.missReasons[widget.date.dayKey];
     final options = {..._presets(context), ...habit.missReasons.values};
@@ -89,7 +96,10 @@ class _MissReasonPickerState extends State<MissReasonPicker> {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
-            child: Text(context.l10n.miss_reason_title, style: sheetLabelStyle(context)),
+            child: Text(
+              context.l10n.miss_reason_title,
+              style: sheetLabelStyle(context),
+            ),
           ),
           Wrap(
             spacing: 8,
@@ -145,7 +155,10 @@ class MissReasonsTile extends StatelessWidget {
     final tally = missedTally(habit);
     if (tally.isEmpty) return const SizedBox.shrink();
     final settings = context.watch<SettingsController>();
-    final summary = tally.entries.take(3).map((e) => '${e.key} ${e.value}').join('  ·  ');
+    final summary = tally.entries
+        .take(3)
+        .map((e) => '${e.key} ${e.value}')
+        .join('  ·  ');
     void open() => _showMissReasons(context, tally);
 
     final Widget tile;
@@ -159,25 +172,46 @@ class MissReasonsTile extends StatelessWidget {
     } else if (settings.isMinimalStyle) {
       tile = MinimalList(
         children: [
-          MinimalRow(label: context.l10n.miss_reasons, caption: summary, onTap: open, last: true),
+          MinimalRow(
+            label: context.l10n.miss_reasons,
+            caption: summary,
+            onTap: open,
+            last: true,
+          ),
         ],
       );
     } else {
       tile = Card(
         child: ListTile(
           onTap: open,
-          leading: Icon(LucideIcons.messageCircleQuestion, size: 22, color: context.colors.primary),
+          leading: Icon(
+            LucideIcons.messageCircleQuestion,
+            size: 22,
+            color: context.colors.primary,
+          ),
           title: Text(
             context.l10n.miss_reasons,
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: context.colors.onSurface),
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: context.colors.onSurface,
+            ),
           ),
           subtitle: Text(
             summary,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: context.tokens.muted),
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: context.tokens.muted,
+            ),
           ),
-          trailing: Icon(LucideIcons.chevronRight, size: 18, color: context.tokens.muted),
+          trailing: Icon(
+            LucideIcons.chevronRight,
+            size: 18,
+            color: context.tokens.muted,
+          ),
         ),
       );
     }
@@ -209,8 +243,16 @@ Future<void> _showMissReasons(BuildContext context, Map<String, int> tally) {
                   children: [
                     Row(
                       children: [
-                        Expanded(child: Text(entry.key, style: sheetOptionStyle(sheet, size: 14.5))),
-                        Text('${entry.value}', style: sheetHeadingStyle(sheet, size: 14)),
+                        Expanded(
+                          child: Text(
+                            entry.key,
+                            style: sheetOptionStyle(sheet, size: 14.5),
+                          ),
+                        ),
+                        Text(
+                          '${entry.value}',
+                          style: sheetHeadingStyle(sheet, size: 14),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 6),

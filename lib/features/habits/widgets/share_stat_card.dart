@@ -27,10 +27,10 @@ class ShareStatCard extends StatelessWidget {
   final double width;
 
   double get _aspect => switch (range) {
-        ShareRange.week => showStats ? 1.06 : 1.32,
-        ShareRange.month => 0.92,
-        ShareRange.year => showStats ? 1.12 : 1.36,
-      };
+    ShareRange.week => showStats ? 1.06 : 1.32,
+    ShareRange.month => 0.92,
+    ShareRange.year => showStats ? 1.12 : 1.36,
+  };
 
   bool get _hasImage => imagePath.isNotEmpty && File(imagePath).existsSync();
 
@@ -54,8 +54,10 @@ class ShareStatCard extends StatelessWidget {
               blur < 0.5
                   ? Image.file(File(imagePath), fit: BoxFit.cover)
                   : ImageFiltered(
-                      imageFilter:
-                          ui.ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+                      imageFilter: ui.ImageFilter.blur(
+                        sigmaX: blur,
+                        sigmaY: blur,
+                      ),
                       child: Image.file(File(imagePath), fit: BoxFit.cover),
                     ),
               DecoratedBox(
@@ -78,15 +80,18 @@ class ShareStatCard extends StatelessWidget {
                   Expanded(
                     child: Container(
                       width: double.infinity,
-                      padding:
-                          EdgeInsets.all(_hasImage ? pad * 0.25 : pad * 0.95),
+                      padding: EdgeInsets.all(
+                        _hasImage ? pad * 0.25 : pad * 0.95,
+                      ),
                       decoration: _hasImage
                           ? null
                           : BoxDecoration(
-                              color: const Color(0xFF111113)
-                                  .withValues(alpha: 0.93),
-                              borderRadius:
-                                  BorderRadius.circular(width * 0.062),
+                              color: const Color(
+                                0xFF111113,
+                              ).withValues(alpha: 0.93),
+                              borderRadius: BorderRadius.circular(
+                                width * 0.062,
+                              ),
                             ),
                       child: _Panel(
                         key: ValueKey(range),
@@ -177,23 +182,23 @@ class _PanelState extends State<_Panel> {
               final offset = index - _base;
               return switch (widget.range) {
                 ShareRange.month => ShareMonthPage(
-                    habit: widget.habit,
-                    accent: widget.accent,
-                    width: widget.width,
-                    offset: offset,
-                  ),
+                  habit: widget.habit,
+                  accent: widget.accent,
+                  width: widget.width,
+                  offset: offset,
+                ),
                 ShareRange.week => ShareWeekPage(
-                    habit: widget.habit,
-                    accent: widget.accent,
-                    width: widget.width,
-                    offset: offset,
-                  ),
+                  habit: widget.habit,
+                  accent: widget.accent,
+                  width: widget.width,
+                  offset: offset,
+                ),
                 ShareRange.year => ShareYearPage(
-                    habit: widget.habit,
-                    accent: widget.accent,
-                    width: widget.width,
-                    offset: offset,
-                  ),
+                  habit: widget.habit,
+                  accent: widget.accent,
+                  width: widget.width,
+                  offset: offset,
+                ),
               };
             },
           ),

@@ -112,8 +112,8 @@ class _TodayProgressState extends State<TodayProgress>
                     total == 0
                         ? context.l10n.no_habits_yet
                         : allDone
-                            ? context.l10n.all_done_today
-                            : context.l10n.x_of_y_completed('$done', '$total'),
+                        ? context.l10n.all_done_today
+                        : context.l10n.x_of_y_completed('$done', '$total'),
                     style: TextStyle(
                       color: scheme.onSurface,
                       fontSize: 20,
@@ -141,8 +141,9 @@ class _TodayProgressState extends State<TodayProgress>
                     child: Center(
                       child: Text(
                         '${(ratio * 100).round()}%',
-                        textScaler: MediaQuery.textScalerOf(context)
-                            .clamp(maxScaleFactor: 1),
+                        textScaler: MediaQuery.textScalerOf(
+                          context,
+                        ).clamp(maxScaleFactor: 1),
                         style: TextStyle(
                           color: scheme.onSurface,
                           fontSize: 15,
@@ -205,7 +206,9 @@ class _RingPainter extends CustomPainter {
         center.dx + wave * math.cos(angle),
         center.dy + wave * math.sin(angle),
       );
-      i == 0 ? path.moveTo(point.dx, point.dy) : path.lineTo(point.dx, point.dy);
+      i == 0
+          ? path.moveTo(point.dx, point.dy)
+          : path.lineTo(point.dx, point.dy);
     }
     return path;
   }

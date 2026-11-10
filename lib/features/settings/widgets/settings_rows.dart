@@ -5,11 +5,11 @@ import 'package:flow_tracker/core/utils/responsive.dart';
 import 'package:flow_tracker/features/settings/widgets/minimal_settings_widgets.dart';
 
 Widget settingsDivider(BuildContext context) => Divider(
-      height: 1,
-      indent: bareRows(context) ? 16 : 60,
-      endIndent: 16,
-      color: context.colors.surfaceContainerHighest,
-    );
+  height: 1,
+  indent: bareRows(context) ? 16 : 60,
+  endIndent: 16,
+  color: context.colors.surfaceContainerHighest,
+);
 
 class IconBadge extends StatelessWidget {
   const IconBadge({super.key, required this.icon, this.tint});
@@ -60,21 +60,22 @@ class SettingRow extends StatelessWidget {
     final segmented = trailing is Segmented ? trailing as Segmented : null;
     final longest = _longestWord(context);
     final heading = textWidth(context, title, _titleStyle);
-    final compact = segmented != null &&
+    final compact =
+        segmented != null &&
         (stacked
             ? segmented.naturalWidth(context) > inner - 44
             : inner - 56 - segmented.naturalWidth(context) <
-                (heading > 100 ? heading : 100));
+                  (heading > 100 ? heading : 100));
     final shown = compact
         ? SegmentedSelect(segmented: segmented, title: title)
         : trailing;
     final side = stacked
         ? 0.0
         : compact
-            ? SegmentedSelect.width
-            : segmented?.naturalWidth(context) ?? 64;
-    final bare = bareRows(context) ||
-        longest > inner - 44 - (stacked ? 0 : side + 12);
+        ? SegmentedSelect.width
+        : segmented?.naturalWidth(context) ?? 64;
+    final bare =
+        bareRows(context) || longest > inner - 44 - (stacked ? 0 : side + 12);
     final row = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -115,7 +116,10 @@ class SettingRow extends StatelessWidget {
     return IgnorePointer(child: Opacity(opacity: 0.45, child: row));
   }
 
-  static const _titleStyle = TextStyle(fontSize: 16, fontWeight: FontWeight.w600);
+  static const _titleStyle = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.w600,
+  );
 
   double _longestWord(BuildContext context) {
     var longest = 0.0;
@@ -129,7 +133,10 @@ class SettingRow extends StatelessWidget {
 
 double textWidth(BuildContext context, String text, TextStyle style) {
   final painter = TextPainter(
-    text: TextSpan(text: text, style: DefaultTextStyle.of(context).style.merge(style)),
+    text: TextSpan(
+      text: text,
+      style: DefaultTextStyle.of(context).style.merge(style),
+    ),
     textScaler: MediaQuery.textScalerOf(context),
     textDirection: Directionality.of(context),
     maxLines: 1,
@@ -192,7 +199,10 @@ class NavRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (subtitle != null)
-                  Text(subtitle!, style: TextStyle(color: context.tokens.muted)),
+                  Text(
+                    subtitle!,
+                    style: TextStyle(color: context.tokens.muted),
+                  ),
                 const SizedBox(height: 4),
                 shown!,
               ],
@@ -205,8 +215,7 @@ class NavRow extends StatelessWidget {
         children: [
           if (!stacked && shown != null) shown,
           const SizedBox(width: 6),
-          Icon(LucideIcons.chevronRight,
-              size: 18, color: context.tokens.muted),
+          Icon(LucideIcons.chevronRight, size: 18, color: context.tokens.muted),
         ],
       ),
       onTap: onTap,
@@ -268,8 +277,11 @@ class LinkRow extends StatelessWidget {
       subtitle: subtitle == null
           ? null
           : Text(subtitle!, style: TextStyle(color: context.tokens.muted)),
-      trailing:
-          Icon(LucideIcons.chevronRight, size: 18, color: context.tokens.muted),
+      trailing: Icon(
+        LucideIcons.chevronRight,
+        size: 18,
+        color: context.tokens.muted,
+      ),
       onTap: onTap,
     );
   }
@@ -351,8 +363,11 @@ class PickerRow extends StatelessWidget {
               ],
               if (trailing != null) trailing!,
               const SizedBox(width: 6),
-              Icon(LucideIcons.chevronRight,
-                  size: 18, color: context.tokens.muted),
+              Icon(
+                LucideIcons.chevronRight,
+                size: 18,
+                color: context.tokens.muted,
+              ),
             ],
           ),
         ),
@@ -404,7 +419,10 @@ class Segmented extends StatelessWidget {
                 onTap: () => onChanged(i),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 160),
-                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 9,
+                    vertical: 5,
+                  ),
                   decoration: BoxDecoration(
                     color: i == index ? scheme.primary : Colors.transparent,
                     borderRadius: BorderRadius.circular(8),
@@ -417,7 +435,9 @@ class Segmented extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: i == index ? scheme.onPrimary : context.tokens.muted,
+                      color: i == index
+                          ? scheme.onPrimary
+                          : context.tokens.muted,
                     ),
                   ),
                 ),
@@ -466,7 +486,10 @@ class SegmentedSelect extends StatelessWidget {
             children: [
               Flexible(
                 child: Text(
-                  segmented.options[segmented.index.clamp(0, segmented.options.length - 1)],
+                  segmented.options[segmented.index.clamp(
+                    0,
+                    segmented.options.length - 1,
+                  )],
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(

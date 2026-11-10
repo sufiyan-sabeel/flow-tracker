@@ -126,10 +126,26 @@ class IslandThumb extends StatelessWidget {
       opacity: 0.4,
       child: ColorFiltered(
         colorFilter: const ColorFilter.matrix([
-          0.2126, 0.7152, 0.0722, 0, 0,
-          0.2126, 0.7152, 0.0722, 0, 0,
-          0.2126, 0.7152, 0.0722, 0, 0,
-          0, 0, 0, 1, 0,
+          0.2126,
+          0.7152,
+          0.0722,
+          0,
+          0,
+          0.2126,
+          0.7152,
+          0.0722,
+          0,
+          0,
+          0.2126,
+          0.7152,
+          0.0722,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
         ]),
         child: art,
       ),
@@ -252,7 +268,11 @@ class _Done extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             label,
-            style: sheetActionStyle(context, size: 15, color: context.tokens.success),
+            style: sheetActionStyle(
+              context,
+              size: 15,
+              color: context.tokens.success,
+            ),
           ),
         ],
       ),
@@ -331,7 +351,9 @@ class _ShopState extends State<_Shop> {
             itemBuilder: (_, i) {
               final group = IslandGroup.values[i];
               final all = islandGroupPieces(group);
-              final built = all.where((p) => widget.owned.contains(p.id)).length;
+              final built = all
+                  .where((p) => widget.owned.contains(p.id))
+                  .length;
               return _Chip(
                 label: islandGroupName(context, group),
                 detail: '$built/${all.length}',
@@ -369,8 +391,7 @@ class _ShopState extends State<_Shop> {
               : GridView.builder(
                   controller: widget.controller,
                   padding: const EdgeInsets.fromLTRB(14, 4, 14, 28),
-                  gridDelegate:
-                      const SliverGridDelegateWithMaxCrossAxisExtent(
+                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                     maxCrossAxisExtent: 132,
                     mainAxisSpacing: 10,
                     crossAxisSpacing: 10,
@@ -417,7 +438,10 @@ class _Chip extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14),
           child: Row(
             children: [
-              Text(label, style: sheetOptionStyle(context, size: 14, color: tone)),
+              Text(
+                label,
+                style: sheetOptionStyle(context, size: 14, color: tone),
+              ),
               const SizedBox(width: 7),
               Text(
                 detail,
@@ -453,12 +477,14 @@ List<IslandLot> islandShopLots(IslandGroup group, Set<String> owned) {
   for (final pieces in lots.values) {
     final built = pieces.where((p) => owned.contains(p.id)).length;
     final left = pieces.where((p) => !owned.contains(p.id));
-    out.add(IslandLot(
-      left.isEmpty ? pieces.first : left.first,
-      built,
-      pieces.length,
-      left.isEmpty,
-    ));
+    out.add(
+      IslandLot(
+        left.isEmpty ? pieces.first : left.first,
+        built,
+        pieces.length,
+        left.isEmpty,
+      ),
+    );
   }
   out.sort((a, b) {
     if (a.done != b.done) return a.done ? 1 : -1;
@@ -613,7 +639,10 @@ Future<void> showIslandHelpSheet(
           const SizedBox(height: 20),
           _Rule(icon: LucideIcons.check, text: sheet.l10n.island_how_check),
           _Rule(icon: LucideIcons.timer, text: sheet.l10n.island_how_focus),
-          _Rule(icon: LucideIcons.sparkles, text: sheet.l10n.island_how_perfect),
+          _Rule(
+            icon: LucideIcons.sparkles,
+            text: sheet.l10n.island_how_perfect,
+          ),
           _Rule(icon: LucideIcons.listChecks, text: sheet.l10n.island_how_todo),
           _Rule(icon: LucideIcons.flame, text: sheet.l10n.island_how_streak),
           _Rule(icon: LucideIcons.hand, text: sheet.l10n.island_zoom_hint),

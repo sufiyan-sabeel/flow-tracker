@@ -31,26 +31,26 @@ int _styleOf(BuildContext context) =>
     context.watch<SettingsController>().appStyle;
 
 TextStyle _shareTitle(int style) => switch (style) {
-      2 => ExpressType.display.at(24, spacing: -0.4, color: Colors.white),
-      1 => MinimalType.display(24, color: Colors.white),
-      _ => const TextStyle(
-          fontFamily: 'PlayfairDisplay',
-          fontStyle: FontStyle.italic,
-          fontSize: 22,
-          fontWeight: FontWeight.w700,
-          color: Colors.white,
-        ),
-    };
+  2 => ExpressType.display.at(24, spacing: -0.4, color: Colors.white),
+  1 => MinimalType.display(24, color: Colors.white),
+  _ => const TextStyle(
+    fontFamily: 'PlayfairDisplay',
+    fontStyle: FontStyle.italic,
+    fontSize: 22,
+    fontWeight: FontWeight.w700,
+    color: Colors.white,
+  ),
+};
 
 TextStyle _shareLabel(int style, double size, Color color) => switch (style) {
-      2 => ExpressType.headline.at(size, weight: 800, color: color),
-      1 => MinimalType.label(size: size, color: color),
-      _ => TextStyle(
-          fontSize: size,
-          fontWeight: FontWeight.w700,
-          color: color,
-        ),
-    };
+  2 => ExpressType.headline.at(size, weight: 800, color: color),
+  1 => MinimalType.label(size: size, color: color),
+  _ => TextStyle(
+    fontSize: size,
+    fontWeight: FontWeight.w700,
+    color: color,
+  ),
+};
 
 Future<void> showShareCard(BuildContext context, Habit habit) async {
   AppNavigator.push(SharePage(habit: habit), fullscreenDialog: true);
@@ -274,12 +274,12 @@ class _SharePageState extends State<SharePage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (!Platform.isLinux)
-                      _CircleAction(
-                        style: style,
-                        icon: LucideIcons.share2,
-                        label: context.l10n.share,
-                        onTap: _busy ? null : _share,
-                      ),
+                        _CircleAction(
+                          style: style,
+                          icon: LucideIcons.share2,
+                          label: context.l10n.share,
+                          onTap: _busy ? null : _share,
+                        ),
                       if (!Platform.isLinux) const SizedBox(width: 40),
                       _CircleAction(
                         style: style,
@@ -389,7 +389,10 @@ class _RangeTabs extends StatelessWidget {
               },
               behavior: HitTestBehavior.opaque,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -398,8 +401,9 @@ class _RangeTabs extends StatelessWidget {
                       style: DefaultTextStyle.of(context).style.copyWith(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white
-                            .withValues(alpha: range == entry.key ? 1 : 0.42),
+                        color: Colors.white.withValues(
+                          alpha: range == entry.key ? 1 : 0.42,
+                        ),
                       ),
                       child: Text(entry.value),
                     ),
@@ -504,11 +508,13 @@ class _Options extends StatelessWidget {
                           data: SliderTheme.of(context).copyWith(
                             trackHeight: 3,
                             activeTrackColor: Colors.white,
-                            inactiveTrackColor:
-                                Colors.white.withValues(alpha: 0.2),
+                            inactiveTrackColor: Colors.white.withValues(
+                              alpha: 0.2,
+                            ),
                             thumbColor: Colors.white,
-                            overlayShape:
-                                const RoundSliderOverlayShape(overlayRadius: 14),
+                            overlayShape: const RoundSliderOverlayShape(
+                              overlayRadius: 14,
+                            ),
                           ),
                           child: Slider(
                             value: blur,
@@ -578,7 +584,11 @@ class _Toggle extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: selected ? 0.18 : 0.06),
                 borderRadius: BorderRadius.circular(
-                  switch (style) { 2 => 22.0, 1 => 10.0, _ => 13.0 },
+                  switch (style) {
+                    2 => 22.0,
+                    1 => 10.0,
+                    _ => 13.0,
+                  },
                 ),
                 border: Border.all(
                   color: selected

@@ -54,8 +54,8 @@ class TimelineWeekStrip extends StatefulWidget {
         habit.tracking || !DayPlan.isDueOn(habit, day)
             ? 0
             : habit.isCompletedOn(day)
-                ? 2
-                : 1,
+            ? 2
+            : 1,
     ];
   }
 
@@ -107,13 +107,17 @@ class _TimelineWeekStripState extends State<TimelineWeekStrip>
 
   List<DateTime> _weeksOfMonth() {
     final selected = widget.selected;
-    final start = DateTime(selected.year, selected.month)
-        .startOfWeek(widget.first.weekday);
+    final start = DateTime(
+      selected.year,
+      selected.month,
+    ).startOfWeek(widget.first.weekday);
     return [for (var w = 0; w < 6; w++) start.addDays(w * 7)];
   }
 
   String _range(String locale) {
-    if (widget.month) return DateFormat.MMMMEEEEd(locale).format(widget.selected);
+    if (widget.month) {
+      return DateFormat.MMMMEEEEd(locale).format(widget.selected);
+    }
     final format = DateFormat.MMMd(locale);
     final first = widget.first;
     return '${format.format(first)} - ${format.format(first.addDays(6))}';
@@ -131,9 +135,7 @@ class _TimelineWeekStripState extends State<TimelineWeekStrip>
       ))
         label.replaceAll('.', ''),
     ];
-    final weeks = month || _fold.value > 0
-        ? _weeksOfMonth()
-        : [widget.first];
+    final weeks = month || _fold.value > 0 ? _weeksOfMonth() : [widget.first];
     final current = weeks.indexWhere(
       (week) => week.isSameDay(widget.first),
     );
@@ -154,26 +156,26 @@ class _TimelineWeekStripState extends State<TimelineWeekStrip>
     final spoken = DateFormat.MMMMEEEEd(locale);
 
     Widget row(int w, double fold) => Row(
-          children: [
-            for (var i = 0; i < 7; i++)
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3),
-                  child: _DayCard(
-                    day: weeks[w].addDays(i),
-                    label: labels[i],
-                    spoken: spoken,
-                    selected: weeks[w].addDays(i).isSameDay(widget.selected),
-                    outside: weeks[w].addDays(i).month != widget.selected.month,
-                    tally: tallies[w][i],
-                    style: widget.style,
-                    fold: fold,
-                    onTap: widget.onSelected,
-                  ),
-                ),
+      children: [
+        for (var i = 0; i < 7; i++)
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 3),
+              child: _DayCard(
+                day: weeks[w].addDays(i),
+                label: labels[i],
+                spoken: spoken,
+                selected: weeks[w].addDays(i).isSameDay(widget.selected),
+                outside: weeks[w].addDays(i).month != widget.selected.month,
+                tally: tallies[w][i],
+                style: widget.style,
+                fold: fold,
+                onTap: widget.onSelected,
               ),
-          ],
-        );
+            ),
+          ),
+      ],
+    );
 
     Widget reveal(double fold, Widget child) {
       if (fold >= 1) return child;
@@ -187,16 +189,16 @@ class _TimelineWeekStripState extends State<TimelineWeekStrip>
     }
 
     Widget grid(double fold) => Column(
-          key: ValueKey(widget.page),
-          children: [
-            for (var w = 0; w < weeks.length; w++)
-              if (w == current || fold > 0)
-                Padding(
-                  padding: EdgeInsets.only(top: w == 0 ? 0 : 6 * fold),
-                  child: w == current ? row(w, fold) : reveal(fold, row(w, fold)),
-                ),
-          ],
-        );
+      key: ValueKey(widget.page),
+      children: [
+        for (var w = 0; w < weeks.length; w++)
+          if (w == current || fold > 0)
+            Padding(
+              padding: EdgeInsets.only(top: w == 0 ? 0 : 6 * fold),
+              child: w == current ? row(w, fold) : reveal(fold, row(w, fold)),
+            ),
+      ],
+    );
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(13, 0, 13, 14),
@@ -304,35 +306,35 @@ class _TimelineWeekStripState extends State<TimelineWeekStrip>
                     behavior: HitTestBehavior.opaque,
                     onHorizontalDragEnd: express
                         ? (details) => widget.onShift(
-                              (details.primaryVelocity ?? 0) < 0 ? 1 : -1,
-                            )
+                            (details.primaryVelocity ?? 0) < 0 ? 1 : -1,
+                          )
                         : null,
                     child: ClipRect(
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 280),
-                          switchInCurve: Curves.easeOutCubic,
-                          switchOutCurve: Curves.easeInCubic,
-                          layoutBuilder: (current, previous) => Stack(
-                            alignment: Alignment.topCenter,
-                            children: [...previous, if (current != null) current],
-                          ),
-                          transitionBuilder: (child, animation) {
-                            final shift = child.key == ValueKey(widget.page)
-                                ? widget.direction
-                                : -widget.direction;
-                            return FadeTransition(
-                              opacity: animation,
-                              child: SlideTransition(
-                                position: Tween(
-                                  begin: Offset(0.25 * shift, 0),
-                                  end: Offset.zero,
-                                ).animate(animation),
-                                child: child,
-                              ),
-                            );
-                          },
-                          child: grid(fold),
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 280),
+                        switchInCurve: Curves.easeOutCubic,
+                        switchOutCurve: Curves.easeInCubic,
+                        layoutBuilder: (current, previous) => Stack(
+                          alignment: Alignment.topCenter,
+                          children: [...previous, if (current != null) current],
                         ),
+                        transitionBuilder: (child, animation) {
+                          final shift = child.key == ValueKey(widget.page)
+                              ? widget.direction
+                              : -widget.direction;
+                          return FadeTransition(
+                            opacity: animation,
+                            child: SlideTransition(
+                              position: Tween(
+                                begin: Offset(0.25 * shift, 0),
+                                end: Offset.zero,
+                              ).animate(animation),
+                              child: child,
+                            ),
+                          );
+                        },
+                        child: grid(fold),
+                      ),
                     ),
                   ),
                 ],
@@ -441,62 +443,63 @@ class _DayCard extends StatelessWidget {
       child: GestureDetector(
         onTap: () => onTap(day),
         child: SizedBox(
-            height: lerpDouble(66, 46, fold),
-            child: AnimatedContainer(
-              duration:
-                  express ? Express.morph : const Duration(milliseconds: 220),
-              curve: express ? Express.bouncy : Curves.easeOutCubic,
-              decoration: BoxDecoration(
-                color: selected
-                    ? strong
-                    : fade(scheme.surfaceContainerHighest.withValues(alpha: 0.5)),
-                borderRadius: BorderRadius.circular(radius),
-                border: Border.all(
-                  color: today && !selected
-                      ? strong.withValues(alpha: 0.7)
-                      : Colors.transparent,
-                  width: 1.5,
-                ),
+          height: lerpDouble(66, 46, fold),
+          child: AnimatedContainer(
+            duration: express
+                ? Express.morph
+                : const Duration(milliseconds: 220),
+            curve: express ? Express.bouncy : Curves.easeOutCubic,
+            decoration: BoxDecoration(
+              color: selected
+                  ? strong
+                  : fade(scheme.surfaceContainerHighest.withValues(alpha: 0.5)),
+              borderRadius: BorderRadius.circular(radius),
+              border: Border.all(
+                color: today && !selected
+                    ? strong.withValues(alpha: 0.7)
+                    : Colors.transparent,
+                width: 1.5,
               ),
-              child: MediaQuery.withClampedTextScaling(
-                maxScaleFactor: 1.15,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (fold < 1)
-                      ClipRect(
-                        child: Align(
-                          alignment: Alignment.bottomCenter,
-                          heightFactor: 1 - fold,
-                          child: Padding(
-                              padding: const EdgeInsets.only(bottom: 4),
-                              child: Text(
-                                label,
-                                maxLines: 1,
-                                overflow: TextOverflow.clip,
-                                softWrap: false,
-                                style: express
-                                    ? ExpressType.body.at(
-                                        11,
-                                        weight: 800,
-                                        height: 1.1,
-                                        color: faint,
-                                      )
-                                    : minimal
-                                        ? MinimalType.label(size: 11, color: faint)
-                                        : TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w700,
-                                            height: 1.1,
-                                            color: faint,
-                                          ),
-                              ),
+            ),
+            child: MediaQuery.withClampedTextScaling(
+              maxScaleFactor: 1.15,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (fold < 1)
+                    ClipRect(
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        heightFactor: 1 - fold,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: Text(
+                            label,
+                            maxLines: 1,
+                            overflow: TextOverflow.clip,
+                            softWrap: false,
+                            style: express
+                                ? ExpressType.body.at(
+                                    11,
+                                    weight: 800,
+                                    height: 1.1,
+                                    color: faint,
+                                  )
+                                : minimal
+                                ? MinimalType.label(size: 11, color: faint)
+                                : TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.1,
+                                    color: faint,
+                                  ),
                           ),
                         ),
                       ),
-                    Transform.scale(
-                      scale: lerpDouble(1, 16 / 19, fold)!,
-                      child: Text(
+                    ),
+                  Transform.scale(
+                    scale: lerpDouble(1, 16 / 19, fold)!,
+                    child: Text(
                       '${day.day}',
                       maxLines: 1,
                       style: express
@@ -507,28 +510,28 @@ class _DayCard extends StatelessWidget {
                               tabular: true,
                             )
                           : minimal
-                              ? MinimalType.figure(19, height: 1.05, color: ink)
-                              : TextStyle(
-                                  fontSize: 19,
-                                  fontWeight: FontWeight.w800,
-                                  height: 1.05,
-                                  color: ink,
-                                  fontFeatures: const [
-                                    FontFeature.tabularFigures(),
-                                  ],
-                                ),
+                          ? MinimalType.figure(19, height: 1.05, color: ink)
+                          : TextStyle(
+                              fontSize: 19,
+                              fontWeight: FontWeight.w800,
+                              height: 1.05,
+                              color: ink,
+                              fontFeatures: const [
+                                FontFeature.tabularFigures(),
+                              ],
+                            ),
                     ),
-                    ),
-                    SizedBox(height: lerpDouble(3, 2, fold)),
-                    _DayMeter(
-                      tally: tally,
-                      color: selected ? ink : fade(strong),
-                    ),
-                  ],
-                ),
+                  ),
+                  SizedBox(height: lerpDouble(3, 2, fold)),
+                  _DayMeter(
+                    tally: tally,
+                    color: selected ? ink : fade(strong),
+                  ),
+                ],
               ),
             ),
           ),
+        ),
       ),
     );
   }

@@ -119,7 +119,9 @@ class CompactPill extends StatelessWidget {
                   : context.colors.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(9),
               border: Border.all(
-                color: selected ? accent.withValues(alpha: 0.75) : Colors.transparent,
+                color: selected
+                    ? accent.withValues(alpha: 0.75)
+                    : Colors.transparent,
                 width: 1.2,
               ),
             ),
@@ -186,8 +188,9 @@ class CompactTabs extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 12.5,
-                          fontWeight:
-                              i == index ? FontWeight.w700 : FontWeight.w600,
+                          fontWeight: i == index
+                              ? FontWeight.w700
+                              : FontWeight.w600,
                           color: i == index ? accent : context.tokens.muted,
                         ),
                       ),
@@ -253,8 +256,8 @@ class CompactStepperRow extends StatelessWidget {
     final text = clock
         ? formatMinutes(value)
         : unit.isEmpty
-            ? formatAmount(value)
-            : '${formatAmount(value)} $unit';
+        ? formatAmount(value)
+        : '${formatAmount(value)} $unit';
 
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 4, 4, 4),
@@ -278,7 +281,7 @@ class CompactStepperRow extends StatelessWidget {
           ),
           HoldRepeatButton(
             icon: LucideIcons.minus,
-label: context.l10n.a11y_decrease,
+            label: context.l10n.a11y_decrease,
             size: 36,
             iconSize: 17,
             onTap: value - step >= min ? () => onChanged(value - step) : null,
@@ -304,7 +307,7 @@ label: context.l10n.a11y_decrease,
           ),
           HoldRepeatButton(
             icon: LucideIcons.plus,
-label: context.l10n.a11y_increase,
+            label: context.l10n.a11y_increase,
             size: 36,
             iconSize: 17,
             onTap: max != null && value + step > max!
@@ -373,8 +376,9 @@ class CompactWeekdays extends StatelessWidget {
                     labels[i],
                     maxLines: 1,
                     softWrap: false,
-                    textScaler: MediaQuery.textScalerOf(context)
-                        .clamp(maxScaleFactor: 1.3),
+                    textScaler: MediaQuery.textScalerOf(
+                      context,
+                    ).clamp(maxScaleFactor: 1.3),
                     style: TextStyle(
                       color: active ? accent : context.tokens.muted,
                       fontWeight: FontWeight.w700,
@@ -472,8 +476,11 @@ class CompactReminderRow extends StatelessWidget {
                   behavior: HitTestBehavior.opaque,
                   child: Padding(
                     padding: const EdgeInsets.all(8),
-                    child:
-                        Icon(LucideIcons.x, size: 16, color: context.tokens.muted),
+                    child: Icon(
+                      LucideIcons.x,
+                      size: 16,
+                      color: context.tokens.muted,
+                    ),
                   ),
                 ),
               ),

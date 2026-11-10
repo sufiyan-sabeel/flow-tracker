@@ -16,16 +16,16 @@ import 'package:flow_tracker/features/statistics/widgets/stat_kit.dart';
 import 'package:flow_tracker/core/extensions/color_extensions.dart';
 
 String habitMoneySaved(BuildContext context, Habit habit) => formatMoney(
-      habit.moneySaved,
-      context.watch<SettingsController>().currency,
-      Localizations.localeOf(context).toString(),
-    );
+  habit.moneySaved,
+  context.watch<SettingsController>().currency,
+  Localizations.localeOf(context).toString(),
+);
 
 String habitMoneySpent(BuildContext context, Habit habit) => formatMoney(
-      habit.moneySpent,
-      context.watch<SettingsController>().currency,
-      Localizations.localeOf(context).toString(),
-    );
+  habit.moneySpent,
+  context.watch<SettingsController>().currency,
+  Localizations.localeOf(context).toString(),
+);
 
 bool showsMoney(Habit habit) => habit.hasCost || habit.logsSpent;
 
@@ -73,8 +73,9 @@ class _CurrencyDialog extends StatefulWidget {
 }
 
 class _CurrencyDialogState extends State<_CurrencyDialog> {
-  late final TextEditingController _controller =
-      TextEditingController(text: widget.initial);
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.initial,
+  );
 
   @override
   void dispose() {
@@ -122,7 +123,11 @@ class SavedMoneyCard extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
         child: Row(
           children: [
-            Icon(LucideIcons.piggyBank, size: 22, color: context.tokens.success),
+            Icon(
+              LucideIcons.piggyBank,
+              size: 22,
+              color: context.tokens.success,
+            ),
             const SizedBox(width: 14),
             Expanded(
               child: Column(

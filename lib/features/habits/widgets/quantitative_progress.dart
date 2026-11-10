@@ -42,7 +42,11 @@ class QuantitativeProgress extends StatelessWidget {
       accent: habit.color.shownIn(context),
     );
     if (result != null && result >= 0 && result != current && context.mounted) {
-      context.read<HabitsController>().setProgress(habit.id, AppClock.now(), result);
+      context.read<HabitsController>().setProgress(
+        habit.id,
+        AppClock.now(),
+        result,
+      );
     }
   }
 
@@ -50,14 +54,18 @@ class QuantitativeProgress extends StatelessWidget {
   Widget build(BuildContext context) {
     final today = AppClock.now();
     final count = habit.completions[today.dayKey]?.count ?? 0;
-    final ratio =
-        habit.perDayTarget <= 0 ? 0.0 : (count / habit.perDayTarget).clamp(0.0, 1.0);
+    final ratio = habit.perDayTarget <= 0
+        ? 0.0
+        : (count / habit.perDayTarget).clamp(0.0, 1.0);
     final controller = context.read<HabitsController>();
 
     Future<void> add(double delta) async {
       if (delta > 0) {
-        final allowed =
-            await confirmUnscheduledDay(context, habit: habit, date: today);
+        final allowed = await confirmUnscheduledDay(
+          context,
+          habit: habit,
+          date: today,
+        );
         if (!allowed) return;
       }
       await controller.addProgress(habit.id, today, delta);
@@ -69,24 +77,30 @@ class QuantitativeProgress extends StatelessWidget {
         child: Column(
           children: [
             switch (habit.hasGoal ? habit.quantKind : QuantKind.generic) {
-              QuantKind.water =>
-                _WaterCups(count: count, target: habit.perDayTarget),
-              QuantKind.reading =>
-                ReadingBooks(habit: habit, ratio: ratio, count: count),
+              QuantKind.water => _WaterCups(
+                count: count,
+                target: habit.perDayTarget,
+              ),
+              QuantKind.reading => ReadingBooks(
+                habit: habit,
+                ratio: ratio,
+                count: count,
+              ),
               QuantKind.time => _Stopwatch(
-                  progress: habit.progressFor(count),
-                  color: habit.color.shownIn(context),
-                ),
+                progress: habit.progressFor(count),
+                color: habit.color.shownIn(context),
+              ),
               QuantKind.generic when habit.readsSteps && habit.hasGoal =>
                 _StepsTrail(
                   ratio: ratio,
-                  color: habit.progressFor(count)
+                  color: habit
+                      .progressFor(count)
                       .solidColor(habit.color.shownIn(context)),
                 ),
               QuantKind.generic => _GenericRing(
-                  progress: habit.progressFor(count),
-                  color: habit.color.shownIn(context),
-                ),
+                progress: habit.progressFor(count),
+                color: habit.color.shownIn(context),
+              ),
             },
             const SizedBox(height: 18),
             Semantics(
@@ -101,10 +115,10 @@ class QuantitativeProgress extends StatelessWidget {
                       Text(
                         habit.hasGoal
                             ? '${habit.amountText(count)} / '
-                                '${habit.amountText(habit.perDayTarget)}'
-                                '${habit.isTimeAmount ? '' : ' ${habit.unitLabel}'}'
+                                  '${habit.amountText(habit.perDayTarget)}'
+                                  '${habit.isTimeAmount ? '' : ' ${habit.unitLabel}'}'
                             : '${habit.amountText(count)}'
-                                '${habit.isTimeAmount ? '' : ' ${habit.unitLabel}'}',
+                                  '${habit.isTimeAmount ? '' : ' ${habit.unitLabel}'}',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
@@ -112,8 +126,11 @@ class QuantitativeProgress extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 6),
-                      Icon(LucideIcons.pencil,
-                          size: 14, color: context.tokens.muted),
+                      Icon(
+                        LucideIcons.pencil,
+                        size: 14,
+                        color: context.tokens.muted,
+                      ),
                     ],
                   ),
                 ),
@@ -235,8 +252,8 @@ class _RoundActionButtonState extends State<_RoundActionButton> {
             color: disabled
                 ? color.withValues(alpha: 0.08)
                 : widget.filled
-                    ? color
-                    : color.withValues(alpha: 0.14),
+                ? color
+                : color.withValues(alpha: 0.14),
           ),
           child: Icon(
             widget.icon,
@@ -244,8 +261,8 @@ class _RoundActionButtonState extends State<_RoundActionButton> {
             color: disabled
                 ? color.withValues(alpha: 0.3)
                 : widget.filled
-                    ? color.ink
-                    : color,
+                ? color.ink
+                : color,
           ),
         ),
       ),
@@ -283,14 +300,14 @@ class _WaterCups extends StatelessWidget {
     }
 
     Widget row(int start, int end) => Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (var i = start; i < end; i++) ...[
-              if (i > start) const SizedBox(width: 12),
-              glass(i),
-            ],
-          ],
-        );
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var i = start; i < end; i++) ...[
+          if (i > start) const SizedBox(width: 12),
+          glass(i),
+        ],
+      ],
+    );
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -302,7 +319,6 @@ class _WaterCups extends StatelessWidget {
     );
   }
 }
-
 
 class _StepsTrail extends StatelessWidget {
   const _StepsTrail({required this.ratio, required this.color});
@@ -341,14 +357,14 @@ class _StepsTrail extends StatelessWidget {
     }
 
     Widget row(int start) => Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (var i = start; i < start + _perRow; i++) ...[
-              if (i > start) const SizedBox(width: 14),
-              footprint(i),
-            ],
-          ],
-        );
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var i = start; i < start + _perRow; i++) ...[
+          if (i > start) const SizedBox(width: 14),
+          footprint(i),
+        ],
+      ],
+    );
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -372,9 +388,12 @@ class _Stopwatch extends StatelessWidget {
     final solid = progress.solidColor(color);
     return Center(
       child: TweenAnimationBuilder<double>(
-        tween: Tween(begin: 0, end: progress.reachedGoal && !progress.exceededGoal
-            ? 1.0
-            : progress.fraction),
+        tween: Tween(
+          begin: 0,
+          end: progress.reachedGoal && !progress.exceededGoal
+              ? 1.0
+              : progress.fraction,
+        ),
         duration: const Duration(milliseconds: 650),
         curve: Curves.easeOutCubic,
         builder: (context, t, _) => SizedBox(
@@ -387,7 +406,9 @@ class _Stopwatch extends StatelessWidget {
                   painter: StopwatchPainter(
                     fill: t,
                     color: solid,
-                    under: progress.exceededGoal ? progress.reachedColor(color) : null,
+                    under: progress.exceededGoal
+                        ? progress.reachedColor(color)
+                        : null,
                   ),
                 ),
               ),
@@ -406,15 +427,15 @@ class _Stopwatch extends StatelessWidget {
 }
 
 Future<void> _editBook(BuildContext context, Habit habit) => showOptionSheet(
-      context,
-      title: context.l10n.book,
-      options: [context.l10n.book_at_page, context.l10n.book_read_before],
-      icons: const [LucideIcons.bookOpen, LucideIcons.repeat],
-      index: -1,
-      onSelected: (choice) => unawaited(
-        choice == 0 ? _setPage(context, habit) : _setReads(context, habit),
-      ),
-    );
+  context,
+  title: context.l10n.book,
+  options: [context.l10n.book_at_page, context.l10n.book_read_before],
+  icons: const [LucideIcons.bookOpen, LucideIcons.repeat],
+  index: -1,
+  onSelected: (choice) => unawaited(
+    choice == 0 ? _setPage(context, habit) : _setReads(context, habit),
+  ),
+);
 
 Future<void> _setPage(BuildContext context, Habit habit) async {
   final controller = context.read<HabitsController>();
@@ -515,7 +536,9 @@ class _GenericRing extends StatelessWidget {
                   painter: DialPainter(
                     fill: t,
                     color: solid,
-                    under: progress.exceededGoal ? progress.reachedColor(color) : null,
+                    under: progress.exceededGoal
+                        ? progress.reachedColor(color)
+                        : null,
                   ),
                 ),
               ),

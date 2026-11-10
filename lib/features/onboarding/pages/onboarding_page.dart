@@ -247,11 +247,11 @@ class _Page extends StatelessWidget {
 }
 
 TextStyle _kicker(BuildContext context) => TextStyle(
-      fontSize: 11,
-      fontWeight: FontWeight.w700,
-      letterSpacing: 1.4,
-      color: context.tokens.muted,
-    );
+  fontSize: 11,
+  fontWeight: FontWeight.w700,
+  letterSpacing: 1.4,
+  color: context.tokens.muted,
+);
 
 class _Welcome extends StatelessWidget {
   const _Welcome({required this.accent});
@@ -308,8 +308,16 @@ class _Welcome extends StatelessWidget {
         _Promises(
           rows: [
             (LucideIcons.gift, l10n.onb_free_title, l10n.onb_free_body),
-            (LucideIcons.shieldCheck, l10n.onb_private_title, l10n.onb_private_body),
-            (LucideIcons.hardDriveDownload, l10n.onb_yours_title, l10n.onb_yours_body),
+            (
+              LucideIcons.shieldCheck,
+              l10n.onb_private_title,
+              l10n.onb_private_body,
+            ),
+            (
+              LucideIcons.hardDriveDownload,
+              l10n.onb_yours_title,
+              l10n.onb_yours_body,
+            ),
           ],
         ),
       ],
@@ -430,7 +438,9 @@ class _Step extends StatelessWidget {
           height: 190,
           padding: const EdgeInsets.all(22),
           decoration: BoxDecoration(
-            color: context.colors.surfaceContainerHighest.withValues(alpha: 0.7),
+            color: context.colors.surfaceContainerHighest.withValues(
+              alpha: 0.7,
+            ),
             borderRadius: BorderRadius.circular(26),
           ),
           child: child,
@@ -468,8 +478,8 @@ class _StreakPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final onAccent = ThemeData.estimateBrightnessForColor(accent) ==
-            Brightness.dark
+    final onAccent =
+        ThemeData.estimateBrightnessForColor(accent) == Brightness.dark
         ? Colors.white
         : Colors.black;
     return Column(
@@ -528,8 +538,34 @@ class _GridPreview extends StatelessWidget {
   final Color accent;
 
   static const _levels = [
-    0, 2, 3, 1, 4, 2, 0, 3, 4, 2, 1, 3, 4, 4,
-    2, 0, 3, 4, 1, 2, 4, 3, 4, 2, 4, 3, 1, 4,
+    0,
+    2,
+    3,
+    1,
+    4,
+    2,
+    0,
+    3,
+    4,
+    2,
+    1,
+    3,
+    4,
+    4,
+    2,
+    0,
+    3,
+    4,
+    1,
+    2,
+    4,
+    3,
+    4,
+    2,
+    4,
+    3,
+    1,
+    4,
   ];
 
   @override

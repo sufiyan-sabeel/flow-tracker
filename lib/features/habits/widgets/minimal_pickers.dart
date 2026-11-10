@@ -48,8 +48,9 @@ class _CompactIconPickerState extends State<CompactIconPicker> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => revealCategory(_cats, _activeCat));
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => revealCategory(_cats, _activeCat),
+    );
   }
 
   @override
@@ -191,8 +192,9 @@ class CompactColorPicker extends StatefulWidget {
 }
 
 class _CompactColorPickerState extends State<CompactColorPicker> {
-  late bool _custom = !AppPalette.habitColors
-      .any((c) => c.toARGB32() == widget.selected.toARGB32());
+  late bool _custom = !AppPalette.habitColors.any(
+    (c) => c.toARGB32() == widget.selected.toARGB32(),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -242,7 +244,8 @@ class _CompactColorPickerState extends State<CompactColorPicker> {
                               borderRadius: BorderRadius.circular(9),
                               border: swatchOutline(context, color),
                             ),
-                            child: widget.selected.toARGB32() == color.toARGB32()
+                            child:
+                                widget.selected.toARGB32() == color.toARGB32()
                                 ? Icon(
                                     LucideIcons.check,
                                     size: cell * 0.5,
@@ -298,7 +301,11 @@ class CompactCover extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(LucideIcons.imagePlus, size: 17, color: context.tokens.muted),
+                Icon(
+                  LucideIcons.imagePlus,
+                  size: 17,
+                  color: context.tokens.muted,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   context.l10n.add_image,
@@ -333,13 +340,19 @@ class CompactCover extends StatelessWidget {
             right: 6,
             child: Row(
               children: [
-                CoverActionButton(size: 28, icon: LucideIcons.pencil,
+                CoverActionButton(
+                  size: 28,
+                  icon: LucideIcons.pencil,
                   label: context.l10n.edit,
-                  onTap: onPick),
+                  onTap: onPick,
+                ),
                 const SizedBox(width: 6),
-                CoverActionButton(size: 28, icon: LucideIcons.trash2,
+                CoverActionButton(
+                  size: 28,
+                  icon: LucideIcons.trash2,
                   label: context.l10n.delete,
-                  onTap: onRemove),
+                  onTap: onRemove,
+                ),
               ],
             ),
           ),
@@ -380,7 +393,10 @@ class CompactCategoryPicker extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: Icon(LucideIcons.pencil, color: context.colors.onSurface),
+              leading: Icon(
+                LucideIcons.pencil,
+                color: context.colors.onSurface,
+              ),
               title: Text(
                 context.l10n.edit,
                 style: sheetOptionStyle(sheetContext),
@@ -388,8 +404,10 @@ class CompactCategoryPicker extends StatelessWidget {
               onTap: () => Navigator.of(sheetContext).pop('edit'),
             ),
             ListTile(
-              leading: Icon(LucideIcons.arrowUpDown,
-                  color: context.colors.onSurface),
+              leading: Icon(
+                LucideIcons.arrowUpDown,
+                color: context.colors.onSurface,
+              ),
               title: Text(
                 context.l10n.reorder,
                 style: sheetOptionStyle(sheetContext),

@@ -252,7 +252,10 @@ class HabitTimeFields extends StatelessWidget {
         ? more[index].$1
         : (more.isEmpty ? startMinute : more.last.$1) + 180;
     final at = last.clamp(0, Habit.dayMinutes - 1);
-    final picked = await pickTime(context, TimeOfDay(hour: at ~/ 60, minute: at % 60));
+    final picked = await pickTime(
+      context,
+      TimeOfDay(hour: at ~/ 60, minute: at % 60),
+    );
     if (picked == null) return;
     final minutes = index < more.length ? more[index].$2 : durationMinutes;
     _setMore(index, (picked.hour * 60 + picked.minute, minutes));
@@ -273,120 +276,120 @@ class HabitTimeFields extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: _planned ? null : () => _pickStart(context),
       child: Container(
-      padding: EdgeInsets.all(compact ? 12 : 14),
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest.withValues(alpha: 0.6),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        children: [
-          _Row(
-            icon: LucideIcons.clock,
-            color: color,
-            label: context.l10n.habit_time,
-            value: _planned
-                ? context.clockAt(startMinute)
-                : context.l10n.habit_time_none,
-            compact: compact,
-            onTap: () => _pickStart(context),
-            onClear: _planned
-                ? () {
-                    onChanged(-1, 0);
-                    if (more.isNotEmpty) onMore?.call(const []);
-                  }
-                : null,
-          ),
-          SizedBox(height: compact ? 8 : 10),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              context.l10n.habit_time_sub,
-              style: TextStyle(
-                fontSize: compact ? 11.5 : 12.5,
-                height: 1.35,
-                color: context.tokens.muted,
-              ),
-            ),
-          ),
-          if (_planned) ...[
-            SizedBox(height: compact ? 10 : 12),
+        padding: EdgeInsets.all(compact ? 12 : 14),
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerHighest.withValues(alpha: 0.6),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          children: [
             _Row(
-              icon: LucideIcons.hourglass,
+              icon: LucideIcons.clock,
               color: color,
-              label: context.l10n.habit_duration,
-              value: durationMinutes == 0
-                  ? context.l10n.habit_duration_none
-                  : spanLabel(durationMinutes),
+              label: context.l10n.habit_time,
+              value: _planned
+                  ? context.clockAt(startMinute)
+                  : context.l10n.habit_time_none,
               compact: compact,
-              onTap: () => _pickDuration(context),
+              onTap: () => _pickStart(context),
+              onClear: _planned
+                  ? () {
+                      onChanged(-1, 0);
+                      if (more.isNotEmpty) onMore?.call(const []);
+                    }
+                  : null,
             ),
-            SizedBox(height: compact ? 10 : 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final preset in habitDurationPresets)
-                  _Preset(
-                    label: spanLabel(preset),
-                    color: color,
-                    selected: durationMinutes == preset,
-                    onTap: () => onChanged(startMinute, preset),
-                  ),
-              ],
-            ),
-            if (durationMinutes > 0) ...[
-              SizedBox(height: compact ? 8 : 10),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  '${context.clockAt(startMinute)} - ${context.clockAt(end)}',
-                  style: TextStyle(
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w600,
-                    color: context.tokens.muted,
-                  ),
+            SizedBox(height: compact ? 8 : 10),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                context.l10n.habit_time_sub,
+                style: TextStyle(
+                  fontSize: compact ? 11.5 : 12.5,
+                  height: 1.35,
+                  color: context.tokens.muted,
                 ),
               ),
-            ],
-            if (onMore != null) ...[
-              for (var i = 0; i < more.length; i++) ...[
-                SizedBox(height: compact ? 10 : 12),
-                _MoreRow(
-                  color: color,
-                  compact: compact,
-                  time: context.clockAt(more[i].$1),
-                  span: more[i].$2 == 0
-                      ? context.l10n.habit_duration_none
-                      : spanLabel(more[i].$2),
-                  onTime: () => _pickMore(context, i),
-                  onSpan: () => _pickMoreDuration(context, i),
-                  onClear: () => _setMore(i, null),
-                ),
-              ],
-              SizedBox(height: compact ? 6 : 8),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: TextButton.icon(
-                  onPressed: () => _pickMore(context, more.length),
-                  style: TextButton.styleFrom(
-                    foregroundColor: color,
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    visualDensity: VisualDensity.compact,
-                  ),
-                  icon: const Icon(LucideIcons.clockPlus, size: 17),
-                  label: Text(
-                    context.l10n.habit_time_more,
+            ),
+            if (_planned) ...[
+              SizedBox(height: compact ? 10 : 12),
+              _Row(
+                icon: LucideIcons.hourglass,
+                color: color,
+                label: context.l10n.habit_duration,
+                value: durationMinutes == 0
+                    ? context.l10n.habit_duration_none
+                    : spanLabel(durationMinutes),
+                compact: compact,
+                onTap: () => _pickDuration(context),
+              ),
+              SizedBox(height: compact ? 10 : 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final preset in habitDurationPresets)
+                    _Preset(
+                      label: spanLabel(preset),
+                      color: color,
+                      selected: durationMinutes == preset,
+                      onTap: () => onChanged(startMinute, preset),
+                    ),
+                ],
+              ),
+              if (durationMinutes > 0) ...[
+                SizedBox(height: compact ? 8 : 10),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    '${context.clockAt(startMinute)} - ${context.clockAt(end)}',
                     style: TextStyle(
-                      fontSize: compact ? 13 : 14,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w600,
+                      color: context.tokens.muted,
                     ),
                   ),
                 ),
-              ),
+              ],
+              if (onMore != null) ...[
+                for (var i = 0; i < more.length; i++) ...[
+                  SizedBox(height: compact ? 10 : 12),
+                  _MoreRow(
+                    color: color,
+                    compact: compact,
+                    time: context.clockAt(more[i].$1),
+                    span: more[i].$2 == 0
+                        ? context.l10n.habit_duration_none
+                        : spanLabel(more[i].$2),
+                    onTime: () => _pickMore(context, i),
+                    onSpan: () => _pickMoreDuration(context, i),
+                    onClear: () => _setMore(i, null),
+                  ),
+                ],
+                SizedBox(height: compact ? 6 : 8),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton.icon(
+                    onPressed: () => _pickMore(context, more.length),
+                    style: TextButton.styleFrom(
+                      foregroundColor: color,
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    icon: const Icon(LucideIcons.clockPlus, size: 17),
+                    label: Text(
+                      context.l10n.habit_time_more,
+                      style: TextStyle(
+                        fontSize: compact ? 13 : 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ],
-        ],
-      ),
+        ),
       ),
     );
   }
@@ -487,24 +490,24 @@ class _MoreRow extends StatelessWidget {
   final VoidCallback onClear;
 
   Widget _pill(String value, VoidCallback onTap) => GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.14),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            value,
-            style: TextStyle(
-              fontSize: compact ? 13 : 14,
-              fontWeight: FontWeight.w700,
-              color: color,
-            ),
-          ),
+    behavior: HitTestBehavior.opaque,
+    onTap: onTap,
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        value,
+        style: TextStyle(
+          fontSize: compact ? 13 : 14,
+          fontWeight: FontWeight.w700,
+          color: color,
         ),
-      );
+      ),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {

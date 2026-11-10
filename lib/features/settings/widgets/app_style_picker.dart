@@ -126,11 +126,11 @@ class _StyleOption extends StatelessWidget {
             AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 240),
               style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    fontSize: selected ? 16 : 15,
-                    fontWeight: selected ? FontWeight.w900 : FontWeight.w700,
-                    letterSpacing: -0.2,
-                    color: selected ? accent : context.tokens.muted,
-                  ),
+                fontSize: selected ? 16 : 15,
+                fontWeight: selected ? FontWeight.w900 : FontWeight.w700,
+                letterSpacing: -0.2,
+                color: selected ? accent : context.tokens.muted,
+              ),
               child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
             ),
             const SizedBox(height: 6),
@@ -214,7 +214,9 @@ class _LegendRow extends StatelessWidget {
                 : context.colors.surfaceContainerHigh.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(selected ? 22 : 16),
             border: Border.all(
-              color: selected ? accent.withValues(alpha: 0.5) : Colors.transparent,
+              color: selected
+                  ? accent.withValues(alpha: 0.5)
+                  : Colors.transparent,
             ),
           ),
           child: Row(
@@ -253,7 +255,10 @@ class _LegendRow extends StatelessWidget {
                 child: Container(
                   width: 22,
                   height: 22,
-                  decoration: BoxDecoration(shape: BoxShape.circle, color: accent),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: accent,
+                  ),
                   child: Icon(
                     LucideIcons.check,
                     size: 14,
@@ -287,15 +292,14 @@ Widget _block(
   double h,
   Color color, {
   double radius = 2,
-}) =>
-    Container(
-      width: w,
-      height: h,
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(radius),
-      ),
-    );
+}) => Container(
+  width: w,
+  height: h,
+  decoration: BoxDecoration(
+    color: color,
+    borderRadius: BorderRadius.circular(radius),
+  ),
+);
 
 class _ClassicSkeleton extends StatelessWidget {
   const _ClassicSkeleton();
@@ -313,30 +317,30 @@ class _ClassicSkeleton extends StatelessWidget {
         final s = constraints.maxWidth / 86;
 
         Widget habitCard() => Container(
-              height: 21 * s,
-              padding: EdgeInsets.symmetric(horizontal: 5 * s),
-              decoration: BoxDecoration(
-                color: skin.card,
-                borderRadius: BorderRadius.circular(7 * s),
-              ),
-              child: Row(
+          height: 21 * s,
+          padding: EdgeInsets.symmetric(horizontal: 5 * s),
+          decoration: BoxDecoration(
+            color: skin.card,
+            borderRadius: BorderRadius.circular(7 * s),
+          ),
+          child: Row(
+            children: [
+              _block(12 * s, 12 * s, skin.tint, radius: 4 * s),
+              SizedBox(width: 5 * s),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _block(12 * s, 12 * s, skin.tint, radius: 4 * s),
-                  SizedBox(width: 5 * s),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _block(24 * s, 3.2 * s, skin.text, radius: 2 * s),
-                      SizedBox(height: 3 * s),
-                      _block(14 * s, 2.4 * s, skin.faint, radius: 2 * s),
-                    ],
-                  ),
-                  const Spacer(),
-                  _block(12 * s, 12 * s, skin.tint, radius: 4 * s),
+                  _block(24 * s, 3.2 * s, skin.text, radius: 2 * s),
+                  SizedBox(height: 3 * s),
+                  _block(14 * s, 2.4 * s, skin.faint, radius: 2 * s),
                 ],
               ),
-            );
+              const Spacer(),
+              _block(12 * s, 12 * s, skin.tint, radius: 4 * s),
+            ],
+          ),
+        );
 
         return Padding(
           padding: EdgeInsets.fromLTRB(5 * s, 7 * s, 5 * s, 0),
@@ -427,33 +431,33 @@ class _MinimalSkeleton extends StatelessWidget {
         final s = constraints.maxWidth / 86;
 
         Widget wideCard() => Container(
-              height: 22 * s,
-              padding: EdgeInsets.symmetric(horizontal: 5 * s),
-              decoration: BoxDecoration(
-                color: skin.isDark
-                    ? Colors.white.withValues(alpha: 0.05)
-                    : Colors.white.withValues(alpha: 0.75),
-                borderRadius: BorderRadius.circular(7 * s),
-                border: Border.all(color: skin.faint.withValues(alpha: 0.35)),
-              ),
-              child: Row(
-                children: [
-                  _block(13 * s, 13 * s, skin.tint, radius: 4.5 * s),
-                  SizedBox(width: 5 * s),
-                  _block(16 * s, 3.2 * s, skin.text, radius: 2 * s),
-                  const Spacer(),
-                  for (var i = 0; i < 4; i++) ...[
-                    if (i > 0) SizedBox(width: 2.5 * s),
-                    _block(
-                      5 * s,
-                      9 * s,
-                      i == 3 ? skin.accent : skin.tint,
-                      radius: 1.8 * s,
-                    ),
-                  ],
-                ],
-              ),
-            );
+          height: 22 * s,
+          padding: EdgeInsets.symmetric(horizontal: 5 * s),
+          decoration: BoxDecoration(
+            color: skin.isDark
+                ? Colors.white.withValues(alpha: 0.05)
+                : Colors.white.withValues(alpha: 0.75),
+            borderRadius: BorderRadius.circular(7 * s),
+            border: Border.all(color: skin.faint.withValues(alpha: 0.35)),
+          ),
+          child: Row(
+            children: [
+              _block(13 * s, 13 * s, skin.tint, radius: 4.5 * s),
+              SizedBox(width: 5 * s),
+              _block(16 * s, 3.2 * s, skin.text, radius: 2 * s),
+              const Spacer(),
+              for (var i = 0; i < 4; i++) ...[
+                if (i > 0) SizedBox(width: 2.5 * s),
+                _block(
+                  5 * s,
+                  9 * s,
+                  i == 3 ? skin.accent : skin.tint,
+                  radius: 1.8 * s,
+                ),
+              ],
+            ],
+          ),
+        );
 
         return Padding(
           padding: EdgeInsets.fromLTRB(5 * s, 7 * s, 5 * s, 6 * s),
@@ -518,33 +522,37 @@ class _ExpressSkeleton extends StatelessWidget {
         final s = constraints.maxWidth / 86;
 
         Widget row(double topRadius, double bottomRadius) => Container(
-              height: 17 * s,
-              padding: EdgeInsets.symmetric(horizontal: 4 * s),
-              decoration: BoxDecoration(
-                color: skin.card,
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(topRadius * s),
-                  bottom: Radius.circular(bottomRadius * s),
-                ),
-              ),
-              child: Row(
-                children: [
-                  _block(11 * s, 11 * s, skin.tint, radius: 5.5 * s),
-                  SizedBox(width: 4 * s),
-                  _block(20 * s, 3 * s, skin.text, radius: 2 * s),
-                  const Spacer(),
-                  _block(11 * s, 11 * s, skin.accent, radius: 5.5 * s),
-                ],
-              ),
-            );
+          height: 17 * s,
+          padding: EdgeInsets.symmetric(horizontal: 4 * s),
+          decoration: BoxDecoration(
+            color: skin.card,
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(topRadius * s),
+              bottom: Radius.circular(bottomRadius * s),
+            ),
+          ),
+          child: Row(
+            children: [
+              _block(11 * s, 11 * s, skin.tint, radius: 5.5 * s),
+              SizedBox(width: 4 * s),
+              _block(20 * s, 3 * s, skin.text, radius: 2 * s),
+              const Spacer(),
+              _block(11 * s, 11 * s, skin.accent, radius: 5.5 * s),
+            ],
+          ),
+        );
 
         return Padding(
           padding: EdgeInsets.fromLTRB(5 * s, 7 * s, 5 * s, 5 * s),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _block(30 * s, 7 * s, context.colors.onSurface.withValues(alpha: 0.7),
-                  radius: 3 * s),
+              _block(
+                30 * s,
+                7 * s,
+                context.colors.onSurface.withValues(alpha: 0.7),
+                radius: 3 * s,
+              ),
               SizedBox(height: 6 * s),
               Container(
                 height: 26 * s,

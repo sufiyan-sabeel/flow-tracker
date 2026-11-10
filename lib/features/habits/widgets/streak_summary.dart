@@ -20,10 +20,10 @@ class StreakSummary extends StatelessWidget {
   final HeatmapMode mode;
 
   String _format(BuildContext context, int value) => switch (habit.interval) {
-        HabitInterval.weekly => context.l10n.count_weeks(value),
-        HabitInterval.monthly => context.l10n.count_months(value),
-        _ => context.l10n.count_days(value),
-      };
+    HabitInterval.weekly => context.l10n.count_weeks(value),
+    HabitInterval.monthly => context.l10n.count_months(value),
+    _ => context.l10n.count_days(value),
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -42,31 +42,35 @@ class StreakSummary extends StatelessWidget {
             ),
           )
         else ...[
-        Expanded(
-          child: _StatBox(
-            icon: LucideIcons.flame,
-            iconColor: habit.color.shownIn(context),
-            shape: ExpressShape.cookie,
-            label: context.l10n.current,
-            value: _format(context, habit.currentStreak),
+          Expanded(
+            child: _StatBox(
+              icon: LucideIcons.flame,
+              iconColor: habit.color.shownIn(context),
+              shape: ExpressShape.cookie,
+              label: context.l10n.current,
+              value: _format(context, habit.currentStreak),
+            ),
           ),
-        ),
-        const SizedBox(width: Express.groupGap),
-        Expanded(
-          child: _StatBox(
-            icon: LucideIcons.trophy,
-            iconColor: context.tokens.warning,
-            shape: ExpressShape.gem,
-            label: context.l10n.best,
-            value: _format(context, habit.longestStreak),
+          const SizedBox(width: Express.groupGap),
+          Expanded(
+            child: _StatBox(
+              icon: LucideIcons.trophy,
+              iconColor: context.tokens.warning,
+              shape: ExpressShape.gem,
+              label: context.l10n.best,
+              value: _format(context, habit.longestStreak),
+            ),
           ),
-        ),
         ],
         const SizedBox(width: Express.groupGap),
         Expanded(
           child: _StatBox(
-            icon: negative ? LucideIcons.triangleAlert : LucideIcons.circleCheck,
-            iconColor: negative ? context.tokens.danger : context.tokens.success,
+            icon: negative
+                ? LucideIcons.triangleAlert
+                : LucideIcons.circleCheck,
+            iconColor: negative
+                ? context.tokens.danger
+                : context.tokens.success,
             shape: ExpressShape.clover,
             label: period,
             value: '$count',

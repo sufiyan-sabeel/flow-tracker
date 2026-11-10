@@ -164,7 +164,12 @@ class BookPainter extends CustomPainter {
       );
       canvas.drawRRect(
         RRect.fromRectAndRadius(
-          Rect.fromLTWH(w * 0.24, topY + 3, w * 0.12, (h - topY - 6).clamp(0, h)),
+          Rect.fromLTWH(
+            w * 0.24,
+            topY + 3,
+            w * 0.12,
+            (h - topY - 6).clamp(0, h),
+          ),
           const Radius.circular(2),
         ),
         Paint()..color = hi.withValues(alpha: 0.65),
@@ -206,10 +211,10 @@ class FootPainter extends CustomPainter {
 
   static Path _toes(double w, double h) {
     Rect toe(double x, double y, double rx, double ry) => Rect.fromCenter(
-          center: Offset(x * w, y * h),
-          width: 2 * rx * w,
-          height: 2 * ry * h,
-        );
+      center: Offset(x * w, y * h),
+      width: 2 * rx * w,
+      height: 2 * ry * h,
+    );
     return Path()
       ..addOval(toe(0.25, 0.115, 0.115, 0.095))
       ..addOval(toe(0.465, 0.065, 0.075, 0.062))
@@ -341,7 +346,11 @@ class StopwatchPainter extends CustomPainter {
     for (var i = 0; i < 4; i++) {
       final a = i * math.pi / 2;
       final dir = Offset(math.sin(a), -math.cos(a));
-      canvas.drawLine(center + dir * inner * 0.70, center + dir * inner * 0.88, tick);
+      canvas.drawLine(
+        center + dir * inner * 0.70,
+        center + dir * inner * 0.88,
+        tick,
+      );
     }
 
     const start = -math.pi / 2;
@@ -411,7 +420,8 @@ class DialPainter extends CustomPainter {
         : Color.lerp(color, Colors.white, 0.80)!;
     final face = Color.lerp(color, Colors.white, 0.93)!;
     final ink = Color.lerp(color, Colors.black, 0.30)!;
-    final unlit = under ??
+    final unlit =
+        under ??
         (light
             ? Colors.black.withValues(alpha: 0.18)
             : Colors.white.withValues(alpha: 0.75));

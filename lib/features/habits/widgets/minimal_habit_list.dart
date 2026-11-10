@@ -71,49 +71,51 @@ class MinimalHabitList extends StatelessWidget {
         if (index == 0) return _Cascade(index: 0, child: header);
         final i = index - 1;
         if (i == habits.length) return _Cascade(index: index, child: fold!);
-        final habit = i > habits.length ? more[i - habits.length - 1] : habits[i];
+        final habit = i > habits.length
+            ? more[i - habits.length - 1]
+            : habits[i];
         return _Cascade(
           index: index,
           child: HabitEntrance(
-          key: ValueKey(habit.id),
-          index: i,
-          child: Opacity(
-            opacity: i > habits.length ? 0.6 : 1,
-            child: SlotTransition(
-            leaving: leaving.contains(habit.id),
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: PaneMark(
-                id: habit.id,
-                tint: habit.color.shownIn(context),
-                corners: BorderRadius.circular(20),
-                child: SwipeCheck(
-                  done: habit.isCompletedOn(AppClock.today()),
-                  tint: habit.color.shownIn(context),
-                  corners: BorderRadius.circular(20),
-                  onSwipe: onSwipe == null ? null : () => onSwipe!(habit),
-                  child: KeepBuilt(
-                  keys: [habit, mode, AppClock.today()],
-                  build: () => mode == HeatmapMode.week
-                    ? GridWeekCard(
-                        habit: habit,
-                        onOpen: () => onOpen(habit),
-                        onToggleDay: (d) => onToggleDay(habit, d),
-                        onLongPress: () => onLongPress(habit),
-                      )
-                    : GridYearCard(
-                        habit: habit,
-                        onOpen: () => onOpen(habit),
-                        onToggleToday: () => onToggleToday(habit),
-                        onToggleDay: (d) => onToggleDay(habit, d),
-                        onLongPress: () => onLongPress(habit),
+            key: ValueKey(habit.id),
+            index: i,
+            child: Opacity(
+              opacity: i > habits.length ? 0.6 : 1,
+              child: SlotTransition(
+                leaving: leaving.contains(habit.id),
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: PaneMark(
+                    id: habit.id,
+                    tint: habit.color.shownIn(context),
+                    corners: BorderRadius.circular(20),
+                    child: SwipeCheck(
+                      done: habit.isCompletedOn(AppClock.today()),
+                      tint: habit.color.shownIn(context),
+                      corners: BorderRadius.circular(20),
+                      onSwipe: onSwipe == null ? null : () => onSwipe!(habit),
+                      child: KeepBuilt(
+                        keys: [habit, mode, AppClock.today()],
+                        build: () => mode == HeatmapMode.week
+                            ? GridWeekCard(
+                                habit: habit,
+                                onOpen: () => onOpen(habit),
+                                onToggleDay: (d) => onToggleDay(habit, d),
+                                onLongPress: () => onLongPress(habit),
+                              )
+                            : GridYearCard(
+                                habit: habit,
+                                onOpen: () => onOpen(habit),
+                                onToggleToday: () => onToggleToday(habit),
+                                onToggleDay: (d) => onToggleDay(habit, d),
+                                onLongPress: () => onLongPress(habit),
+                              ),
                       ),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          ),
           ),
         );
       },
@@ -134,28 +136,28 @@ class MinimalHabitList extends StatelessWidget {
         return _Cascade(
           index: index,
           child: HabitEntrance(
-          key: ValueKey(group[i].id),
-          index: index - 1,
-          child: Opacity(
-            opacity: extra ? 0.6 : 1,
-            child: Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(child: _monthCard(context, group[i])),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: i + 1 < group.length
-                        ? _monthCard(context, group[i + 1])
-                        : const SizedBox.shrink(),
+            key: ValueKey(group[i].id),
+            index: index - 1,
+            child: Opacity(
+              opacity: extra ? 0.6 : 1,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(child: _monthCard(context, group[i])),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: i + 1 < group.length
+                            ? _monthCard(context, group[i + 1])
+                            : const SizedBox.shrink(),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
-          ),
-          ),
           ),
         );
       },
@@ -175,14 +177,14 @@ class MinimalHabitList extends StatelessWidget {
         corners: BorderRadius.circular(30),
         onSwipe: onSwipe == null ? null : () => onSwipe!(habit),
         child: KeepBuilt(
-        keys: [habit, AppClock.today()],
-        build: () => GridMonthCard(
-          habit: habit,
-          onOpen: () => onOpen(habit),
-          onToggleToday: () => onToggleToday(habit),
-          onToggleDay: (d) => onToggleDay(habit, d),
-          onLongPress: () => onLongPress(habit),
-        ),
+          keys: [habit, AppClock.today()],
+          build: () => GridMonthCard(
+            habit: habit,
+            onOpen: () => onOpen(habit),
+            onToggleToday: () => onToggleToday(habit),
+            onToggleDay: (d) => onToggleDay(habit, d),
+            onLongPress: () => onLongPress(habit),
+          ),
         ),
       ),
     );
@@ -206,8 +208,9 @@ class _Cascade extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final parent =
-        context.dependOnInheritedWidgetOfExactType<_SwitchIn>()?.animation;
+    final parent = context
+        .dependOnInheritedWidgetOfExactType<_SwitchIn>()
+        ?.animation;
     if (parent == null) return child;
     final start = 0.05 * index.clamp(0, 6);
     final curve = CurvedAnimation(
@@ -217,8 +220,10 @@ class _Cascade extends StatelessWidget {
     return FadeTransition(
       opacity: curve,
       child: SlideTransition(
-        position: Tween(begin: const Offset(0, 0.06), end: Offset.zero)
-            .animate(curve),
+        position: Tween(
+          begin: const Offset(0, 0.06),
+          end: Offset.zero,
+        ).animate(curve),
         child: RepaintBoundary(child: child),
       ),
     );

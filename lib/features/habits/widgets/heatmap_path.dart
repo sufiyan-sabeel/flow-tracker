@@ -9,9 +9,9 @@ bool heatmapPathOn(BuildContext context) =>
     context.watch<SettingsController>().heatmapPath;
 
 Color heatmapPathColor(BuildContext context, Color habit) => Color.alphaBlend(
-      habit.withValues(alpha: 0.55),
-      context.colors.surfaceContainerHighest,
-    );
+  habit.withValues(alpha: 0.55),
+  context.colors.surfaceContainerHighest,
+);
 
 Widget withHeatmapPath({
   required bool on,

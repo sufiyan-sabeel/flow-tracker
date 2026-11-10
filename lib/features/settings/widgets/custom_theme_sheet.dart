@@ -14,15 +14,15 @@ Future<void> showCustomThemeSheet(BuildContext context) =>
     showSheet(context, (_) => const _CustomThemeSheet());
 
 String _partLabel(BuildContext context, String key) => switch (key) {
-      'background' => context.l10n.color_part_background,
-      'card' => context.l10n.color_part_card,
-      'text' => context.l10n.color_part_text,
-      'accent' => context.l10n.color_part_accent,
-      'success' => context.l10n.color_part_success,
-      'warning' => context.l10n.color_part_warning,
-      'danger' => context.l10n.color_part_danger,
-      _ => context.l10n.color_part_info,
-    };
+  'background' => context.l10n.color_part_background,
+  'card' => context.l10n.color_part_card,
+  'text' => context.l10n.color_part_text,
+  'accent' => context.l10n.color_part_accent,
+  'success' => context.l10n.color_part_success,
+  'warning' => context.l10n.color_part_warning,
+  'danger' => context.l10n.color_part_danger,
+  _ => context.l10n.color_part_info,
+};
 
 String _hex(Color color) =>
     '#${(color.toARGB32() & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}';
