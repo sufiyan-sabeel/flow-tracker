@@ -35,10 +35,10 @@ struct HabitGridView: View {
           Spacer(minLength: 0)
         } else if payload != nil {
           EmptyMessage(
-            text: WidgetStrings.get("no_habits", "No habits yet\nTap to open Streak"), style: style)
+            text: WidgetStrings.get("no_habits", "No habits yet\nTap to open Flow-tracker"), style: style)
         } else {
           EmptyMessage(
-            text: WidgetStrings.get("no_data", "No data yet\nOpen Streak to sync"), style: style)
+            text: WidgetStrings.get("no_data", "No data yet\nOpen Flow-tracker to sync"), style: style)
         }
       }
       .widgetURL(Links.app)

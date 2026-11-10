@@ -19,7 +19,7 @@
 		5B1D00010000000000000031 /* Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1D00010000000000000021 /* Style.swift */; };
 		5B1D00010000000000000032 /* Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1D00010000000000000022 /* Actions.swift */; };
 		5B1D00010000000000000033 /* Intents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1D00010000000000000023 /* Intents.swift */; };
-		5B1D00010000000000000034 /* StreakWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1D00010000000000000024 /* StreakWidgets.swift */; };
+		5B1D00010000000000000034 /* FlowTrackerWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1D00010000000000000024 /* FlowTrackerWidgets.swift */; };
 		5B1D00010000000000000035 /* HabitGridWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1D00010000000000000025 /* HabitGridWidget.swift */; };
 		5B1D00010000000000000036 /* TodayWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1D00010000000000000026 /* TodayWidget.swift */; };
 		5B1D00010000000000000037 /* StatsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1D00010000000000000027 /* StatsWidget.swift */; };
@@ -30,7 +30,7 @@
 		5B1D0001000000000000004B /* FocusAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1D0001000000000000002B /* FocusAttributes.swift */; };
 		5B1D0001000000000000003C /* FocusActivityWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1D0001000000000000002C /* FocusActivityWidget.swift */; };
 		5B1D0001000000000000004D /* FocusLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1D0001000000000000002D /* FocusLiveActivity.swift */; };
-		5B1D00010000000000000015 /* StreakWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5B1D0001000000000000000B /* StreakWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		5B1D00010000000000000015 /* FlowTrackerWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5B1D0001000000000000000B /* FlowTrackerWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,7 +46,7 @@
 			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 5B1D0001000000000000000A;
-			remoteInfo = StreakWidgets;
+			remoteInfo = FlowTrackerWidgets;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -67,7 +67,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				5B1D00010000000000000015 /* StreakWidgets.appex in Embed Foundation Extensions */,
+				5B1D00010000000000000015 /* FlowTrackerWidgets.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -95,7 +95,7 @@
 		5B1D00010000000000000021 /* Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Style.swift; sourceTree = "<group>"; };
 		5B1D00010000000000000022 /* Actions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Actions.swift; sourceTree = "<group>"; };
 		5B1D00010000000000000023 /* Intents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Intents.swift; sourceTree = "<group>"; };
-		5B1D00010000000000000024 /* StreakWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakWidgets.swift; sourceTree = "<group>"; };
+		5B1D00010000000000000024 /* FlowTrackerWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowTrackerWidgets.swift; sourceTree = "<group>"; };
 		5B1D00010000000000000025 /* HabitGridWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitGridWidget.swift; sourceTree = "<group>"; };
 		5B1D00010000000000000026 /* TodayWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayWidget.swift; sourceTree = "<group>"; };
 		5B1D00010000000000000027 /* StatsWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsWidget.swift; sourceTree = "<group>"; };
@@ -105,9 +105,9 @@
 		5B1D0001000000000000002B /* FocusAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusAttributes.swift; sourceTree = "<group>"; };
 		5B1D0001000000000000002C /* FocusActivityWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusActivityWidget.swift; sourceTree = "<group>"; };
 		5B1D0001000000000000002D /* FocusLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusLiveActivity.swift; sourceTree = "<group>"; };
-		5B1D0001000000000000000B /* StreakWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = StreakWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		5B1D0001000000000000000B /* FlowTrackerWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FlowTrackerWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B1D00010000000000000018 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		5B1D00010000000000000019 /* StreakWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = StreakWidgets.entitlements; sourceTree = "<group>"; };
+		5B1D00010000000000000019 /* FlowTrackerWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FlowTrackerWidgets.entitlements; sourceTree = "<group>"; };
 		5B1D0001000000000000001A /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -154,7 +154,7 @@
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
 				97C146EF1CF9000F007C117D /* Products */,
-				5B1D0001000000000000000C /* StreakWidgets */,
+				5B1D0001000000000000000C /* FlowTrackerWidgets */,
 				331C8082294A63A400263BE5 /* RunnerTests */,
 			);
 			sourceTree = "<group>";
@@ -164,7 +164,7 @@
 			children = (
 				97C146EE1CF9000F007C117D /* Runner.app */,
 				331C8081294A63A400263BE5 /* RunnerTests.xctest */,
-				5B1D0001000000000000000B /* StreakWidgets.appex */,
+				5B1D0001000000000000000B /* FlowTrackerWidgets.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -187,14 +187,14 @@
 			path = Runner;
 			sourceTree = "<group>";
 		};
-		5B1D0001000000000000000C /* StreakWidgets */ = {
+		5B1D0001000000000000000C /* FlowTrackerWidgets */ = {
 			isa = PBXGroup;
 			children = (
 				5B1D00010000000000000020 /* Payload.swift */,
 				5B1D00010000000000000021 /* Style.swift */,
 				5B1D00010000000000000022 /* Actions.swift */,
 				5B1D00010000000000000023 /* Intents.swift */,
-				5B1D00010000000000000024 /* StreakWidgets.swift */,
+				5B1D00010000000000000024 /* FlowTrackerWidgets.swift */,
 				5B1D00010000000000000025 /* HabitGridWidget.swift */,
 				5B1D00010000000000000026 /* TodayWidget.swift */,
 				5B1D00010000000000000027 /* StatsWidget.swift */,
@@ -204,9 +204,9 @@
 				5B1D0001000000000000002B /* FocusAttributes.swift */,
 				5B1D0001000000000000002C /* FocusActivityWidget.swift */,
 				5B1D00010000000000000018 /* Info.plist */,
-				5B1D00010000000000000019 /* StreakWidgets.entitlements */,
+				5B1D00010000000000000019 /* FlowTrackerWidgets.entitlements */,
 			);
-			path = StreakWidgets;
+			path = FlowTrackerWidgets;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -251,9 +251,9 @@
 			productReference = 97C146EE1CF9000F007C117D /* Runner.app */;
 			productType = "com.apple.product-type.application";
 		};
-		5B1D0001000000000000000A /* StreakWidgets */ = {
+		5B1D0001000000000000000A /* FlowTrackerWidgets */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5B1D00010000000000000010 /* Build configuration list for PBXNativeTarget "StreakWidgets" */;
+			buildConfigurationList = 5B1D00010000000000000010 /* Build configuration list for PBXNativeTarget "FlowTrackerWidgets" */;
 			buildPhases = (
 				5B1D0001000000000000000D /* Sources */,
 				5B1D0001000000000000000E /* Frameworks */,
@@ -263,9 +263,9 @@
 			);
 			dependencies = (
 			);
-			name = StreakWidgets;
-			productName = StreakWidgets;
-			productReference = 5B1D0001000000000000000B /* StreakWidgets.appex */;
+			name = FlowTrackerWidgets;
+			productName = FlowTrackerWidgets;
+			productReference = 5B1D0001000000000000000B /* FlowTrackerWidgets.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
@@ -306,7 +306,7 @@
 			targets = (
 				97C146ED1CF9000F007C117D /* Runner */,
 				331C8080294A63A400263BE5 /* RunnerTests */,
-				5B1D0001000000000000000A /* StreakWidgets */,
+				5B1D0001000000000000000A /* FlowTrackerWidgets */,
 			);
 		};
 /* End PBXProject section */
@@ -402,7 +402,7 @@
 				5B1D00010000000000000031 /* Style.swift in Sources */,
 				5B1D00010000000000000032 /* Actions.swift in Sources */,
 				5B1D00010000000000000033 /* Intents.swift in Sources */,
-				5B1D00010000000000000034 /* StreakWidgets.swift in Sources */,
+				5B1D00010000000000000034 /* FlowTrackerWidgets.swift in Sources */,
 				5B1D00010000000000000035 /* HabitGridWidget.swift in Sources */,
 				5B1D00010000000000000036 /* TodayWidget.swift in Sources */,
 				5B1D00010000000000000037 /* StatsWidget.swift in Sources */,
@@ -424,7 +424,7 @@
 		};
 		5B1D00010000000000000016 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 5B1D0001000000000000000A /* StreakWidgets */;
+			target = 5B1D0001000000000000000A /* FlowTrackerWidgets */;
 			targetProxy = 5B1D00010000000000000017 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -734,12 +734,12 @@
 			baseConfigurationReference = 9740EEB31CF90195004384FC /* Generated.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = StreakWidgets/StreakWidgets.entitlements;
+				CODE_SIGN_ENTITLEMENTS = FlowTrackerWidgets/FlowTrackerWidgets.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = StreakWidgets/Info.plist;
+				INFOPLIST_FILE = FlowTrackerWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -747,7 +747,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = com.streak.app.StreakWidgets;
+				PRODUCT_BUNDLE_IDENTIFIER = com.streak.app.FlowTrackerWidgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -764,12 +764,12 @@
 			baseConfigurationReference = 9740EEB31CF90195004384FC /* Generated.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = StreakWidgets/StreakWidgets.entitlements;
+				CODE_SIGN_ENTITLEMENTS = FlowTrackerWidgets/FlowTrackerWidgets.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = StreakWidgets/Info.plist;
+				INFOPLIST_FILE = FlowTrackerWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -777,7 +777,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = com.streak.app.StreakWidgets;
+				PRODUCT_BUNDLE_IDENTIFIER = com.streak.app.FlowTrackerWidgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -792,12 +792,12 @@
 			baseConfigurationReference = 9740EEB31CF90195004384FC /* Generated.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = StreakWidgets/StreakWidgets.entitlements;
+				CODE_SIGN_ENTITLEMENTS = FlowTrackerWidgets/FlowTrackerWidgets.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = StreakWidgets/Info.plist;
+				INFOPLIST_FILE = FlowTrackerWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -805,7 +805,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = com.streak.app.StreakWidgets;
+				PRODUCT_BUNDLE_IDENTIFIER = com.streak.app.FlowTrackerWidgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -848,7 +848,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		5B1D00010000000000000010 /* Build configuration list for PBXNativeTarget "StreakWidgets" */ = {
+		5B1D00010000000000000010 /* Build configuration list for PBXNativeTarget "FlowTrackerWidgets" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5B1D00010000000000000011 /* Debug */,

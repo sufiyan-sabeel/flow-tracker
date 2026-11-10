@@ -886,7 +886,7 @@ class WidgetConfigActivity : ComponentActivity() {
         }
         if (data == null) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(tr("open_to_sync", "Open Streak to sync"), color = style.muted, fontSize = 13.sp)
+                Text(tr("open_to_sync", "Open Flow-tracker to sync"), color = style.muted, fontSize = 13.sp)
             }
             return
         }

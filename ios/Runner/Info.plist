@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Streak</string>
+	<string>Flow-tracker</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Streak</string>
+	<string>Flow-tracker</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -81,13 +81,13 @@
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>NSCameraUsageDescription</key>
-	<string>Streak uses the camera to take photos for your notes and habit covers.</string>
+	<string>Flow-tracker uses the camera to take photos for your notes and habit covers.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Streak uses Face ID to unlock the app.</string>
+	<string>Flow-tracker uses Face ID to unlock the app.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Streak saves the cards and photos you export to your photo library.</string>
+	<string>Flow-tracker saves the cards and photos you export to your photo library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Streak reads photos you pick for your notes, habit covers and profile.</string>
+	<string>Flow-tracker reads photos you pick for your notes, habit covers and profile.</string>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
 	<key>UIBackgroundModes</key>

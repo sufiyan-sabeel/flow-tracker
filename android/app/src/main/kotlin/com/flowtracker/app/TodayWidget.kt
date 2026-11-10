@@ -113,9 +113,9 @@ class TodayWidget : GlanceAppWidget() {
             if (due.isEmpty()) {
                 EmptyNote(
                     when {
-                        data == null -> WidgetText.get(context, "no_data", "No data yet\nOpen Streak to sync")
+                        data == null -> WidgetText.get(context, "no_data", "No data yet\nOpen Flow-tracker to sync")
                         habits == null || habits.length() == 0 ->
-                            WidgetText.get(context, "no_habits", "No habits yet\nTap to open Streak")
+                            WidgetText.get(context, "no_habits", "No habits yet\nTap to open Flow-tracker")
                         else -> WidgetText.get(context, "todos_empty", "Nothing left for today")
                     },
                     style,

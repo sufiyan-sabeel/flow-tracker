@@ -98,7 +98,7 @@ struct HeatmapView: View {
         }
         .widgetURL(card.habit.map { Links.habit($0.id) } ?? Links.app)
       } else {
-        EmptyMessage(text: WidgetStrings.get("open_to_sync", "Open Streak to sync"), style: style)
+        EmptyMessage(text: WidgetStrings.get("open_to_sync", "Open Flow-tracker to sync"), style: style)
           .widgetURL(Links.app)
       }
     }

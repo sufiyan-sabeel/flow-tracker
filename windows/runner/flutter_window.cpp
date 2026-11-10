@@ -11,7 +11,7 @@ constexpr UINT_PTR kShowFallbackTimer = 1;
 constexpr UINT kShowFallbackMs = 4000;
 constexpr UINT_PTR kRefitTimer = 2;
 constexpr UINT kRefitMs = 600;
-constexpr wchar_t kWindowKey[] = L"Software\\Streak";
+constexpr wchar_t kWindowKey[] = L"Software\\Flow-tracker";
 constexpr wchar_t kPlacementValue[] = L"WindowPlacement";
 }
 

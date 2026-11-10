@@ -39,7 +39,7 @@ struct TodayView: View {
           }
           Spacer(minLength: 0)
         } else {
-          Text(WidgetStrings.get("open_to_sync", "Open Streak to sync"))
+          Text(WidgetStrings.get("open_to_sync", "Open Flow-tracker to sync"))
             .font(.system(size: 13))
             .foregroundStyle(style.muted)
           Spacer(minLength: 0)

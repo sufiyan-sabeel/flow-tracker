@@ -2,7 +2,7 @@ import SwiftUI
 import WidgetKit
 
 @main
-struct StreakWidgets: WidgetBundle {
+struct FlowTrackerWidgets: WidgetBundle {
   var body: some Widget {
     HabitGridWidget()
     TodayWidget()

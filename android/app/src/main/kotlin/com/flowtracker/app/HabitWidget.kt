@@ -97,7 +97,7 @@ class HabitWidget : GlanceAppWidget() {
                     WidgetText.get(
                         context,
                         if (data == null) "no_data" else "no_habits",
-                        if (data == null) "No data yet\nOpen Streak to sync" else "No habits yet\nTap to open Streak",
+                        if (data == null) "No data yet\nOpen Flow-tracker to sync" else "No habits yet\nTap to open Flow-tracker",
                     ),
                     style,
                 )

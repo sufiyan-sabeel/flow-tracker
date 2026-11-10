@@ -167,7 +167,7 @@ object HeatmapRenderer {
         if (data == null || data.levels.isEmpty()) {
             views.setViewVisibility(R.id.hm_content, View.GONE)
             views.setViewVisibility(R.id.hm_empty, View.VISIBLE)
-            val message = WidgetText.get(context, "open_to_sync", "Open Streak to sync")
+            val message = WidgetText.get(context, "open_to_sync", "Open Flow-tracker to sync")
             views.setImageViewBitmap(
                 R.id.hm_empty,
                 WidgetDraw.text(context, message, 13f, Ink(style.muted), 600, widthDp - PAD_DP * 2),
