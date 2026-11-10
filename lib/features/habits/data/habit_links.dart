@@ -18,10 +18,10 @@ class HabitLinks {
       '${_link('add', habit)}&amount=${formatAmount(habit.incrementAmount)}';
 
   static String _link(String action, Habit habit) =>
-      'streak://$action?habit=${habit.id}';
+      'flowtracker://$action?habit=${habit.id}';
 
   static bool marksHabit(Uri uri) =>
-      uri.scheme == 'streak' && marks.contains(uri.host);
+      uri.scheme == 'flowtracker' && marks.contains(uri.host);
 
   static Map<String, Completion>? apply(Habit habit, Uri uri) {
     if (habit.isArchived) return null;

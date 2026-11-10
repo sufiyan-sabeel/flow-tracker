@@ -40,9 +40,12 @@ void main() {
   test('add sums the amount of the link, or the habit step without one', () {
     final once = _with(water, Uri.parse(HabitLinks.add(water)));
     expect(once.completions[today.dayKey]?.count, 2);
-    final more = _with(once, Uri.parse('streak://add?habit=water&amount=3.5'));
+    final more = _with(
+      once,
+      Uri.parse('flowtracker://add?habit=water&amount=3.5'),
+    );
     expect(more.completions[today.dayKey]?.count, 5.5);
-    final step = _with(more, Uri.parse('streak://add?habit=water'));
+    final step = _with(more, Uri.parse('flowtracker://add?habit=water'));
     expect(step.completions[today.dayKey]?.count, 7.5);
   });
 
@@ -53,7 +56,7 @@ void main() {
 
   test('relapse only works on habits to avoid, and adds up', () {
     expect(
-      HabitLinks.apply(run, Uri.parse('streak://relapse?habit=run')),
+      HabitLinks.apply(run, Uri.parse('flowtracker://relapse?habit=run')),
       isNull,
     );
     final once = _with(smoke, Uri.parse(HabitLinks.relapse(smoke)));

@@ -211,7 +211,7 @@ jobs:
       - name: Install CocoaPods
         run: |
           cd ios
-          pod install --repo-update
+          pod install
 
       - name: Show toolchain
         run: |
@@ -292,8 +292,10 @@ jobs:
           $version = "${{ needs.validate.outputs.version }}"
           $src = "$PWD\build\windows\x64\runner\Release"
           New-Item -ItemType Directory -Force -Path out, msi | Out-Null
-          heat dir $src -cg AppFiles -dr INSTALLDIR -gg -scom -sreg -sfrag -srd `
-            -var var.SourceDir -out msi\files.wxs
+          # no -var: heat writes absolute source paths, which is exactly what we
+          # want for a one-shot build and avoids a preprocessor round trip
+          heat dir "$src" -cg AppFiles -dr INSTALLDIR -gg -scom -sreg -sfrag -srd `
+            -out msi\files.wxs
           @"
           <?xml version="1.0" encoding="UTF-8"?>
           <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
@@ -326,8 +328,8 @@ jobs:
             </Product>
           </Wix>
           "@ | Set-Content -Encoding UTF8 msi\product.wxs
-          candle -arch x64 -dSourceDir=$src -out msi\product.wixobj msi\product.wxs
-          candle -arch x64 -dSourceDir=$src -out msi\files.wixobj msi\files.wxs
+          candle -arch x64 -out msi\product.wixobj msi\product.wxs
+          candle -arch x64 -out msi\files.wixobj msi\files.wxs
           light -ext WixUIExtension -out "out\Flow-Tracker-$version-Windows-x64.msi" msi\product.wixobj msi\files.wixobj
 
       - name: Verify installers
@@ -394,6 +396,7 @@ jobs:
           version="${{ needs.validate.outputs.version }}"
           bundle=build/linux/x64/release/bundle
           test -x "$bundle/flow-tracker" || { echo "::error::no Linux executable"; exit 1; }
+          mkdir -p out
           root=pkg/flow-tracker
           mkdir -p "$root/opt/flow-tracker" "$root/usr/bin" "$root/usr/share/applications" \
                    "$root/usr/share/icons/hicolor/256x256/apps"
@@ -425,6 +428,7 @@ jobs:
           set -euo pipefail
           version="${{ needs.validate.outputs.version }}"
           bundle=build/linux/x64/release/bundle
+          mkdir -p out
           appdir=AppDir
           rm -rf "$appdir"
           mkdir -p "$appdir/usr/bin"
@@ -495,12 +499,9 @@ jobs:
       - name: Resolve dependencies
         run: flutter pub get
 
-      - name: Install CocoaPods
-        run: |
-          cd macos
-          pod install
-
       - name: Build macOS release
+        # Flutter writes the Podfile and runs CocoaPods as part of this step, so
+        # there is no separate pod install to do first.
         run: flutter build macos --release
 
       - name: Package DMG and PKG

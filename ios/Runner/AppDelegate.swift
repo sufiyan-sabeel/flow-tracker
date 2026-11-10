@@ -90,7 +90,7 @@ class StreakLinks: NSObject, FlutterSceneLifeCycleDelegate {
 
   func scene(
     _ scene: UIScene, willConnectTo session: UISceneSession,
-    options connectionOptions: UISceneConnectionOptions?
+    options connectionOptions: UIScene.ConnectionOptions?
   ) -> Bool {
     for context in connectionOptions?.urlContexts ?? [] {
       if case let (key, value)? = target(of: context.url) {
@@ -102,7 +102,7 @@ class StreakLinks: NSObject, FlutterSceneLifeCycleDelegate {
 
   func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) -> Bool {
     var handled = false
-    for context in URLContexts where context.url.scheme == "streak" {
+    for context in URLContexts where context.url.scheme == "flowtracker" {
       handled = true
       if case let (key, value)? = target(of: context.url), let method = methods[key] {
         channel?.invokeMethod(method, arguments: value)
@@ -116,7 +116,7 @@ class StreakLinks: NSObject, FlutterSceneLifeCycleDelegate {
   }
 
   private func target(of url: URL) -> (String, String)? {
-    guard url.scheme == "streak",
+    guard url.scheme == "flowtracker",
       let items = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems
     else { return nil }
     for item in items where methods[item.name] != nil {
