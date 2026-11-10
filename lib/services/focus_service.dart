@@ -24,7 +24,8 @@ class FocusService {
 
   static Future<void> Function()? onPending;
 
-  static bool get _available => !kIsWeb && (Platform.isAndroid || Platform.isIOS);
+  static bool get _available =>
+      !kIsWeb && (Platform.isAndroid || Platform.isIOS);
 
   static void listen() {
     if (!_available) return;
@@ -56,30 +57,29 @@ class FocusService {
     required String endBody,
     required bool hold,
     required List<Map<String, Object>> upcoming,
-  }) =>
-      _invoke('show', {
-        'habitId': habitId,
-        'title': title,
-        'state': state,
-        'phase': phase,
-        'running': running,
-        'done': done,
-        'countDown': countDown,
-        'seconds': seconds,
-        'anchor': anchor,
-        'total': total,
-        'channelName': channelName,
-        'pauseLabel': pauseLabel,
-        'resumeLabel': resumeLabel,
-        'stopLabel': stopLabel,
-        'continueLabel': continueLabel,
-        'skipLabel': skipLabel,
-        'minuteLabel': minuteLabel,
-        'endTitle': endTitle,
-        'endBody': endBody,
-        'hold': hold,
-        'upcoming': upcoming,
-      });
+  }) => _invoke('show', {
+    'habitId': habitId,
+    'title': title,
+    'state': state,
+    'phase': phase,
+    'running': running,
+    'done': done,
+    'countDown': countDown,
+    'seconds': seconds,
+    'anchor': anchor,
+    'total': total,
+    'channelName': channelName,
+    'pauseLabel': pauseLabel,
+    'resumeLabel': resumeLabel,
+    'stopLabel': stopLabel,
+    'continueLabel': continueLabel,
+    'skipLabel': skipLabel,
+    'minuteLabel': minuteLabel,
+    'endTitle': endTitle,
+    'endBody': endBody,
+    'hold': hold,
+    'upcoming': upcoming,
+  });
 
   static Future<void> hide() => _invoke('hide', const {});
 
@@ -99,11 +99,14 @@ class FocusService {
   }
 
   static FocusAction _actionFrom(Map<String, dynamic> map) => FocusAction(
-        kind: (map['kind'] ?? '') as String,
-        at: DateTime.fromMillisecondsSinceEpoch(((map['at'] ?? 0) as num).toInt()),
-      );
+    kind: (map['kind'] ?? '') as String,
+    at: DateTime.fromMillisecondsSinceEpoch(((map['at'] ?? 0) as num).toInt()),
+  );
 
-  static Future<void> _invoke(String method, Map<String, Object> arguments) async {
+  static Future<void> _invoke(
+    String method,
+    Map<String, Object> arguments,
+  ) async {
     if (!_available) return;
     try {
       await _channel.invokeMethod(method, arguments);

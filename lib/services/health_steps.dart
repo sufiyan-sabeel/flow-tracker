@@ -18,7 +18,8 @@ class HealthSteps {
     if (!Platform.isAndroid) return HealthAccess.unsupported;
     try {
       final status = await _channel.invokeMethod<String>('status');
-      return HealthAccess.values.asNameMap()[status] ?? HealthAccess.unsupported;
+      return HealthAccess.values.asNameMap()[status] ??
+          HealthAccess.unsupported;
     } on PlatformException {
       return HealthAccess.unsupported;
     } on MissingPluginException {
@@ -55,11 +56,16 @@ class HealthSteps {
     final now = DateTime.now().millisecondsSinceEpoch;
     final ranges = [
       for (final day in days)
-        [_start(day), math.max(_start(day) + 1, math.min(_start(day.addDays(1)), now))],
+        [
+          _start(day),
+          math.max(_start(day) + 1, math.min(_start(day.addDays(1)), now)),
+        ],
     ];
     List<int>? counts;
     try {
-      counts = await _channel.invokeListMethod<int>('readSteps', {'ranges': ranges});
+      counts = await _channel.invokeListMethod<int>('readSteps', {
+        'ranges': ranges,
+      });
     } on PlatformException {
       return;
     }
@@ -68,12 +74,16 @@ class HealthSteps {
       final floor = habit.createdAt.atMidnight;
       await habits.logSteps(habit.id, {
         for (var i = 0; i < days.length; i++)
-          if (counts[i] > 0 && !days[i].isBefore(floor)) days[i]: counts[i].toDouble(),
+          if (counts[i] > 0 && !days[i].isBefore(floor))
+            days[i]: counts[i].toDouble(),
       });
     }
   }
 
-  static int _start(DateTime day) =>
-      DateTime(day.year, day.month, day.day, AppClock.cutoffHour)
-          .millisecondsSinceEpoch;
+  static int _start(DateTime day) => DateTime(
+    day.year,
+    day.month,
+    day.day,
+    AppClock.cutoffHour,
+  ).millisecondsSinceEpoch;
 }

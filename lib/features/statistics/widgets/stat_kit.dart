@@ -6,7 +6,9 @@ import 'package:flow_tracker/app/theme/app_theme.dart';
 
 TextStyle statNumber(BuildContext context, double size, {Color? color}) =>
     TextStyle(
-      fontFamily: AppTheme.isClassic(context) ? AppTheme.classicFont : 'Figtree',
+      fontFamily: AppTheme.isClassic(context)
+          ? AppTheme.classicFont
+          : 'Figtree',
       fontSize: size,
       fontWeight: FontWeight.w900,
       height: 1,
@@ -16,10 +18,10 @@ TextStyle statNumber(BuildContext context, double size, {Color? color}) =>
     );
 
 TextStyle statLabel(BuildContext context) => TextStyle(
-      fontSize: 11,
-      fontWeight: FontWeight.w600,
-      color: context.tokens.muted,
-    );
+  fontSize: 11,
+  fontWeight: FontWeight.w600,
+  color: context.tokens.muted,
+);
 
 class AnimatedStatNumber extends StatelessWidget {
   const AnimatedStatNumber({super.key, required this.value, this.style});
@@ -233,11 +235,11 @@ class _StatHeader extends StatelessWidget {
     final direction = Directionality.of(context);
     final base = DefaultTextStyle.of(context).style;
     TextStyle style(double size) => TextStyle(
-          fontSize: size,
-          height: 1.25,
-          fontWeight: FontWeight.w800,
-          color: textColor,
-        );
+      fontSize: size,
+      height: 1.25,
+      fontWeight: FontWeight.w800,
+      color: textColor,
+    );
     bool fits(double size, double width) {
       final painter = TextPainter(
         text: TextSpan(text: title, style: base.merge(style(size))),

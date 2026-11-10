@@ -7,7 +7,10 @@ import 'package:flow_tracker/features/statistics/data/habit_stats.dart';
 
 ConsistencyPeriod consistencyPeriodOf(BuildContext context) {
   final index = context.watch<SettingsController>().consistencyPeriod;
-  return ConsistencyPeriod.values[index.clamp(0, ConsistencyPeriod.values.length - 1)];
+  return ConsistencyPeriod.values[index.clamp(
+    0,
+    ConsistencyPeriod.values.length - 1,
+  )];
 }
 
 String consistencyCaption(BuildContext context, ConsistencyPeriod period) =>

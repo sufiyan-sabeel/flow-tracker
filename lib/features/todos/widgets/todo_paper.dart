@@ -126,161 +126,172 @@ class TodoPaper extends StatelessWidget {
                   if (cover != null)
                     Positioned.fill(child: CoverImage(path: cover)),
                   CustomPaint(
-                painter: _Sheet(
-                  paper: paper,
-                  blank: dark ? darkSheet : Colors.white,
-                  ink: ink,
-                  reveal: TodoDeal.progress(context),
-                  edged: !dark,
-                  covered: cover != null,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (photos.length == 1)
-                      SizedBox(height: 120, child: CoverImage(path: photos.single)),
-                    if (photos.length > 1)
-                      SizedBox(
-                        height: 96,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Expanded(child: CoverImage(path: photos.first)),
-                            const SizedBox(width: 2),
-                            Expanded(
-                              child: _More(
-                                extra: saved.length - 2,
-                                child: CoverImage(path: photos.last),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(
-                        15,
-                        sticker && photos.isEmpty ? 21 : 15,
-                        15,
-                        11,
-                      ),
-                      child: TodoWrite(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (todo.title.isNotEmpty)
-                            Text(
-                              todo.title,
-                              maxLines: 6,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
-                                height: 1.3,
-                                color: done ? soft : ink,
-                                decoration:
-                                    done ? TextDecoration.lineThrough : null,
-                                decorationColor: soft,
-                              ),
-                            ),
-                            if (todo.body.isNotEmpty) ...[
-                              const SizedBox(height: 5),
-                              Text(
-                                todo.body,
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 12.5,
-                                  height: 1.35,
-                                  color: soft,
+                    painter: _Sheet(
+                      paper: paper,
+                      blank: dark ? darkSheet : Colors.white,
+                      ink: ink,
+                      reveal: TodoDeal.progress(context),
+                      edged: !dark,
+                      covered: cover != null,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (photos.length == 1)
+                          SizedBox(
+                            height: 120,
+                            child: CoverImage(path: photos.single),
+                          ),
+                        if (photos.length > 1)
+                          SizedBox(
+                            height: 96,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(child: CoverImage(path: photos.first)),
+                                const SizedBox(width: 2),
+                                Expanded(
+                                  child: _More(
+                                    extra: saved.length - 2,
+                                    child: CoverImage(path: photos.last),
+                                  ),
                                 ),
-                              ),
-                            ],
-                            if (steps.isNotEmpty) ...[
-                              const SizedBox(height: 9),
-                              for (final step in steps)
-                                _StepRow(
-                                  step: step,
-                                  forced: done,
-                                  onTap: () => context
-                                      .read<TodosController>()
-                                      .toggleStep(todo.id, step.id),
-                                ),
-                              if (hidden > 0)
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 4, left: 24),
-                                  child: Text(
-                                    '+$hidden',
+                              ],
+                            ),
+                          ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(
+                            15,
+                            sticker && photos.isEmpty ? 21 : 15,
+                            15,
+                            11,
+                          ),
+                          child: TodoWrite(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (todo.title.isNotEmpty)
+                                  Text(
+                                    todo.title,
+                                    maxLines: 6,
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 15,
                                       fontWeight: FontWeight.w700,
+                                      height: 1.3,
+                                      color: done ? soft : ink,
+                                      decoration: done
+                                          ? TextDecoration.lineThrough
+                                          : null,
+                                      decorationColor: soft,
+                                    ),
+                                  ),
+                                if (todo.body.isNotEmpty) ...[
+                                  const SizedBox(height: 5),
+                                  Text(
+                                    todo.body,
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                      height: 1.35,
                                       color: soft,
                                     ),
                                   ),
-                                ),
-                            ],
-                            if (project != null) ...[
-                              const SizedBox(height: 10),
-                              ProjectSticker(
-                                project: project,
-                                turn: -TodoSticker.turnFor(todo.id),
-                                scale: 0.9,
-                              ),
-                            ],
-                            if (tags.isNotEmpty) ...[
-                              const SizedBox(height: 10),
-                              Text.rich(
-                                TextSpan(
-                                  children: [
-                                    for (final (index, tag) in tags.indexed)
-                                      TextSpan(
-                                        text: '${index == 0 ? '' : '   '}#${tag.name}',
+                                ],
+                                if (steps.isNotEmpty) ...[
+                                  const SizedBox(height: 9),
+                                  for (final step in steps)
+                                    _StepRow(
+                                      step: step,
+                                      forced: done,
+                                      onTap: () => context
+                                          .read<TodosController>()
+                                          .toggleStep(todo.id, step.id),
+                                    ),
+                                  if (hidden > 0)
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        top: 4,
+                                        left: 24,
+                                      ),
+                                      child: Text(
+                                        '+$hidden',
                                         style: TextStyle(
-                                          color: Color.lerp(
-                                            tag.color,
-                                            ink,
-                                            0.35,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          color: soft,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                                if (project != null) ...[
+                                  const SizedBox(height: 10),
+                                  ProjectSticker(
+                                    project: project,
+                                    turn: -TodoSticker.turnFor(todo.id),
+                                    scale: 0.9,
+                                  ),
+                                ],
+                                if (tags.isNotEmpty) ...[
+                                  const SizedBox(height: 10),
+                                  Text.rich(
+                                    TextSpan(
+                                      children: [
+                                        for (final (index, tag) in tags.indexed)
+                                          TextSpan(
+                                            text:
+                                                '${index == 0 ? '' : '   '}#${tag.name}',
+                                            style: TextStyle(
+                                              color: Color.lerp(
+                                                tag.color,
+                                                ink,
+                                                0.35,
+                                              ),
+                                            ),
                                           ),
+                                      ],
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      height: 1.3,
+                                    ),
+                                  ),
+                                ],
+                                const SizedBox(height: 12),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    TodoCheck(
+                                      title: todo.title,
+                                      done: done,
+                                      ring: soft.withValues(alpha: 0.65),
+                                      fill: ink,
+                                      tick: paper,
+                                      onToggle: onToggle,
+                                    ),
+                                    if (!done)
+                                      Flexible(
+                                        child: _Meta(
+                                          todo: todo,
+                                          overdue: overdue,
                                         ),
                                       ),
                                   ],
                                 ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                  height: 1.3,
-                                ),
-                              ),
-                            ],
-                            const SizedBox(height: 12),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                TodoCheck(
-                                  title: todo.title,
-                                  done: done,
-                                  ring: soft.withValues(alpha: 0.65),
-                                  fill: ink,
-                                  tick: paper,
-                                  onToggle: onToggle,
-                                ),
-                                if (!done)
-                                  Flexible(
-                                    child: _Meta(todo: todo, overdue: overdue),
-                                  ),
                               ],
                             ),
-                          ],
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
+                  ),
                 ],
               ),
             ),
@@ -393,8 +404,11 @@ class _Sheet extends CustomPainter {
     canvas.drawRect(
       sheet,
       Paint()
-        ..color = Color.lerp(blank, paper, tint)!
-            .withValues(alpha: covered ? 0.12 : 1),
+        ..color = Color.lerp(
+          blank,
+          paper,
+          tint,
+        )!.withValues(alpha: covered ? 0.12 : 1),
     );
     canvas.drawRect(
       sheet,

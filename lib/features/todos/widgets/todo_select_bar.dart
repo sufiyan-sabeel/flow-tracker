@@ -52,28 +52,28 @@ class TodoSelectBar extends StatelessWidget {
           ),
           Flexible(
             child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 180),
-              transitionBuilder: (child, animation) => FadeTransition(
-                opacity: animation,
-                child: SlideTransition(
-                  position: Tween(
-                    begin: const Offset(0, 0.4),
-                    end: Offset.zero,
-                  ).animate(animation),
-                  child: child,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 180),
+                  transitionBuilder: (child, animation) => FadeTransition(
+                    opacity: animation,
+                    child: SlideTransition(
+                      position: Tween(
+                        begin: const Offset(0, 0.4),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: child,
+                    ),
+                  ),
+                  child: Text(
+                    context.l10n.todo_selected(count),
+                    key: ValueKey(count),
+                    style: sheetActionStyle(context, size: 14.5),
+                  ),
                 ),
               ),
-              child: Text(
-                context.l10n.todo_selected(count),
-                key: ValueKey(count),
-                style: sheetActionStyle(context, size: 14.5),
-              ),
-            ),
-            ),
             ),
           ),
           _Icon(

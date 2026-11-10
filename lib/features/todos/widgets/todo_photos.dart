@@ -26,7 +26,9 @@ class TodoPhotoGrid extends StatelessWidget {
           child: _Tile(
             path: shown.single.$2,
             onTap: () => showTodoPhotos(context, paths, shown.single.$1),
-            onRemove: onRemove == null ? null : () => onRemove!(shown.single.$1),
+            onRemove: onRemove == null
+                ? null
+                : () => onRemove!(shown.single.$1),
           ),
         ),
       );
@@ -49,8 +51,9 @@ class TodoPhotoGrid extends StatelessWidget {
                     child: _Tile(
                       path: entry.$2,
                       onTap: () => showTodoPhotos(context, paths, entry.$1),
-                      onRemove:
-                          onRemove == null ? null : () => onRemove!(entry.$1),
+                      onRemove: onRemove == null
+                          ? null
+                          : () => onRemove!(entry.$1),
                     ),
                   ),
                 ),
@@ -116,41 +119,40 @@ Future<void> showTodoPhotos(
   BuildContext context,
   List<String> paths,
   int start,
-) =>
-    showGeneralDialog<void>(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: MaterialLocalizations.of(context).closeButtonLabel,
-      barrierColor: Colors.transparent,
-      transitionDuration: const Duration(milliseconds: 280),
-      pageBuilder: (_, __, ___) => _PhotoViewer(paths: paths, start: start),
-      transitionBuilder: (context, animation, _, child) {
-        final curved = CurvedAnimation(
-          parent: animation,
-          curve: Curves.easeOutCubic,
-          reverseCurve: Curves.easeInCubic,
-        );
-        return AnimatedBuilder(
-          animation: curved,
-          child: child,
-          builder: (context, child) => Stack(
-            fit: StackFit.expand,
-            children: [
-              ColoredBox(
-                color: Colors.black.withValues(alpha: 0.86 * curved.value),
-              ),
-              Opacity(
-                opacity: curved.value,
-                child: Transform.scale(
-                  scale: 0.9 + 0.1 * curved.value,
-                  child: child,
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+) => showGeneralDialog<void>(
+  context: context,
+  barrierDismissible: true,
+  barrierLabel: MaterialLocalizations.of(context).closeButtonLabel,
+  barrierColor: Colors.transparent,
+  transitionDuration: const Duration(milliseconds: 280),
+  pageBuilder: (_, __, ___) => _PhotoViewer(paths: paths, start: start),
+  transitionBuilder: (context, animation, _, child) {
+    final curved = CurvedAnimation(
+      parent: animation,
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
     );
+    return AnimatedBuilder(
+      animation: curved,
+      child: child,
+      builder: (context, child) => Stack(
+        fit: StackFit.expand,
+        children: [
+          ColoredBox(
+            color: Colors.black.withValues(alpha: 0.86 * curved.value),
+          ),
+          Opacity(
+            opacity: curved.value,
+            child: Transform.scale(
+              scale: 0.9 + 0.1 * curved.value,
+              child: child,
+            ),
+          ),
+        ],
+      ),
+    );
+  },
+);
 
 class _PhotoViewer extends StatefulWidget {
   const _PhotoViewer({required this.paths, required this.start});
@@ -198,10 +200,11 @@ class _PhotoViewerState extends State<_PhotoViewer> {
                     child: Image.file(
                       File(widget.paths[index]),
                       fit: BoxFit.contain,
-                      cacheWidth: (MediaQuery.sizeOf(context).width *
-                              MediaQuery.devicePixelRatioOf(context) *
-                              2)
-                          .round(),
+                      cacheWidth:
+                          (MediaQuery.sizeOf(context).width *
+                                  MediaQuery.devicePixelRatioOf(context) *
+                                  2)
+                              .round(),
                     ),
                   ),
                 ),

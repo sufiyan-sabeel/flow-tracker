@@ -322,11 +322,11 @@ class HomeWidgetService {
 
     final narrow = _narrowWeekdays();
     Map<String, Object> dayOf(DateTime date) => {
-          'key': date.dayKey,
-          'label': narrow[date.weekday % 7],
-          'short': _dateLabel('ccc', date),
-          'isToday': date.dayKey == today.dayKey,
-        };
+      'key': date.dayKey,
+      'label': narrow[date.weekday % 7],
+      'short': _dateLabel('ccc', date),
+      'isToday': date.dayKey == today.dayKey,
+    };
     final days = window.map(dayOf).toList();
 
     final counted = listed.where((h) => !h.tracking).toList();
@@ -370,7 +370,7 @@ class HomeWidgetService {
         'ratio': weight == 0
             ? 0.0
             : finished.fold<int>(0, (sum, h) => sum + h.difficultyWeight) /
-                weight,
+                  weight,
         'total': due.length,
         'bestStreak': bestStreak,
         'weekDone': weekDone,
@@ -397,13 +397,11 @@ class HomeWidgetService {
 
   static List<int> _heatmapLevels(Iterable<Habit> habits, DateTime today) {
     final midnight = today.atMidnight;
-    final tracked =
-        habits.where((h) => h.kind != HabitKind.negative).toList();
+    final tracked = habits.where((h) => h.kind != HabitKind.negative).toList();
 
     return _heatmapDays(midnight).map((day) {
       if (day.isAfter(midnight)) return -1;
-      final active =
-          tracked.where((h) => !day.isBefore(h.startedAt)).toList();
+      final active = tracked.where((h) => !day.isBefore(h.startedAt)).toList();
       if (active.isEmpty) return 0;
       final done = active.where((h) => h.isCompletedOn(day)).length;
       if (done == 0) return 0;

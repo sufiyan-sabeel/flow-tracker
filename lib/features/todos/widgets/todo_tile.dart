@@ -50,129 +50,135 @@ class TodoTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
         decoration: BoxDecoration(
-          color: scheme.surfaceContainerHighest
-              .withValues(alpha: todo.done ? 0.3 : 0.55),
+          color: scheme.surfaceContainerHighest.withValues(
+            alpha: todo.done ? 0.3 : 0.55,
+          ),
           borderRadius: corners ?? BorderRadius.circular(18),
           border: Border.all(color: scheme.onSurface.withValues(alpha: 0.05)),
         ),
-        child: TodoWrite(child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TodoCheck(
-              title: todo.title,
-              done: done,
-              ring: todo.priority == TodoPriority.none
-                  ? muted.withValues(alpha: 0.8)
-                  : accent,
-              onToggle: onToggle,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 3),
-                  TweenAnimationBuilder<double>(
-                    tween: Tween(end: done ? 1 : 0),
-                    duration: const Duration(milliseconds: 280),
-                    builder: (context, fade, _) => Text(
-                      todo.title.isNotEmpty
-                          ? todo.title
-                          : (todo.steps.firstOrNull?.text ?? ''),
-                      style: TextStyle(
-                        fontSize: 15.5,
-                        fontWeight: FontWeight.w600,
-                        height: 1.3,
-                        color: Color.lerp(scheme.onSurface, muted, fade),
-                        decoration: fade > 0 ? TextDecoration.lineThrough : null,
-                        decorationColor: muted.withValues(alpha: fade),
-                      ),
-                    ),
-                  ),
-                  if (todo.body.isNotEmpty) ...[
+        child: TodoWrite(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TodoCheck(
+                title: todo.title,
+                done: done,
+                ring: todo.priority == TodoPriority.none
+                    ? muted.withValues(alpha: 0.8)
+                    : accent,
+                onToggle: onToggle,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     const SizedBox(height: 3),
-                    Text(
-                      todo.body,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 13,
-                        height: 1.35,
-                        color: muted,
+                    TweenAnimationBuilder<double>(
+                      tween: Tween(end: done ? 1 : 0),
+                      duration: const Duration(milliseconds: 280),
+                      builder: (context, fade, _) => Text(
+                        todo.title.isNotEmpty
+                            ? todo.title
+                            : (todo.steps.firstOrNull?.text ?? ''),
+                        style: TextStyle(
+                          fontSize: 15.5,
+                          fontWeight: FontWeight.w600,
+                          height: 1.3,
+                          color: Color.lerp(scheme.onSurface, muted, fade),
+                          decoration: fade > 0
+                              ? TextDecoration.lineThrough
+                              : null,
+                          decorationColor: muted.withValues(alpha: fade),
+                        ),
                       ),
                     ),
+                    if (todo.body.isNotEmpty) ...[
+                      const SizedBox(height: 3),
+                      Text(
+                        todo.body,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 13,
+                          height: 1.35,
+                          color: muted,
+                        ),
+                      ),
+                    ],
+                    if (todo.estimate != null ||
+                        due != null ||
+                        project != null ||
+                        todo.tags.isNotEmpty ||
+                        todo.steps.isNotEmpty ||
+                        todo.priority != TodoPriority.none) ...[
+                      const SizedBox(height: 7),
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 4,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          if (project != null) _ProjectMark(project: project),
+                          if (due != null)
+                            _MetaLabel(
+                              icon: todo.repeat != null
+                                  ? LucideIcons.repeat
+                                  : todo.time == null
+                                  ? LucideIcons.calendar
+                                  : LucideIcons.clock,
+                              label: todoDueLabel(context, todo),
+                              color: overdue ? context.tokens.danger : muted,
+                            ),
+                          if (todo.estimate != null)
+                            _MetaLabel(
+                              icon: LucideIcons.hourglass,
+                              label: formatMinutes(todo.estimate!.toDouble()),
+                              color: muted,
+                            ),
+                          if (todo.priority != TodoPriority.none)
+                            TodoSticker(
+                              priority: todo.priority,
+                              turn: TodoSticker.turnFor(todo.id),
+                              scale: 0.9,
+                            ),
+                          if (todo.steps.isNotEmpty)
+                            _MetaLabel(
+                              icon: LucideIcons.listChecks,
+                              label:
+                                  '${todo.done ? todo.steps.length : todo.steps.where((s) => s.done).length}/${todo.steps.length}',
+                              color: muted,
+                            ),
+                          for (final tag
+                              in context.watch<TodoTagsController>().resolve(
+                                todo.tags,
+                              ))
+                            _MetaLabel(
+                              icon: CategoryIcons.resolve(tag.icon),
+                              label: tag.name,
+                              color: tag.color,
+                            ),
+                        ],
+                      ),
+                    ],
+                    if (todo.photos.isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      PhotoDeck(
+                        shots: todoPhotoShots(todo),
+                        size: 58,
+                        swipe: false,
+                      ),
+                    ],
                   ],
-                  if (todo.estimate != null ||
-                          due != null ||
-                          project != null ||
-                          todo.tags.isNotEmpty ||
-                          todo.steps.isNotEmpty ||
-                          todo.priority != TodoPriority.none) ...[
-                    const SizedBox(height: 7),
-                    Wrap(
-                      spacing: 12,
-                      runSpacing: 4,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        if (project != null) _ProjectMark(project: project),
-                        if (due != null)
-                          _MetaLabel(
-                            icon: todo.repeat != null
-                                ? LucideIcons.repeat
-                                : todo.time == null
-                                ? LucideIcons.calendar
-                                : LucideIcons.clock,
-                            label: todoDueLabel(context, todo),
-                            color: overdue ? context.tokens.danger : muted,
-                          ),
-                        if (todo.estimate != null)
-                          _MetaLabel(
-                            icon: LucideIcons.hourglass,
-                            label: formatMinutes(todo.estimate!.toDouble()),
-                            color: muted,
-                          ),
-                        if (todo.priority != TodoPriority.none)
-                          TodoSticker(
-                            priority: todo.priority,
-                            turn: TodoSticker.turnFor(todo.id),
-                            scale: 0.9,
-                          ),
-                        if (todo.steps.isNotEmpty)
-                          _MetaLabel(
-                            icon: LucideIcons.listChecks,
-                            label:
-                                '${todo.done ? todo.steps.length : todo.steps.where((s) => s.done).length}/${todo.steps.length}',
-                            color: muted,
-                          ),
-                        for (final tag in context
-                            .watch<TodoTagsController>()
-                            .resolve(todo.tags))
-                          _MetaLabel(
-                            icon: CategoryIcons.resolve(tag.icon),
-                            label: tag.name,
-                            color: tag.color,
-                          ),
-                      ],
-                    ),
-                  ],
-                  if (todo.photos.isNotEmpty) ...[
-                    const SizedBox(height: 10),
-                    PhotoDeck(
-                      shots: todoPhotoShots(todo),
-                      size: 58,
-                      swipe: false,
-                    ),
-                  ],
-                ],
+                ),
               ),
-            ),
-            if (todo.pinned)
-              const Padding(
-                padding: EdgeInsetsDirectional.only(start: 8),
-                child: TodoPin(scale: 0.8),
-              ),
-          ],
-        )),
+              if (todo.pinned)
+                const Padding(
+                  padding: EdgeInsetsDirectional.only(start: 8),
+                  child: TodoPin(scale: 0.8),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

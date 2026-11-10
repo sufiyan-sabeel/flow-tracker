@@ -7,24 +7,23 @@ import 'package:flow_tracker/features/todos/data/todo.dart';
 import 'package:flow_tracker/features/todos/data/todo_groups.dart';
 
 List<PhotoShot> todoPhotoShots(Todo todo) => [
-      for (final path in todo.photos)
-        PhotoShot(path: path, text: todo.text.trim()),
-    ];
+  for (final path in todo.photos) PhotoShot(path: path, text: todo.text.trim()),
+];
 
 List<String> todoPriorityLabels(BuildContext context) => [
-      context.l10n.priority_none,
-      context.l10n.priority_low,
-      context.l10n.priority_medium,
-      context.l10n.priority_high,
-    ];
+  context.l10n.priority_none,
+  context.l10n.priority_low,
+  context.l10n.priority_medium,
+  context.l10n.priority_high,
+];
 
 String todoGroupLabel(BuildContext context, TodoGroup group) => switch (group) {
-      TodoGroup.overdue => context.l10n.todo_overdue,
-      TodoGroup.today => context.l10n.today,
-      TodoGroup.tomorrow => context.l10n.tomorrow,
-      TodoGroup.upcoming => context.l10n.todo_upcoming,
-      TodoGroup.someday => context.l10n.todo_someday,
-    };
+  TodoGroup.overdue => context.l10n.todo_overdue,
+  TodoGroup.today => context.l10n.today,
+  TodoGroup.tomorrow => context.l10n.tomorrow,
+  TodoGroup.upcoming => context.l10n.todo_upcoming,
+  TodoGroup.someday => context.l10n.todo_someday,
+};
 
 String todoDueLabel(BuildContext context, Todo todo) {
   final due = todo.due;

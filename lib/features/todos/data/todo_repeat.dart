@@ -39,26 +39,29 @@ class TodoRepeat {
     int? day,
     bool? fromDone,
     bool? lastDay,
-  }) =>
-      TodoRepeat(
-        unit: unit ?? this.unit,
-        every: every ?? this.every,
-        weekdays: weekdays ?? this.weekdays,
-        byWeekday: byWeekday ?? this.byWeekday,
-        day: day ?? this.day,
-        fromDone: fromDone ?? this.fromDone,
-        lastDay: lastDay ?? this.lastDay,
-      );
+  }) => TodoRepeat(
+    unit: unit ?? this.unit,
+    every: every ?? this.every,
+    weekdays: weekdays ?? this.weekdays,
+    byWeekday: byWeekday ?? this.byWeekday,
+    day: day ?? this.day,
+    fromDone: fromDone ?? this.fromDone,
+    lastDay: lastDay ?? this.lastDay,
+  );
 
   TodoRepeat anchoredTo(DateTime due) => copyWith(
-        day: switch (unit) {
-          RepeatUnit.months when byWeekday => weekOfMonth(due),
-          RepeatUnit.months || RepeatUnit.years => due.day,
-          _ => 0,
-        },
-      );
+    day: switch (unit) {
+      RepeatUnit.months when byWeekday => weekOfMonth(due),
+      RepeatUnit.months || RepeatUnit.years => due.day,
+      _ => 0,
+    },
+  );
 
-  DateTime after(DateTime due, {required DateTime today, bool skipping = false}) {
+  DateTime after(
+    DateTime due, {
+    required DateTime today,
+    bool skipping = false,
+  }) {
     final from = fromDone && !skipping ? today : due.atMidnight;
     var next = _step(from, due);
     var guard = 0;
@@ -121,30 +124,33 @@ class TodoRepeat {
   }
 
   Map<String, dynamic> toMap() => {
-        'unit': unit.index,
-        'every': every,
-        if (weekdays.isNotEmpty) 'weekdays': weekdays,
-        if (byWeekday) 'byWeekday': true,
-        if (day > 0) 'day': day,
-        if (fromDone) 'fromDone': true,
-        if (lastDay) 'lastDay': true,
-      };
+    'unit': unit.index,
+    'every': every,
+    if (weekdays.isNotEmpty) 'weekdays': weekdays,
+    if (byWeekday) 'byWeekday': true,
+    if (day > 0) 'day': day,
+    if (fromDone) 'fromDone': true,
+    if (lastDay) 'lastDay': true,
+  };
 
   factory TodoRepeat.fromMap(Map<String, dynamic> map) => TodoRepeat(
-        unit: RepeatUnit.values[((map['unit'] ?? 0) as num)
-            .toInt()
-            .clamp(0, RepeatUnit.values.length - 1)],
-        every: math.max(1, ((map['every'] ?? 1) as num).toInt()),
-        weekdays: (map['weekdays'] as List?)
-                ?.map((d) => (d as num).toInt())
-                .where((d) => d >= 1 && d <= 7)
-                .toList() ??
-            const [],
-        byWeekday: map['byWeekday'] == true,
-        day: ((map['day'] ?? 0) as num).toInt().clamp(0, 31),
-        fromDone: map['fromDone'] == true,
-        lastDay: map['lastDay'] == true,
-      );
+    unit:
+        RepeatUnit.values[((map['unit'] ?? 0) as num).toInt().clamp(
+          0,
+          RepeatUnit.values.length - 1,
+        )],
+    every: math.max(1, ((map['every'] ?? 1) as num).toInt()),
+    weekdays:
+        (map['weekdays'] as List?)
+            ?.map((d) => (d as num).toInt())
+            .where((d) => d >= 1 && d <= 7)
+            .toList() ??
+        const [],
+    byWeekday: map['byWeekday'] == true,
+    day: ((map['day'] ?? 0) as num).toInt().clamp(0, 31),
+    fromDone: map['fromDone'] == true,
+    lastDay: map['lastDay'] == true,
+  );
 
   @override
   bool operator ==(Object other) =>
@@ -160,12 +166,12 @@ class TodoRepeat {
 
   @override
   int get hashCode => Object.hash(
-        unit,
-        every,
-        byWeekday,
-        day,
-        fromDone,
-        lastDay,
-        Object.hashAllUnordered(weekdays),
-      );
+    unit,
+    every,
+    byWeekday,
+    day,
+    fromDone,
+    lastDay,
+    Object.hashAllUnordered(weekdays),
+  );
 }

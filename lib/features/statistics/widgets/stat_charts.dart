@@ -157,10 +157,12 @@ class ValueBars extends StatelessWidget {
               top: scale.top,
               format: axisFormat ?? tooltip,
             ),
-            rightTitles:
-                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            topTitles:
-                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            topTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
@@ -198,8 +200,9 @@ class ValueBars extends StatelessWidget {
                     backDrawRodData: BackgroundBarChartRodData(
                       show: true,
                       toY: maxY,
-                      color: context.colors.surfaceContainerHighest
-                          .withValues(alpha: 0.22),
+                      color: context.colors.surfaceContainerHighest.withValues(
+                        alpha: 0.22,
+                      ),
                     ),
                   ),
                 ],
@@ -279,8 +282,10 @@ class _HabitRankingState extends State<HabitRanking>
                           alignment: Alignment.centerLeft,
                           child: Container(
                             height: 10,
-                            width: (box.maxWidth * share * t)
-                                .clamp(4, box.maxWidth),
+                            width: (box.maxWidth * share * t).clamp(
+                              4,
+                              box.maxWidth,
+                            ),
                             decoration: BoxDecoration(
                               color: entries[i].color,
                               borderRadius: BorderRadius.circular(5),

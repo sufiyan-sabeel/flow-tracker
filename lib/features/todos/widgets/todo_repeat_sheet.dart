@@ -126,7 +126,9 @@ class _RepeatSheetState extends State<_RepeatSheet> {
   }
 
   void _toggleWeekday(TodoRepeat repeat, int weekday) {
-    final days = repeat.weekdays.isEmpty ? [_due.weekday] : [...repeat.weekdays];
+    final days = repeat.weekdays.isEmpty
+        ? [_due.weekday]
+        : [...repeat.weekdays];
     if (days.contains(weekday)) {
       if (days.length == 1) return;
       days.remove(weekday);
@@ -177,7 +179,10 @@ class _RepeatSheetState extends State<_RepeatSheet> {
                 ),
                 const SizedBox(height: 10),
                 _EveryRow(
-                  label: todoRepeatLabel(context, repeat.copyWith(weekdays: const [])),
+                  label: todoRepeatLabel(
+                    context,
+                    repeat.copyWith(weekdays: const []),
+                  ),
                   every: repeat.every,
                   onChanged: (every) => _set(repeat.copyWith(every: every)),
                 ),
@@ -386,7 +391,9 @@ class _WeekdayRow extends StatelessWidget {
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: on ? scheme.primary : scheme.surfaceContainerHighest,
+                      color: on
+                          ? scheme.primary
+                          : scheme.surfaceContainerHighest,
                     ),
                     child: Text(
                       labels[i],

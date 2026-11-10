@@ -13,90 +13,89 @@ Future<void> showTodoPaperPicker(
   required String cover,
   required ValueChanged<int> onPicked,
   required ValueChanged<String> onCover,
-}) =>
-    showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      builder: (sheet) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 2, 20, 18),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SheetTitle(sheet.l10n.todo_paper),
-              const SizedBox(height: 16),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    _Swatch(
-                      color: sheetColor(sheet, -1),
-                      picked: selected < 0,
-                      auto: true,
-                      onTap: () {
-                        Navigator.of(sheet).pop();
-                        onPicked(-1);
-                      },
-                    ),
-                    for (var index = 0; index < todoPapers.length; index++)
-                      _Swatch(
-                        color: sheetColor(sheet, index),
-                        picked: selected == index,
-                        onTap: () {
-                          Navigator.of(sheet).pop();
-                          onPicked(index);
-                        },
-                      ),
-                  ],
+}) => showModalBottomSheet<void>(
+  context: context,
+  showDragHandle: true,
+  builder: (sheet) => SafeArea(
+    child: Padding(
+      padding: const EdgeInsets.fromLTRB(20, 2, 20, 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SheetTitle(sheet.l10n.todo_paper),
+          const SizedBox(height: 16),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _Swatch(
+                  color: sheetColor(sheet, -1),
+                  picked: selected < 0,
+                  auto: true,
+                  onTap: () {
+                    Navigator.of(sheet).pop();
+                    onPicked(-1);
+                  },
                 ),
-              ),
-              const SizedBox(height: 22),
-              SheetTitle(sheet.l10n.todo_background),
-              const SizedBox(height: 14),
-              Row(
-                children: [
-                  _Backdrop(
-                    picked: cover.isEmpty,
-                    label: sheet.l10n.todo_paper,
+                for (var index = 0; index < todoPapers.length; index++)
+                  _Swatch(
+                    color: sheetColor(sheet, index),
+                    picked: selected == index,
                     onTap: () {
                       Navigator.of(sheet).pop();
-                      onCover('');
+                      onPicked(index);
                     },
-                    child: Icon(
-                      LucideIcons.imageOff,
-                      size: 20,
-                      color: sheet.tokens.muted,
-                    ),
                   ),
-                  if (CoverImage.exists(cover))
-                    _Backdrop(
-                      picked: true,
-                      label: sheet.l10n.todo_background,
-                      onTap: () => Navigator.of(sheet).pop(),
-                      child: SizedBox.expand(child: CoverImage(path: cover)),
-                    ),
-                  _Backdrop(
-                    picked: false,
-                    label: sheet.l10n.todo_background_pick,
-                    onTap: () async {
-                      Navigator.of(sheet).pop();
-                      final path = await CoverStorage.store(folder: 'todos');
-                      if (path != null) onCover(path);
-                    },
-                    child: Icon(
-                      LucideIcons.imagePlus,
-                      size: 20,
-                      color: sheet.colors.primary,
-                    ),
-                  ),
-                ],
+              ],
+            ),
+          ),
+          const SizedBox(height: 22),
+          SheetTitle(sheet.l10n.todo_background),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              _Backdrop(
+                picked: cover.isEmpty,
+                label: sheet.l10n.todo_paper,
+                onTap: () {
+                  Navigator.of(sheet).pop();
+                  onCover('');
+                },
+                child: Icon(
+                  LucideIcons.imageOff,
+                  size: 20,
+                  color: sheet.tokens.muted,
+                ),
+              ),
+              if (CoverImage.exists(cover))
+                _Backdrop(
+                  picked: true,
+                  label: sheet.l10n.todo_background,
+                  onTap: () => Navigator.of(sheet).pop(),
+                  child: SizedBox.expand(child: CoverImage(path: cover)),
+                ),
+              _Backdrop(
+                picked: false,
+                label: sheet.l10n.todo_background_pick,
+                onTap: () async {
+                  Navigator.of(sheet).pop();
+                  final path = await CoverStorage.store(folder: 'todos');
+                  if (path != null) onCover(path);
+                },
+                child: Icon(
+                  LucideIcons.imagePlus,
+                  size: 20,
+                  color: sheet.colors.primary,
+                ),
               ),
             ],
           ),
-        ),
+        ],
       ),
-    );
+    ),
+  ),
+);
 
 class _Swatch extends StatelessWidget {
   const _Swatch({

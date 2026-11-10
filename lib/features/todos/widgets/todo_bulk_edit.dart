@@ -55,7 +55,8 @@ T? _shared<T>(List<Todo> todos, T Function(Todo todo) value) {
 Future<void> _pickPriority(BuildContext context, List<String> ids) =>
     showTodoPriorityPicker(
       context,
-      selected: _shared(_current(context, ids), (t) => t.priority) ??
+      selected:
+          _shared(_current(context, ids), (t) => t.priority) ??
           TodoPriority.none,
       onPicked: (priority) =>
           _apply(context, ids, (todo) => todo.copyWith(priority: priority)),
@@ -74,8 +75,8 @@ Future<void> _pickTags(BuildContext context, List<String> ids) {
   var common = todos.isEmpty
       ? <String>{}
       : todos
-          .map((todo) => todo.tags.toSet())
-          .reduce((a, b) => a.intersection(b));
+            .map((todo) => todo.tags.toSet())
+            .reduce((a, b) => a.intersection(b));
   return showTodoTagPicker(
     context,
     selected: common.toList(),
@@ -104,10 +105,10 @@ Future<void> _pickDate(BuildContext context, List<String> ids) {
   final l10n = context.l10n;
   final today = AppClock.today();
   void setDate(String date) => _apply(
-        context,
-        ids,
-        (todo) => todo.copyWith(date: date, clearMinutes: date.isEmpty),
-      );
+    context,
+    ids,
+    (todo) => todo.copyWith(date: date, clearMinutes: date.isEmpty),
+  );
   return showOptionSheet(
     context,
     title: l10n.todo_date,

@@ -67,47 +67,45 @@ class BackupService {
   const BackupService._();
 
   static Map<String, Object?> _payload(List<Habit> habits) => {
-        'app': 'streak',
-        'version': _kBackupVersion,
-        'exportedAt': DateTime.now().toIso8601String(),
-        'device': LocalStore.deviceId,
-        'changes': LocalStore.changes,
-        'deleted': LocalStore.deleted,
-        'cleared': LocalStore.cleared,
-        'days': LocalStore.days,
-        'habits': habits.map((h) => h.toMap()).toList(),
-        'categories':
-            LocalStore.readCategories().map((c) => c.toMap()).toList(),
-        'notes': LocalStore.readNotes().map((n) => n.toMap()).toList(),
-        'focus':
-            LocalStore.readFocusSessions().map((f) => f.toMap()).toList(),
-        'todos': LocalStore.readTodos().map((t) => t.toMap()).toList(),
-        'todoTags': LocalStore.readTodoTags().map((t) => t.toMap()).toList(),
-        'settings': {
-          for (final key in backupSettingKeys)
-            if (LocalStore.setting<Object?>(key, null) case final value?)
-              key: value,
-        },
-      };
+    'app': 'streak',
+    'version': _kBackupVersion,
+    'exportedAt': DateTime.now().toIso8601String(),
+    'device': LocalStore.deviceId,
+    'changes': LocalStore.changes,
+    'deleted': LocalStore.deleted,
+    'cleared': LocalStore.cleared,
+    'days': LocalStore.days,
+    'habits': habits.map((h) => h.toMap()).toList(),
+    'categories': LocalStore.readCategories().map((c) => c.toMap()).toList(),
+    'notes': LocalStore.readNotes().map((n) => n.toMap()).toList(),
+    'focus': LocalStore.readFocusSessions().map((f) => f.toMap()).toList(),
+    'todos': LocalStore.readTodos().map((t) => t.toMap()).toList(),
+    'todoTags': LocalStore.readTodoTags().map((t) => t.toMap()).toList(),
+    'settings': {
+      for (final key in backupSettingKeys)
+        if (LocalStore.setting<Object?>(key, null) case final value?)
+          key: value,
+    },
+  };
 
   static Map<String, Object?> _habitPayload(Habit habit) => {
-        'app': 'streak',
-        'version': _kBackupVersion,
-        'exportedAt': DateTime.now().toIso8601String(),
-        'habits': [habit.toMap()],
-        'categories': LocalStore.readCategories()
-            .where((c) => c.id == habit.category || c.name == habit.category)
-            .map((c) => c.toMap())
-            .toList(),
-        'notes': LocalStore.readNotes()
-            .where((n) => n.habitId == habit.id)
-            .map((n) => n.toMap())
-            .toList(),
-        'focus': LocalStore.readFocusSessions()
-            .where((f) => f.habitId == habit.id)
-            .map((f) => f.toMap())
-            .toList(),
-      };
+    'app': 'streak',
+    'version': _kBackupVersion,
+    'exportedAt': DateTime.now().toIso8601String(),
+    'habits': [habit.toMap()],
+    'categories': LocalStore.readCategories()
+        .where((c) => c.id == habit.category || c.name == habit.category)
+        .map((c) => c.toMap())
+        .toList(),
+    'notes': LocalStore.readNotes()
+        .where((n) => n.habitId == habit.id)
+        .map((n) => n.toMap())
+        .toList(),
+    'focus': LocalStore.readFocusSessions()
+        .where((f) => f.habitId == habit.id)
+        .map((f) => f.toMap())
+        .toList(),
+  };
 
   static bool _hasContent(List<Habit> habits) =>
       habits.isNotEmpty ||
@@ -232,17 +230,12 @@ class BackupService {
     const stampLength = 19;
     final plain = prefix.length + stampLength + extension.length;
     final own = '_${LocalStore.deviceId}$extension';
-    final files = dir
-        .listSync()
-        .whereType<File>()
-        .where((f) {
-          final name = f.uri.pathSegments.last;
-          return name.startsWith(prefix) &&
-              name.endsWith(extension) &&
-              (name.length == plain || name.endsWith(own));
-        })
-        .toList()
-      ..sort((a, b) => b.path.compareTo(a.path));
+    final files = dir.listSync().whereType<File>().where((f) {
+      final name = f.uri.pathSegments.last;
+      return name.startsWith(prefix) &&
+          name.endsWith(extension) &&
+          (name.length == plain || name.endsWith(own));
+    }).toList()..sort((a, b) => b.path.compareTo(a.path));
     final days = <String>{};
     for (final (index, file) in files.indexed) {
       final name = file.uri.pathSegments.last;
@@ -323,8 +316,9 @@ class BackupService {
     }
 
     return parse(
-      const Utf8Decoder(allowMalformed: true)
-          .convert(await File(path).readAsBytes()),
+      const Utf8Decoder(
+        allowMalformed: true,
+      ).convert(await File(path).readAsBytes()),
     );
   }
 

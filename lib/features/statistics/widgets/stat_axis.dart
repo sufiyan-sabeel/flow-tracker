@@ -28,7 +28,8 @@ TextStyle axisLabelStyle(BuildContext context) {
 double axisStep(double maxValue, int lines) {
   if (maxValue <= 0) return 1;
   final raw = maxValue / lines;
-  final magnitude = math.pow(10, (math.log(raw) / math.ln10).floor())
+  final magnitude = math
+      .pow(10, (math.log(raw) / math.ln10).floor())
       .toDouble();
   final normalised = raw / magnitude;
   final rounded = normalised <= 1

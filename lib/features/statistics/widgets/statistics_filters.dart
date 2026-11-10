@@ -81,8 +81,8 @@ class _FilterChip extends StatelessWidget {
                 fontWeight: FontWeight.w700,
                 color: active
                     ? (color.computeLuminance() > 0.55
-                        ? Colors.black
-                        : Colors.white)
+                          ? Colors.black
+                          : Colors.white)
                     : context.tokens.muted,
               ),
             ),
@@ -162,4 +162,3 @@ class _ArrowButton extends StatelessWidget {
     );
   }
 }
-

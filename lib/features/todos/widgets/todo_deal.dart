@@ -113,7 +113,8 @@ class _TodoDealState extends State<TodoDeal>
 
   @override
   Widget build(BuildContext context) {
-    final enter = _enter ??= !_dealt &&
+    final enter = _enter ??=
+        !_dealt &&
         widget.fresh &&
         !(Scrollable.maybeOf(context)?.position.isScrollingNotifier.value ??
             false);
@@ -191,7 +192,8 @@ class _TodoShiftState extends State<TodoShift>
     final scroll = Scrollable.maybeOf(context);
     final view = scroll?.context.findRenderObject();
     if (box == null || !box.attached || !box.hasSize || view == null) return;
-    final at = box.localToGlobal(Offset.zero, ancestor: view) +
+    final at =
+        box.localToGlobal(Offset.zero, ancestor: view) +
         Offset(0, scroll!.position.pixels);
     final before = widget.spots[widget.id];
     widget.spots[widget.id] = at;

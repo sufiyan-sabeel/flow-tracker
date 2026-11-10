@@ -153,23 +153,23 @@ class _TrashState extends State<_Trash> with SingleTickerProviderStateMixin {
             ];
 
             Widget layer(Widget child) => Positioned.fromRect(
-                  rect: bin,
-                  child: Opacity(
-                    opacity: appear.clamp(0.0, 1.0),
-                    child: Transform(
-                      alignment: Alignment.bottomCenter,
-                      transform: Matrix4.identity()
-                        ..translateByDouble(0, 44 * (1 - appear), 0, 1)
-                        ..scaleByDouble(
-                          1 + 0.06 * squash,
-                          1 - 0.08 * squash,
-                          1,
-                          1,
-                        ),
-                      child: child,
+              rect: bin,
+              child: Opacity(
+                opacity: appear.clamp(0.0, 1.0),
+                child: Transform(
+                  alignment: Alignment.bottomCenter,
+                  transform: Matrix4.identity()
+                    ..translateByDouble(0, 44 * (1 - appear), 0, 1)
+                    ..scaleByDouble(
+                      1 + 0.06 * squash,
+                      1 - 0.08 * squash,
+                      1,
+                      1,
                     ),
-                  ),
-                );
+                  child: child,
+                ),
+              ),
+            );
 
             return Opacity(
               opacity: 1 - leave,
@@ -201,7 +201,10 @@ class _TrashState extends State<_Trash> with SingleTickerProviderStateMixin {
     final tall = wide * from.height / from.width;
     final fit = tall > bin.height * 0.9 ? bin.height * 0.9 / tall : 1.0;
     final size = Size(wide * fit, tall * fit);
-    final stack = Offset(bin.center.dx, bin.top - size.height * 0.18 - index * 4);
+    final stack = Offset(
+      bin.center.dx,
+      bin.top - size.height * 0.18 - index * 4,
+    );
     final inside = Offset(bin.center.dx, bin.top + bin.height * 0.58);
 
     final peak = Offset(
@@ -380,10 +383,9 @@ class _BinFront extends StatelessWidget {
               fit: StackFit.expand,
               children: [
                 ColoredBox(
-                  color: (dark
-                          ? const Color(0xFFA0A0A8)
-                          : const Color(0xFF85858C))
-                      .withValues(alpha: 0.24),
+                  color:
+                      (dark ? const Color(0xFFA0A0A8) : const Color(0xFF85858C))
+                          .withValues(alpha: 0.24),
                 ),
                 DecoratedBox(
                   decoration: BoxDecoration(

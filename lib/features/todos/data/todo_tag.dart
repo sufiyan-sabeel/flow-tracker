@@ -29,36 +29,35 @@ class TodoTag {
     String? icon,
     int? order,
     TodoTagKind? kind,
-  }) =>
-      TodoTag(
-        id: id,
-        name: name ?? this.name,
-        color: color ?? this.color,
-        icon: icon ?? this.icon,
-        order: order ?? this.order,
-        kind: kind ?? this.kind,
-      );
+  }) => TodoTag(
+    id: id,
+    name: name ?? this.name,
+    color: color ?? this.color,
+    icon: icon ?? this.icon,
+    order: order ?? this.order,
+    kind: kind ?? this.kind,
+  );
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'name': name,
-        'color': color.toARGB32(),
-        'icon': icon,
-        'order': order,
-        'kind': kind.name,
-      };
+    'id': id,
+    'name': name,
+    'color': color.toARGB32(),
+    'icon': icon,
+    'order': order,
+    'kind': kind.name,
+  };
 
   factory TodoTag.fromMap(Map<String, dynamic> map) => TodoTag(
-        id: map['id'] as String,
-        name: (map['name'] ?? '') as String,
-        color: Color((map['color'] ?? 0xFF7C5CFC) as int),
-        icon: (map['icon'] ?? 'folder') as String,
-        order: ((map['order'] ?? 0) as num).toInt(),
-        kind: TodoTagKind.values.firstWhere(
-          (k) => k.name == map['kind'],
-          orElse: () => TodoTagKind.label,
-        ),
-      );
+    id: map['id'] as String,
+    name: (map['name'] ?? '') as String,
+    color: Color((map['color'] ?? 0xFF7C5CFC) as int),
+    icon: (map['icon'] ?? 'folder') as String,
+    order: ((map['order'] ?? 0) as num).toInt(),
+    kind: TodoTagKind.values.firstWhere(
+      (k) => k.name == map['kind'],
+      orElse: () => TodoTagKind.label,
+    ),
+  );
 
   String toJson() => json.encode(toMap());
 

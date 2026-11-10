@@ -35,9 +35,9 @@ class TodoTagsController extends ChangeNotifier {
   }
 
   List<TodoTag> resolve(Iterable<String> ids) => [
-        for (final id in ids)
-          if (byId(id) case final tag?) tag,
-      ];
+    for (final id in ids)
+      if (byId(id) case final tag?) tag,
+  ];
 
   Future<TodoTag> create({
     required String name,
@@ -50,7 +50,8 @@ class TodoTagsController extends ChangeNotifier {
       name: name.trim(),
       color: color,
       icon: icon,
-      order: _tags
+      order:
+          _tags
               .where((t) => t.kind == kind)
               .fold<int>(-1, (top, t) => t.order > top ? t.order : top) +
           1,

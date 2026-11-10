@@ -127,7 +127,9 @@ Future<void> _startup() async {
     if (call.method == 'link') {
       final link = Uri.tryParse(call.arguments as String? ?? '');
       final context = AppNavigator.key.currentContext;
-      if (link == null || context == null) throw StateError('No app to take the link');
+      if (link == null || context == null) {
+        throw StateError('No app to take the link');
+      }
       await context.read<HabitsController>().applyLink(link);
     }
     return null;
@@ -141,10 +143,13 @@ Future<void> _startup() async {
       NotificationService.openFromPayload(pending);
     }
     if (isMobile) {
-      final launched =
-          await _appChannel.invokeMethod<String>('consumeLaunchHabit');
+      final launched = await _appChannel.invokeMethod<String>(
+        'consumeLaunchHabit',
+      );
       if (launched != null) _openHabit(launched);
-      final focusOn = await _appChannel.invokeMethod<String>('consumeLaunchFocus');
+      final focusOn = await _appChannel.invokeMethod<String>(
+        'consumeLaunchFocus',
+      );
       if (focusOn != null) _startFocus(focusOn);
       final page = await _appChannel.invokeMethod<String>('consumeLaunchPage');
       if (page != null) _openPage(page);
@@ -219,7 +224,9 @@ void _openDay(String target) {
   final split = target.lastIndexOf(':');
   final context = AppNavigator.key.currentContext;
   if (split <= 0 || context == null) return;
-  final habit = context.read<HabitsController>().byId(target.substring(0, split));
+  final habit = context.read<HabitsController>().byId(
+    target.substring(0, split),
+  );
   if (habit == null) return;
   showDayActionsSheet(
     context,

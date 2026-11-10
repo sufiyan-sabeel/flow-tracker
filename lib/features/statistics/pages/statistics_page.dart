@@ -87,250 +87,267 @@ class _StatisticsPageState extends State<StatisticsPage> {
       body: Stack(
         children: [
           NotificationListener<ScrollUpdateNotification>(
-        onNotification: (note) {
-          if (note.depth == 0 && note.metrics.axis == Axis.vertical) {
-            _scrolled.value = note.metrics.pixels > 2;
-          }
-          return false;
-        },
-        child: Consumer<HabitsController>(
-        builder: (context, controller, _) {
-          final all = controller.habits;
-          if (all.isEmpty) {
-            return AppEmptyState(
-              icon: LucideIcons.chartColumn,
-              title: context.l10n.no_data_yet,
-              message: context.l10n.stats_empty,
-            );
-          }
+            onNotification: (note) {
+              if (note.depth == 0 && note.metrics.axis == Axis.vertical) {
+                _scrolled.value = note.metrics.pixels > 2;
+              }
+              return false;
+            },
+            child: Consumer<HabitsController>(
+              builder: (context, controller, _) {
+                final all = controller.habits;
+                if (all.isEmpty) {
+                  return AppEmptyState(
+                    icon: LucideIcons.chartColumn,
+                    title: context.l10n.no_data_yet,
+                    message: context.l10n.stats_empty,
+                  );
+                }
 
-          if (_habitId != null && controller.byId(_habitId!) == null) {
-            _habitId = null;
-          }
-          final scoped = _habitId == null
-              ? HabitStats.counted(all)
-              : [controller.byId(_habitId!)!];
-          final accent =
-              _habitId == null ? context.colors.primary : scoped.first.color;
-          final stats = _statsFor(scoped, all);
-          final currentYear = AppClock.now().year;
+                if (_habitId != null && controller.byId(_habitId!) == null) {
+                  _habitId = null;
+                }
+                final scoped = _habitId == null
+                    ? HabitStats.counted(all)
+                    : [controller.byId(_habitId!)!];
+                final accent = _habitId == null
+                    ? context.colors.primary
+                    : scoped.first.color;
+                final stats = _statsFor(scoped, all);
+                final currentYear = AppClock.now().year;
 
-          return ListView(
-            padding: context.pagePadding(
-              16,
-              8 + MediaQuery.paddingOf(context).top,
-              16,
-              104,
-            ),
-            children: spanned(context, [
-              const IslandEntry(),
-              HabitFilter(
-                habits: all,
-                selected: _habitId,
-                onSelected: (id) => setState(() => _habitId = id),
-              ),
-              const SizedBox(height: 16),
-              YearNavigator(
-                year: _year,
-                canGoForward: _year < currentYear,
-                onChanged: (delta) => setState(() => _year += delta),
-              ),
-              const SizedBox(height: 16),
-              StatReveal(
-                child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: YearHeatmap(
-                    year: _year,
-                    dailyCounts: stats.dailyCounts,
-                    maxCount: scoped.length,
-                    color: accent,
-                    habit: _habitId == null ? null : scoped.first,
+                return ListView(
+                  padding: context.pagePadding(
+                    16,
+                    8 + MediaQuery.paddingOf(context).top,
+                    16,
+                    104,
                   ),
-                ),
-                ),
-              ),
-              const SpanEnd(),
-              const SizedBox(height: 16),
-              StatReveal(
-                child: IntrinsicHeight(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child: MiniStat(
-                          icon: LucideIcons.hash,
-                          color: accent,
-                          value: '${stats.total}',
-                          label: context.l10n.completions,
+                  children: spanned(context, [
+                    const IslandEntry(),
+                    HabitFilter(
+                      habits: all,
+                      selected: _habitId,
+                      onSelected: (id) => setState(() => _habitId = id),
+                    ),
+                    const SizedBox(height: 16),
+                    YearNavigator(
+                      year: _year,
+                      canGoForward: _year < currentYear,
+                      onChanged: (delta) => setState(() => _year += delta),
+                    ),
+                    const SizedBox(height: 16),
+                    StatReveal(
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: YearHeatmap(
+                            year: _year,
+                            dailyCounts: stats.dailyCounts,
+                            maxCount: scoped.length,
+                            color: accent,
+                            habit: _habitId == null ? null : scoped.first,
+                          ),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: MiniStat(
-                          icon: LucideIcons.trophy,
-                          color: context.tokens.success,
-                          value: '${stats.bestStreak}',
-                          label: context.l10n.best_streak,
+                    ),
+                    const SpanEnd(),
+                    const SizedBox(height: 16),
+                    StatReveal(
+                      child: IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(
+                              child: MiniStat(
+                                icon: LucideIcons.hash,
+                                color: accent,
+                                value: '${stats.total}',
+                                label: context.l10n.completions,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: MiniStat(
+                                icon: LucideIcons.trophy,
+                                color: context.tokens.success,
+                                value: '${stats.bestStreak}',
+                                label: context.l10n.best_streak,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              StatReveal(
-                child: IntrinsicHeight(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child: MiniStat(
-                          icon: LucideIcons.flame,
-                          color: context.tokens.warning,
-                          value: '${stats.currentStreak}',
-                          label: context.l10n.current_streak,
+                    ),
+                    const SizedBox(height: 12),
+                    StatReveal(
+                      child: IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(
+                              child: MiniStat(
+                                icon: LucideIcons.flame,
+                                color: context.tokens.warning,
+                                value: '${stats.currentStreak}',
+                                label: context.l10n.current_streak,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: MiniStat(
+                                icon: LucideIcons.percent,
+                                color: context.tokens.info,
+                                value: '${stats.monthRate}%',
+                                label: context.l10n.completion_rate,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: MiniStat(
-                          icon: LucideIcons.percent,
-                          color: context.tokens.info,
-                          value: '${stats.monthRate}%',
-                          label: context.l10n.completion_rate,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              StatReveal(
-                child: StatCard(
-                  title: context.l10n.times_completed,
-                  icon: LucideIcons.circleCheckBig,
-                  color: accent,
-                  child: PeriodTotals(
-                    stats: stats,
-                    year: _year,
-                    color: accent,
-                  ),
-                ),
-              ),
-              if (scoped.length == 1 && showsMoney(scoped.first)) ...[
-                const SizedBox(height: 12),
-                StatReveal(child: SavedMoneyStats(habit: scoped.first)),
-              ],
-              if (scoped.length == 1 &&
-                  scoped.first.kind == HabitKind.quantitative) ...[
-                const SizedBox(height: 12),
-                StatReveal(child: QuantStatsRow(habit: scoped.first)),
-              ],
-              if (context.watch<SettingsController>().focusEnabled &&
-                  context.select<FocusController, int>((f) => f.sessionCount) >
-                      0) ...[
-                const SizedBox(height: 12),
-                StatReveal(
-                  child: _FocusStats(habitId: _habitId, accent: accent),
-                ),
-              ],
-              const SizedBox(height: 16),
-              StatReveal(
-                child: _PerfectStreakCard(
-                  streak: stats.perfectStreak,
-                  best: stats.bestPerfectStreak,
-                  color: accent,
-                ),
-              ),
-              const SizedBox(height: 24),
-              _TrendCard(stats: stats, color: accent),
-              const SizedBox(height: 16),
-              StatReveal(
-                child: StatCard(
-                  title: context.l10n.completions_per_month,
-                  icon: LucideIcons.chartSpline,
-                  color: accent,
-                  child: stats.total > 0
-                      ? MonthlyLine(
-                          key: ValueKey('monthly-$_year-$_habitId'),
-                          values: stats.monthly,
-                          color: accent,
+                    ),
+                    const SizedBox(height: 16),
+                    StatReveal(
+                      child: StatCard(
+                        title: context.l10n.times_completed,
+                        icon: LucideIcons.circleCheckBig,
+                        color: accent,
+                        child: PeriodTotals(
+                          stats: stats,
                           year: _year,
-                        )
-                      : _ChartPlaceholder(text: context.l10n.not_enough_data),
-                ),
-              ),
-              const SizedBox(height: 16),
-              IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(
-                      child: StatCard(
-                        title: context.l10n.completion_rate_short,
-                        icon: LucideIcons.target,
-                        color: accent,
-                        child: Center(
-                          child: _ConsistencyCard(stats: stats, color: accent),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: StatCard(
-                        title: context.l10n.when_best,
-                        icon: LucideIcons.calendarDays,
-                        color: accent,
-                        child: WeekdayBars(
-                          values: stats.weekday,
                           color: accent,
-                          height: 150,
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              StatReveal(
-                child: StatCard(
-                  title: context.l10n.completion_time,
-                  icon: LucideIcons.clock,
-                  color: accent,
-                  child: stats.hourSamples >= 5
-                      ? HourArea(values: stats.hours, color: accent)
-                      : _ChartPlaceholder(text: context.l10n.not_enough_data),
-                ),
-              ),
+                    if (scoped.length == 1 && showsMoney(scoped.first)) ...[
+                      const SizedBox(height: 12),
+                      StatReveal(child: SavedMoneyStats(habit: scoped.first)),
+                    ],
+                    if (scoped.length == 1 &&
+                        scoped.first.kind == HabitKind.quantitative) ...[
+                      const SizedBox(height: 12),
+                      StatReveal(child: QuantStatsRow(habit: scoped.first)),
+                    ],
+                    if (context.watch<SettingsController>().focusEnabled &&
+                        context.select<FocusController, int>(
+                              (f) => f.sessionCount,
+                            ) >
+                            0) ...[
+                      const SizedBox(height: 12),
+                      StatReveal(
+                        child: _FocusStats(habitId: _habitId, accent: accent),
+                      ),
+                    ],
+                    const SizedBox(height: 16),
+                    StatReveal(
+                      child: _PerfectStreakCard(
+                        streak: stats.perfectStreak,
+                        best: stats.bestPerfectStreak,
+                        color: accent,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    _TrendCard(stats: stats, color: accent),
+                    const SizedBox(height: 16),
+                    StatReveal(
+                      child: StatCard(
+                        title: context.l10n.completions_per_month,
+                        icon: LucideIcons.chartSpline,
+                        color: accent,
+                        child: stats.total > 0
+                            ? MonthlyLine(
+                                key: ValueKey('monthly-$_year-$_habitId'),
+                                values: stats.monthly,
+                                color: accent,
+                                year: _year,
+                              )
+                            : _ChartPlaceholder(
+                                text: context.l10n.not_enough_data,
+                              ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: StatCard(
+                              title: context.l10n.completion_rate_short,
+                              icon: LucideIcons.target,
+                              color: accent,
+                              child: Center(
+                                child: _ConsistencyCard(
+                                  stats: stats,
+                                  color: accent,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: StatCard(
+                              title: context.l10n.when_best,
+                              icon: LucideIcons.calendarDays,
+                              color: accent,
+                              child: WeekdayBars(
+                                values: stats.weekday,
+                                color: accent,
+                                height: 150,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    StatReveal(
+                      child: StatCard(
+                        title: context.l10n.completion_time,
+                        icon: LucideIcons.clock,
+                        color: accent,
+                        child: stats.hourSamples >= 5
+                            ? HourArea(values: stats.hours, color: accent)
+                            : _ChartPlaceholder(
+                                text: context.l10n.not_enough_data,
+                              ),
+                      ),
+                    ),
 
-              if (_habitId == null && all.length > 1) ...[
-                const SizedBox(height: 16),
-                StatReveal(
-                  child: StatCard(
-                    title: context.l10n.by_habit,
-                    icon: LucideIcons.chartPie,
-                    color: accent,
-                    child: HabitDonut(entries: _ranking(context, all, stats)),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                StatReveal(
-                  child: _RankingCard(
-                    accent: accent,
-                    entries: _ranking(context, all, stats, limit: all.length),
-                  ),
-                ),
-              ],
-              const SizedBox(height: 16),
-              StatReveal(
-                child: _SecondaryStats(stats: stats, accent: accent),
-              ),
-            ]),
-          );
-        },
-        ),
-      ),
+                    if (_habitId == null && all.length > 1) ...[
+                      const SizedBox(height: 16),
+                      StatReveal(
+                        child: StatCard(
+                          title: context.l10n.by_habit,
+                          icon: LucideIcons.chartPie,
+                          color: accent,
+                          child: HabitDonut(
+                            entries: _ranking(context, all, stats),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      StatReveal(
+                        child: _RankingCard(
+                          accent: accent,
+                          entries: _ranking(
+                            context,
+                            all,
+                            stats,
+                            limit: all.length,
+                          ),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 16),
+                    StatReveal(
+                      child: _SecondaryStats(stats: stats, accent: accent),
+                    ),
+                  ]),
+                );
+              },
+            ),
+          ),
           HeaderBlur(scrolled: _scrolled),
         ],
       ),
@@ -425,8 +442,8 @@ class _TrendCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final start = AppClock.today().subtract(
-          const Duration(days: HabitStats.window - 1),
-        );
+      const Duration(days: HabitStats.window - 1),
+    );
     return StatCard(
       title: context.l10n.streak_evolution,
       icon: LucideIcons.trendingUp,
@@ -546,7 +563,10 @@ class _PerfectStreakCard extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 15),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [color.withValues(alpha: 0.22), color.withValues(alpha: 0.06)],
+          colors: [
+            color.withValues(alpha: 0.22),
+            color.withValues(alpha: 0.06),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -692,44 +712,44 @@ class _FocusStats extends StatelessWidget {
       child: GestureDetector(
         onTap: () => AppNavigator.push(FocusStatsPage(habitId: habitId)),
         child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              child: MiniStat(
-                icon: LucideIcons.timer,
-                color: accent,
-                value: formatHoursShort(seconds),
-                label: context.l10n.focus_total,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: MiniStat(
+                  icon: LucideIcons.timer,
+                  color: accent,
+                  value: formatHoursShort(seconds),
+                  label: context.l10n.focus_total,
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: MiniStat(
-                icon: LucideIcons.circlePlay,
-                color: context.tokens.info,
-                value: '$sessions',
-                label: context.l10n.focus_sessions,
-              ),
-            ),
-            if (context.watch<SettingsController>().focusDailyGoal > 0) ...[
               const SizedBox(width: 12),
               Expanded(
                 child: MiniStat(
-                  icon: LucideIcons.target,
-                  color: context.tokens.success,
-                  value: context.l10n.focus_goal_today(
-                    formatHoursShort(focus.secondsForDay(AppClock.now())),
-                    formatHoursShort(
-                      context.watch<SettingsController>().focusDailyGoal * 60,
-                    ),
-                  ),
-                  label: context.l10n.focus_daily_goal,
+                  icon: LucideIcons.circlePlay,
+                  color: context.tokens.info,
+                  value: '$sessions',
+                  label: context.l10n.focus_sessions,
                 ),
               ),
+              if (context.watch<SettingsController>().focusDailyGoal > 0) ...[
+                const SizedBox(width: 12),
+                Expanded(
+                  child: MiniStat(
+                    icon: LucideIcons.target,
+                    color: context.tokens.success,
+                    value: context.l10n.focus_goal_today(
+                      formatHoursShort(focus.secondsForDay(AppClock.now())),
+                      formatHoursShort(
+                        context.watch<SettingsController>().focusDailyGoal * 60,
+                      ),
+                    ),
+                    label: context.l10n.focus_daily_goal,
+                  ),
+                ),
+              ],
             ],
-          ],
-        ),
+          ),
         ),
       ),
     );

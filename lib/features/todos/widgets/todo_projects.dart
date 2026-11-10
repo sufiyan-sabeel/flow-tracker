@@ -108,8 +108,7 @@ class _TodoProjectsState extends State<TodoProjects>
     final todos = context.watch<TodosController>();
     final style = context.watch<SettingsController>().appStyle;
     final minimal = style == 1;
-    final accent =
-        minimal ? context.colors.onSurface : context.colors.primary;
+    final accent = minimal ? context.colors.onSurface : context.colors.primary;
     if (_dragging == null) _order = projects;
     final loose = todos.looseCount;
     final papers = <String, List<Color>>{};
@@ -127,7 +126,9 @@ class _TodoProjectsState extends State<TodoProjects>
         if (_arranging) ...[
           _ArrangeBar(
             accent: accent,
-            onLabel: minimal ? context.colors.surface : context.colors.onPrimary,
+            onLabel: minimal
+                ? context.colors.surface
+                : context.colors.onPrimary,
             style: style,
             onDone: () => _arrange(false),
           ),
@@ -334,8 +335,10 @@ class _ArrangeBar extends StatelessWidget {
               onTap: onDone,
               behavior: HitTestBehavior.opaque,
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: accent,
                   borderRadius: BorderRadius.circular(style == 2 ? 16 : 11),
@@ -422,7 +425,7 @@ class _ProjectSlot extends StatelessWidget {
           color: project.color,
           icon: CategoryIcons.resolve(project.icon),
           count: count,
-      tints: tints,
+          tints: tints,
           seed: seed,
           lifted: lifted,
         ),
@@ -578,8 +581,9 @@ class _ProjectCellState extends State<_ProjectCell> {
       label: '${widget.label}, ${context.l10n.todo_tag_count(widget.count)}',
       excludeSemantics: true,
       child: MouseRegion(
-        cursor:
-            tap == null ? SystemMouseCursors.basic : SystemMouseCursors.click,
+        cursor: tap == null
+            ? SystemMouseCursors.basic
+            : SystemMouseCursors.click,
         onEnter: (_) => setState(() => _hovered = true),
         onExit: (_) => setState(() => _hovered = false),
         child: GestureDetector(
@@ -606,7 +610,8 @@ class _ProjectCellState extends State<_ProjectCell> {
                     icon: widget.icon,
                     papers: widget.count,
                     tints: widget.tints,
-                    lifted: widget.lifted ||
+                    lifted:
+                        widget.lifted ||
                         _landing ||
                         _pressed ||
                         (_hovered && tap != null),

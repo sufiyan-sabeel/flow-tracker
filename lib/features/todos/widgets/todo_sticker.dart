@@ -57,12 +57,12 @@ class ProjectSticker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _Sticker(
-        icon: CategoryIcons.resolve(project.icon),
-        label: project.name,
-        color: project.color,
-        turn: turn,
-        scale: scale,
-      );
+    icon: CategoryIcons.resolve(project.icon),
+    label: project.name,
+    color: project.color,
+    turn: turn,
+    scale: scale,
+  );
 }
 
 class _Sticker extends StatelessWidget {
@@ -87,7 +87,12 @@ class _Sticker extends StatelessWidget {
     return Transform.rotate(
       angle: turn,
       child: Container(
-        padding: EdgeInsets.fromLTRB(6 * scale, 3 * scale, 8 * scale, 3 * scale),
+        padding: EdgeInsets.fromLTRB(
+          6 * scale,
+          3 * scale,
+          8 * scale,
+          3 * scale,
+        ),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(7 * scale),
           border: Border.all(color: Colors.white, width: 2 * scale),
@@ -112,21 +117,21 @@ class _Sticker extends StatelessWidget {
             ConstrainedBox(
               constraints: BoxConstraints(maxWidth: 120 * scale),
               child: ScrollingLine(
-              rounds: 1,
-              replayOnScrollUp: true,
-              child: Text(
-              label.toUpperCase(),
-              maxLines: 1,
-              softWrap: false,
-              style: TextStyle(
-                fontSize: size - 1,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 0.6,
-                height: 1.1,
-                color: Colors.white,
+                rounds: 1,
+                replayOnScrollUp: true,
+                child: Text(
+                  label.toUpperCase(),
+                  maxLines: 1,
+                  softWrap: false,
+                  style: TextStyle(
+                    fontSize: size - 1,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.6,
+                    height: 1.1,
+                    color: Colors.white,
+                  ),
+                ),
               ),
-            ),
-            ),
             ),
           ],
         ),
@@ -264,7 +269,11 @@ class _PriorityTile extends StatelessWidget {
                         const SizedBox(width: 7),
                         Text(
                           todoPriorityLabels(context)[0],
-                          style: sheetActionStyle(context, size: 14, color: muted),
+                          style: sheetActionStyle(
+                            context,
+                            size: 14,
+                            color: muted,
+                          ),
                         ),
                       ],
                     )

@@ -46,9 +46,7 @@ class _YearHeatmapState extends State<YearHeatmap> {
   DateTime _startFrom(bool rolling, int weekStart) {
     final habit = widget.habit;
     if (rolling) {
-      final recent = AppClock.today()
-          .startOfWeek(weekStart)
-          .addDays(-(7 * 52));
+      final recent = AppClock.today().startOfWeek(weekStart).addDays(-(7 * 52));
       if (!_wholeHistory) return recent;
       final first = habit!.startedAt.startOfWeek(weekStart);
       final floor = recent.addDays(-7 * 467);
@@ -88,7 +86,10 @@ class _YearHeatmapState extends State<YearHeatmap> {
       final rolling = _rollingFor(settings.heatmapRolling);
       final target = today.year != widget.year && !rolling
           ? 0.0
-          : ((today.epochDay - _startFrom(rolling, settings.weekStart).epochDay) ~/ 7) * _step +
+          : ((today.epochDay -
+                            _startFrom(rolling, settings.weekStart).epochDay) ~/
+                        7) *
+                    _step +
                 _cell / 2 -
                 position.viewportDimension / 2;
       position.jumpTo(
@@ -105,14 +106,18 @@ class _YearHeatmapState extends State<YearHeatmap> {
     final start = _startFrom(rolling, settings.weekStart);
     final lastOfYear = DateTime(widget.year, 12, 31);
     final columns = rolling
-        ? (today.startOfWeek(settings.weekStart).epochDay - start.epochDay) ~/ 7 + 1
+        ? (today.startOfWeek(settings.weekStart).epochDay - start.epochDay) ~/
+                  7 +
+              1
         : (lastOfYear.epochDay - start.epochDay) ~/ 7 + 1;
     final empty = context.colors.surfaceContainerHighest;
     final max = widget.maxCount <= 0 ? 1 : widget.maxCount;
     final locale = Localizations.localeOf(context).languageCode;
 
     Color cellColor(DateTime date) {
-      if (!rolling && (date.year > widget.year || (!_wholeHistory && date.year != widget.year))) {
+      if (!rolling &&
+          (date.year > widget.year ||
+              (!_wholeHistory && date.year != widget.year))) {
         return Colors.transparent;
       }
       final habit = widget.habit;
@@ -121,7 +126,11 @@ class _YearHeatmapState extends State<YearHeatmap> {
       final count = widget.dailyCounts[date.dayKey] ?? 0;
       if (count <= 0) return empty;
       final ratio = (count / max).clamp(0.25, 1.0);
-      return Color.lerp(widget.color.withValues(alpha: 0.35), widget.color, ratio)!;
+      return Color.lerp(
+        widget.color.withValues(alpha: 0.35),
+        widget.color,
+        ratio,
+      )!;
     }
 
     return LayoutBuilder(
@@ -136,7 +145,8 @@ class _YearHeatmapState extends State<YearHeatmap> {
             children: List.generate(columns, (col) {
               final colDate = start.addDays(col * 7);
               final prevDate = start.addDays((col - 1) * 7);
-                      final isNewMonth = (rolling || _wholeHistory || colDate.year == widget.year) &&
+              final isNewMonth =
+                  (rolling || _wholeHistory || colDate.year == widget.year) &&
                   (col == 0 || colDate.month != prevDate.month);
               return Padding(
                 padding: const EdgeInsets.only(right: _gap),
@@ -152,11 +162,12 @@ class _YearHeatmapState extends State<YearHeatmap> {
                               alignment: Alignment.centerLeft,
                               child: Text(
                                 (_wholeHistory && colDate.month == 1
-                                    ? DateFormat('MMM yy', locale)
-                                    : DateFormat.MMM(locale))
+                                        ? DateFormat('MMM yy', locale)
+                                        : DateFormat.MMM(locale))
                                     .format(colDate),
-                                textScaler: MediaQuery.textScalerOf(context)
-                                    .clamp(maxScaleFactor: 1.2),
+                                textScaler: MediaQuery.textScalerOf(
+                                  context,
+                                ).clamp(maxScaleFactor: 1.2),
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w600,

@@ -160,7 +160,9 @@ class TodosController extends ChangeNotifier {
     notifyListeners();
     TodosWidgetService.syncSoon(_todos);
     await LocalStore.writeTodo(todo);
-    if (_remindsDifferently(before, todo)) await _notifications.scheduleTodo(todo);
+    if (_remindsDifferently(before, todo)) {
+      await _notifications.scheduleTodo(todo);
+    }
     if (dropped.isNotEmpty) await CoverStorage.forgetAll(dropped);
   }
 
@@ -248,14 +250,14 @@ class TodosController extends ChangeNotifier {
   }
 
   Future<void> forgetTag(String tagId) => _rewrite(
-        (todo) => todo.tags.contains(tagId),
-        (todo) => todo.copyWith(tags: [...todo.tags]..remove(tagId)),
-      );
+    (todo) => todo.tags.contains(tagId),
+    (todo) => todo.copyWith(tags: [...todo.tags]..remove(tagId)),
+  );
 
   Future<void> forgetProject(String projectId) => _rewrite(
-        (todo) => todo.project == projectId,
-        (todo) => todo.copyWith(project: ''),
-      );
+    (todo) => todo.project == projectId,
+    (todo) => todo.copyWith(project: ''),
+  );
 
   Future<void> _rewrite(
     bool Function(Todo todo) touches,

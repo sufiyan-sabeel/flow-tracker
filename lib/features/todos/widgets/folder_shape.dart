@@ -86,124 +86,127 @@ class FolderShape extends StatelessWidget {
           clipBehavior: Clip.none,
           children: [
             if (withBack) ...[
-            Positioned(
-              left: width * 0.1,
-              right: width * 0.1,
-              top: height * 0.55,
-              bottom: height * 0.05,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(radius),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: dark ? 0.5 : 0.22),
-                      blurRadius: 26,
-                      spreadRadius: -2,
-                      offset: const Offset(0, 16),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Positioned(
-              left: width * 0.048,
-              right: width * 0.048,
-              top: 0,
-              bottom: 0,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(radius * 0.9),
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: panel,
-                  ),
-                ),
-              ),
-            ),
-            for (final (index, sheet) in sheets.indexed.toList().reversed)
-              AnimatedPositioned(
-                duration: const Duration(milliseconds: 280),
-                curve: Curves.easeOutBack,
-                left: width * sheet.left,
-                top: height * (sheet.top - (lifted ? _lift : 0)),
-                width: width * sheet.width,
-                height: height * (0.86 - sheet.top),
-                child: Transform.rotate(
-                  angle: sheet.turn,
-                  child: _Paper(
-                    lines: sheet.lines,
-                    color: index < tints.length
-                        ? tints[index]
-                        : (dark ? darkSheet : Colors.white),
-                    dark: dark,
-                  ),
-                ),
-              ),
-            ],
-            if (withFront)
-            Positioned.fill(
-              child: ClipPath(
-                clipper: ShapeBorderClipper(shape: outline),
-                child: BackdropFilter(
-                  enabled: glass,
-                  filter: ImageFilter.blur(
-                    sigmaX: width * 0.015,
-                    sigmaY: width * 0.015,
-                  ),
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      ColoredBox(
-                        color: (dark
-                                ? const Color(0xFF9A9AA2)
-                                : const Color(0xFF7A7A80))
-                            .withValues(alpha: 0.26),
-                      ),
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            stops: const [0.2, 0.36, 0.58, 0.96],
-                            colors: [
-                              Colors.white.withValues(alpha: 0.24),
-                              Colors.white.withValues(alpha: 0),
-                              Colors.black.withValues(alpha: 0),
-                              Colors.black.withValues(alpha: 0.72),
-                            ],
-                          ),
+              Positioned(
+                left: width * 0.1,
+                right: width * 0.1,
+                top: height * 0.55,
+                bottom: height * 0.05,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(radius),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(
+                          alpha: dark ? 0.5 : 0.22,
                         ),
+                        blurRadius: 26,
+                        spreadRadius: -2,
+                        offset: const Offset(0, 16),
                       ),
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            stops: const [0, 0.13, 0.87, 1],
-                            colors: [
-                              Colors.black.withValues(alpha: 0.55),
-                              Colors.black.withValues(alpha: 0),
-                              Colors.black.withValues(alpha: 0),
-                              Colors.black.withValues(alpha: 0.6),
-                            ],
-                          ),
-                        ),
-                      ),
-                      DecoratedBox(decoration: ShapeDecoration(shape: front)),
-                      if (icon != null)
-                        Align(
-                          alignment: const Alignment(0, 0.58),
-                          child: _Emblem(
-                            icon: icon!,
-                            size: height * 0.16,
-                            color: color,
-                            seed: style == 2 ? seed : null,
-                          ),
-                        ),
                     ],
                   ),
                 ),
               ),
-            ),
+              Positioned(
+                left: width * 0.048,
+                right: width * 0.048,
+                top: 0,
+                bottom: 0,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(radius * 0.9),
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: panel,
+                    ),
+                  ),
+                ),
+              ),
+              for (final (index, sheet) in sheets.indexed.toList().reversed)
+                AnimatedPositioned(
+                  duration: const Duration(milliseconds: 280),
+                  curve: Curves.easeOutBack,
+                  left: width * sheet.left,
+                  top: height * (sheet.top - (lifted ? _lift : 0)),
+                  width: width * sheet.width,
+                  height: height * (0.86 - sheet.top),
+                  child: Transform.rotate(
+                    angle: sheet.turn,
+                    child: _Paper(
+                      lines: sheet.lines,
+                      color: index < tints.length
+                          ? tints[index]
+                          : (dark ? darkSheet : Colors.white),
+                      dark: dark,
+                    ),
+                  ),
+                ),
+            ],
+            if (withFront)
+              Positioned.fill(
+                child: ClipPath(
+                  clipper: ShapeBorderClipper(shape: outline),
+                  child: BackdropFilter(
+                    enabled: glass,
+                    filter: ImageFilter.blur(
+                      sigmaX: width * 0.015,
+                      sigmaY: width * 0.015,
+                    ),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        ColoredBox(
+                          color:
+                              (dark
+                                      ? const Color(0xFF9A9AA2)
+                                      : const Color(0xFF7A7A80))
+                                  .withValues(alpha: 0.26),
+                        ),
+                        DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              stops: const [0.2, 0.36, 0.58, 0.96],
+                              colors: [
+                                Colors.white.withValues(alpha: 0.24),
+                                Colors.white.withValues(alpha: 0),
+                                Colors.black.withValues(alpha: 0),
+                                Colors.black.withValues(alpha: 0.72),
+                              ],
+                            ),
+                          ),
+                        ),
+                        DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              stops: const [0, 0.13, 0.87, 1],
+                              colors: [
+                                Colors.black.withValues(alpha: 0.55),
+                                Colors.black.withValues(alpha: 0),
+                                Colors.black.withValues(alpha: 0),
+                                Colors.black.withValues(alpha: 0.6),
+                              ],
+                            ),
+                          ),
+                        ),
+                        DecoratedBox(decoration: ShapeDecoration(shape: front)),
+                        if (icon != null)
+                          Align(
+                            alignment: const Alignment(0, 0.58),
+                            child: _Emblem(
+                              icon: icon!,
+                              size: height * 0.16,
+                              color: color,
+                              seed: style == 2 ? seed : null,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
           ],
         );
       },
@@ -269,13 +272,13 @@ class _Bar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        width: width,
-        height: height,
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(height),
-        ),
-      );
+    width: width,
+    height: height,
+    decoration: BoxDecoration(
+      color: color,
+      borderRadius: BorderRadius.circular(height),
+    ),
+  );
 }
 
 class _Emblem extends StatelessWidget {
@@ -339,11 +342,15 @@ class _FolderFront extends OutlinedBorder {
       ..lineTo(rect.right - r, bodyTop)
       ..arcToPoint(Offset(rect.right, bodyTop + r), radius: Radius.circular(r))
       ..lineTo(rect.right, rect.bottom - r)
-      ..arcToPoint(Offset(rect.right - r, rect.bottom),
-          radius: Radius.circular(r))
+      ..arcToPoint(
+        Offset(rect.right - r, rect.bottom),
+        radius: Radius.circular(r),
+      )
       ..lineTo(rect.left + r, rect.bottom)
-      ..arcToPoint(Offset(rect.left, rect.bottom - r),
-          radius: Radius.circular(r))
+      ..arcToPoint(
+        Offset(rect.left, rect.bottom - r),
+        radius: Radius.circular(r),
+      )
       ..close();
   }
 
@@ -352,9 +359,9 @@ class _FolderFront extends OutlinedBorder {
 
   @override
   _FolderFront copyWith({BorderSide? side, double? radius}) => _FolderFront(
-        radius: radius ?? this.radius,
-        side: side ?? this.side,
-      );
+    radius: radius ?? this.radius,
+    side: side ?? this.side,
+  );
 
   @override
   Path getOuterPath(Rect rect, {TextDirection? textDirection}) => _path(rect);

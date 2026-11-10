@@ -32,9 +32,9 @@ const todoIconLead = [
 ];
 
 List<String> get todoIconNames => [
-      ...todoIconLead,
-      ...CategoryIcons.names.where((name) => !todoIconLead.contains(name)),
-    ];
+  ...todoIconLead,
+  ...CategoryIcons.names.where((name) => !todoIconLead.contains(name)),
+];
 
 class _TagDraft {
   TodoTag? tag;
@@ -64,28 +64,26 @@ Future<void> showTodoProjectPicker(
   BuildContext context, {
   required String selected,
   required ValueChanged<String> onChanged,
-}) =>
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (_) => _ProjectPickerSheet(
-        selected: selected,
-        onChanged: onChanged,
-      ),
-    );
+}) => showModalBottomSheet<void>(
+  context: context,
+  isScrollControlled: true,
+  showDragHandle: true,
+  builder: (_) => _ProjectPickerSheet(
+    selected: selected,
+    onChanged: onChanged,
+  ),
+);
 
 Future<void> showTodoTagPicker(
   BuildContext context, {
   required List<String> selected,
   required ValueChanged<List<String>> onChanged,
-}) =>
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (_) => _TagPickerSheet(selected: selected, onChanged: onChanged),
-    );
+}) => showModalBottomSheet<void>(
+  context: context,
+  isScrollControlled: true,
+  showDragHandle: true,
+  builder: (_) => _TagPickerSheet(selected: selected, onChanged: onChanged),
+);
 
 Future<void> createProject(BuildContext context) async {
   final tags = context.read<TodoTagsController>();
@@ -121,7 +119,10 @@ Future<void> editOrDeleteTag(
           children: [
             _SheetHeading(tag: tag),
             ListTile(
-              leading: Icon(LucideIcons.pencil, color: context.colors.onSurface),
+              leading: Icon(
+                LucideIcons.pencil,
+                color: context.colors.onSurface,
+              ),
               title: Text(
                 tag.isProject
                     ? context.l10n.todo_project_edit
@@ -132,8 +133,10 @@ Future<void> editOrDeleteTag(
             ),
             if (onArrange != null)
               ListTile(
-                leading: Icon(LucideIcons.move,
-                    color: context.colors.onSurface),
+                leading: Icon(
+                  LucideIcons.move,
+                  color: context.colors.onSurface,
+                ),
                 title: Text(
                   context.l10n.todo_project_arrange,
                   style: sheetOptionStyle(sheet),
@@ -242,8 +245,9 @@ class _TagEditorSheet extends StatefulWidget {
 }
 
 class _TagEditorSheetState extends State<_TagEditorSheet> {
-  late final TextEditingController _name =
-      TextEditingController(text: widget.initial?.name ?? '');
+  late final TextEditingController _name = TextEditingController(
+    text: widget.initial?.name ?? '',
+  );
   late Color _color = widget.initial?.color ?? todoTagPalette.first;
   late String _icon = widget.initial?.icon ?? 'folder';
   late final bool _project = widget.initial?.isProject ?? widget.project;
@@ -272,13 +276,13 @@ class _TagEditorSheetState extends State<_TagEditorSheet> {
   late final String _id = widget.initial?.id ?? const Uuid().v4();
 
   TodoTag _build() => TodoTag(
-        id: _id,
-        name: _name.text.trim(),
-        color: _color,
-        icon: _icon,
-        order: widget.initial?.order ?? 0,
-        kind: _project ? TodoTagKind.project : TodoTagKind.label,
-      );
+    id: _id,
+    name: _name.text.trim(),
+    color: _color,
+    icon: _icon,
+    order: widget.initial?.order ?? 0,
+    kind: _project ? TodoTagKind.project : TodoTagKind.label,
+  );
 
   void _remember() => widget.draft.tag = _canSave ? _build() : null;
 
@@ -327,8 +331,10 @@ class _TagEditorSheetState extends State<_TagEditorSheet> {
                 },
               ),
               const SizedBox(height: 18),
-              Text(context.l10n.todo_tag_icon,
-                  style: sheetBodyStyle(context, size: 13)),
+              Text(
+                context.l10n.todo_tag_icon,
+                style: sheetBodyStyle(context, size: 13),
+              ),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 10,
@@ -356,7 +362,9 @@ class _TagEditorSheetState extends State<_TagEditorSheet> {
                           child: Icon(
                             CategoryIcons.resolve(name),
                             size: 20,
-                            color: _icon == name ? _color : context.tokens.muted,
+                            color: _icon == name
+                                ? _color
+                                : context.tokens.muted,
                           ),
                         ),
                       ),
@@ -388,8 +396,10 @@ class _TagEditorSheetState extends State<_TagEditorSheet> {
                 ],
               ),
               const SizedBox(height: 18),
-              Text(context.l10n.color,
-                  style: sheetBodyStyle(context, size: 13)),
+              Text(
+                context.l10n.color,
+                style: sheetBodyStyle(context, size: 13),
+              ),
               const SizedBox(height: 10),
               Wrap(
                 spacing: 10,
@@ -472,10 +482,10 @@ class _TagPickerSheetState extends State<_TagPickerSheet> {
     final result = await showTodoTagEditor(context);
     if (result == null || !mounted) return;
     final tag = await context.read<TodoTagsController>().create(
-          name: result.name,
-          color: result.color,
-          icon: result.icon,
-        );
+      name: result.name,
+      color: result.color,
+      icon: result.icon,
+    );
     _toggle(tag.id);
   }
 
@@ -535,8 +545,11 @@ class _TagPickerSheetState extends State<_TagPickerSheet> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(LucideIcons.plus,
-                              size: 14, color: context.colors.primary),
+                          Icon(
+                            LucideIcons.plus,
+                            size: 14,
+                            color: context.colors.primary,
+                          ),
                           const SizedBox(width: 6),
                           Text(
                             context.l10n.todo_tag_new,
@@ -653,11 +666,11 @@ class _ProjectPickerSheetState extends State<_ProjectPickerSheet> {
     final result = await showTodoTagEditor(context, project: true);
     if (result == null || !mounted) return;
     final project = await context.read<TodoTagsController>().create(
-          name: result.name,
-          color: result.color,
-          icon: result.icon,
-          kind: TodoTagKind.project,
-        );
+      name: result.name,
+      color: result.color,
+      icon: result.icon,
+      kind: TodoTagKind.project,
+    );
     _pick(project.id);
   }
 
@@ -676,8 +689,10 @@ class _ProjectPickerSheetState extends State<_ProjectPickerSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(context.l10n.todo_project_pick,
-                style: sheetTitleStyle(context)),
+            Text(
+              context.l10n.todo_project_pick,
+              style: sheetTitleStyle(context),
+            ),
             const SizedBox(height: 16),
             Wrap(
               spacing: 8,

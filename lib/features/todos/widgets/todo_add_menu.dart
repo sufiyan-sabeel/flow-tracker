@@ -8,19 +8,18 @@ Future<int?> showTodoAddMenu(
   BuildContext context, {
   required Rect anchor,
   required List<TodoAddOption> options,
-}) =>
-    showGeneralDialog<int>(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: MaterialLocalizations.of(context).closeButtonLabel,
-      barrierColor: Colors.black.withValues(alpha: 0.45),
-      transitionDuration: const Duration(milliseconds: 240),
-      pageBuilder: (menu, animation, _) => _AddMenu(
-        anchor: anchor,
-        options: options,
-        animation: animation,
-      ),
-    );
+}) => showGeneralDialog<int>(
+  context: context,
+  barrierDismissible: true,
+  barrierLabel: MaterialLocalizations.of(context).closeButtonLabel,
+  barrierColor: Colors.black.withValues(alpha: 0.45),
+  transitionDuration: const Duration(milliseconds: 240),
+  pageBuilder: (menu, animation, _) => _AddMenu(
+    anchor: anchor,
+    options: options,
+    animation: animation,
+  ),
+);
 
 class _AddMenu extends StatelessWidget {
   const _AddMenu({

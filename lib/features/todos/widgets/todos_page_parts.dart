@@ -17,9 +17,8 @@ import 'package:flow_tracker/features/todos/data/todo_tag.dart';
 import 'package:flow_tracker/features/todos/state/todos_controller.dart';
 import 'package:flow_tracker/features/todos/widgets/todo_tag_sheet.dart';
 
-BorderRadius todoCorners(bool express, int index, int length) => express
-    ? expressSlotRadius(index, length)
-    : stackedCorners(index, length);
+BorderRadius todoCorners(bool express, int index, int length) =>
+    express ? expressSlotRadius(index, length) : stackedCorners(index, length);
 
 class TodoTagBar extends StatelessWidget {
   const TodoTagBar({
@@ -225,7 +224,11 @@ class TodoSwipeable extends StatelessWidget {
             color: context.tokens.danger.withValues(alpha: 0.16),
             borderRadius: corners,
           ),
-          child: Icon(LucideIcons.trash2, size: 20, color: context.tokens.danger),
+          child: Icon(
+            LucideIcons.trash2,
+            size: 20,
+            color: context.tokens.danger,
+          ),
         ),
         confirmDismiss: (_) async {
           await onDelete();
@@ -304,12 +307,12 @@ class TodoCompletedHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => TodoSectionHeader(
-        label: context.l10n.todo_completed,
-        count: count,
-        danger: false,
-        folded: !expanded,
-        onTap: onTap,
-      );
+    label: context.l10n.todo_completed,
+    count: count,
+    danger: false,
+    folded: !expanded,
+    onTap: onTap,
+  );
 }
 
 class TodoAddButton extends StatefulWidget {
@@ -413,8 +416,10 @@ class TodoEmptyState extends StatelessWidget {
               icon: const Icon(LucideIcons.plus, size: 18),
               label: Text(context.l10n.todo_new),
               style: FilledButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 14,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),

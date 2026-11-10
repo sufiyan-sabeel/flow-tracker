@@ -125,7 +125,8 @@ class HabitStats {
 
     for (final habit in habits) {
       final negative = habit.kind == HabitKind.negative;
-      final periodic = !negative &&
+      final periodic =
+          !negative &&
           (habit.interval == HabitInterval.weekly ||
               habit.interval == HabitInterval.monthly);
       final daySpecific = !negative && habit.interval.isDaySpecific;
@@ -133,9 +134,11 @@ class HabitStats {
       var closed = 0;
       var inPeriod = 0;
       DateTime? period;
-      for (var day = habit.startedAt;
-          !day.isAfter(today);
-          day = day.addDays(1)) {
+      for (
+        var day = habit.startedAt;
+        !day.isAfter(today);
+        day = day.addDays(1)
+      ) {
         if (periodic) {
           final key = habit.interval == HabitInterval.weekly
               ? day.startOfWeek(Habit.weekStart)
@@ -193,8 +196,7 @@ class HabitStats {
     var floor = habits
         .map((h) => h.startedAt)
         .reduce((a, b) => a.isBefore(b) ? a : b);
-    final limit =
-        today.addDays(-perfectWindow).atMidnight;
+    final limit = today.addDays(-perfectWindow).atMidnight;
     if (floor.isBefore(limit)) floor = limit;
 
     final days = today.epochDay - floor.epochDay;
@@ -269,9 +271,11 @@ class HabitStats {
           if (day.isBefore(habit.startedAt)) break;
           if (habit.isCompletedOn(day)) monthDone++;
         }
-        for (var day = today;
-            !day.isBefore(weekFloor) && !day.isBefore(habit.startedAt);
-            day = day.addDays(-1)) {
+        for (
+          var day = today;
+          !day.isBefore(weekFloor) && !day.isBefore(habit.startedAt);
+          day = day.addDays(-1)
+        ) {
           if (habit.isCompletedOn(day)) weekDone++;
         }
         for (var m = 1; m <= 12; m++) {

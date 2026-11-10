@@ -42,7 +42,9 @@ List<TodoSection> groupPending(
 
 List<Todo> sortCompleted(List<Todo> todos) {
   final list = todos.where((t) => t.done).toList()
-    ..sort((a, b) => (b.doneAt ?? b.createdAt).compareTo(a.doneAt ?? a.createdAt));
+    ..sort(
+      (a, b) => (b.doneAt ?? b.createdAt).compareTo(a.doneAt ?? a.createdAt),
+    );
   return list;
 }
 

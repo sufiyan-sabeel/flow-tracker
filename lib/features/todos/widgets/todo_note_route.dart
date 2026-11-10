@@ -28,8 +28,7 @@ class TodoNoteRoute extends PageRoute<bool> {
     BuildContext context,
     Animation<double> animation,
     Animation<double> secondaryAnimation,
-  ) =>
-      page;
+  ) => page;
 
   @override
   Widget buildTransitions(

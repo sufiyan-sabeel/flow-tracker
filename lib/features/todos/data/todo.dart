@@ -73,25 +73,25 @@ class Todo {
   bool get repeats => repeat != null && due != null;
 
   Todo nextTime(DateTime today, {bool skipping = false}) => copyWith(
-        date: repeat!.after(due!, today: today, skipping: skipping).dayKey,
-        steps: [for (final step in steps) step.copyWith(done: false)],
-      );
+    date: repeat!.after(due!, today: today, skipping: skipping).dayKey,
+    steps: [for (final step in steps) step.copyWith(done: false)],
+  );
 
   Todo doneRecord(String id, DateTime at) => Todo(
-        id: id,
-        text: text,
-        done: true,
-        date: date,
-        minutes: minutes,
-        estimate: estimate,
-        priority: priority,
-        tags: tags,
-        project: project,
-        steps: steps,
-        paper: paper,
-        createdAt: createdAt,
-        doneAt: at,
-      );
+    id: id,
+    text: text,
+    done: true,
+    date: date,
+    minutes: minutes,
+    estimate: estimate,
+    priority: priority,
+    tags: tags,
+    project: project,
+    steps: steps,
+    paper: paper,
+    createdAt: createdAt,
+    doneAt: at,
+  );
 
   Todo copyWith({
     String? text,
@@ -114,79 +114,80 @@ class Todo {
     bool clearDoneAt = false,
     bool clearMinutes = false,
     bool clearEstimate = false,
-  }) =>
-      Todo(
-        id: id,
-        text: text ?? this.text,
-        done: done ?? this.done,
-        date: date ?? this.date,
-        minutes: clearMinutes ? null : (minutes ?? this.minutes),
-        estimate: clearEstimate ? null : (estimate ?? this.estimate),
-        priority: priority ?? this.priority,
-        photos: photos ?? this.photos,
-        tags: tags ?? this.tags,
-        project: project ?? this.project,
-        steps: steps ?? this.steps,
-        paper: paper ?? this.paper,
-        cover: cover ?? this.cover,
-        pinned: pinned ?? this.pinned,
-        repeat: clearRepeat ? null : (repeat ?? this.repeat),
-        createdAt: createdAt,
-        doneAt: clearDoneAt ? null : (doneAt ?? this.doneAt),
-        focusOnly: focusOnly ?? this.focusOnly,
-      );
+  }) => Todo(
+    id: id,
+    text: text ?? this.text,
+    done: done ?? this.done,
+    date: date ?? this.date,
+    minutes: clearMinutes ? null : (minutes ?? this.minutes),
+    estimate: clearEstimate ? null : (estimate ?? this.estimate),
+    priority: priority ?? this.priority,
+    photos: photos ?? this.photos,
+    tags: tags ?? this.tags,
+    project: project ?? this.project,
+    steps: steps ?? this.steps,
+    paper: paper ?? this.paper,
+    cover: cover ?? this.cover,
+    pinned: pinned ?? this.pinned,
+    repeat: clearRepeat ? null : (repeat ?? this.repeat),
+    createdAt: createdAt,
+    doneAt: clearDoneAt ? null : (doneAt ?? this.doneAt),
+    focusOnly: focusOnly ?? this.focusOnly,
+  );
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'text': text,
-        'done': done,
-        'date': date,
-        'minutes': minutes,
-        'estimate': estimate,
-        'priority': priority.index,
-        'photos': photos,
-        'tags': tags,
-        'project': project,
-        'steps': [for (final step in steps) step.toMap()],
-        'paper': paper,
-        'cover': cover,
-        'pinned': pinned,
-        if (repeat != null) 'repeat': repeat!.toMap(),
-        'createdAt': createdAt.toIso8601String(),
-        'doneAt': doneAt?.toIso8601String(),
-        if (focusOnly) 'focusOnly': true,
-      };
+    'id': id,
+    'text': text,
+    'done': done,
+    'date': date,
+    'minutes': minutes,
+    'estimate': estimate,
+    'priority': priority.index,
+    'photos': photos,
+    'tags': tags,
+    'project': project,
+    'steps': [for (final step in steps) step.toMap()],
+    'paper': paper,
+    'cover': cover,
+    'pinned': pinned,
+    if (repeat != null) 'repeat': repeat!.toMap(),
+    'createdAt': createdAt.toIso8601String(),
+    'doneAt': doneAt?.toIso8601String(),
+    if (focusOnly) 'focusOnly': true,
+  };
 
   factory Todo.fromMap(Map<String, dynamic> map) => Todo(
-        id: map['id'] as String,
-        text: (map['text'] ?? '') as String,
-        done: (map['done'] ?? false) as bool,
-        date: (map['date'] ?? '') as String,
-        minutes: (map['minutes'] as num?)?.toInt(),
-        estimate: (map['estimate'] as num?)?.toInt(),
-        priority: TodoPriority.values[((map['priority'] ?? 0) as num)
-            .toInt()
-            .clamp(0, TodoPriority.values.length - 1)],
-        photos:
-            (map['photos'] as List?)?.map((p) => p as String).toList() ?? const [],
-        tags:
-            (map['tags'] as List?)?.map((t) => t as String).toList() ?? const [],
-        project: (map['project'] ?? '') as String,
-        steps: (map['steps'] as List?)
-                ?.map((s) => TodoStep.fromMap(Map<String, dynamic>.from(s as Map)))
-                .toList() ??
-            const [],
-        paper: ((map['paper'] ?? -1) as num).toInt(),
-        cover: (map['cover'] ?? '') as String,
-        pinned: (map['pinned'] ?? false) as bool,
-        repeat: map['repeat'] is Map
-            ? TodoRepeat.fromMap(Map<String, dynamic>.from(map['repeat'] as Map))
-            : null,
-        createdAt: DateTime.tryParse((map['createdAt'] ?? '') as String) ??
-            DateTime.now(),
-        doneAt: DateTime.tryParse((map['doneAt'] ?? '') as String),
-        focusOnly: map['focusOnly'] == true,
-      );
+    id: map['id'] as String,
+    text: (map['text'] ?? '') as String,
+    done: (map['done'] ?? false) as bool,
+    date: (map['date'] ?? '') as String,
+    minutes: (map['minutes'] as num?)?.toInt(),
+    estimate: (map['estimate'] as num?)?.toInt(),
+    priority:
+        TodoPriority.values[((map['priority'] ?? 0) as num).toInt().clamp(
+          0,
+          TodoPriority.values.length - 1,
+        )],
+    photos:
+        (map['photos'] as List?)?.map((p) => p as String).toList() ?? const [],
+    tags: (map['tags'] as List?)?.map((t) => t as String).toList() ?? const [],
+    project: (map['project'] ?? '') as String,
+    steps:
+        (map['steps'] as List?)
+            ?.map((s) => TodoStep.fromMap(Map<String, dynamic>.from(s as Map)))
+            .toList() ??
+        const [],
+    paper: ((map['paper'] ?? -1) as num).toInt(),
+    cover: (map['cover'] ?? '') as String,
+    pinned: (map['pinned'] ?? false) as bool,
+    repeat: map['repeat'] is Map
+        ? TodoRepeat.fromMap(Map<String, dynamic>.from(map['repeat'] as Map))
+        : null,
+    createdAt:
+        DateTime.tryParse((map['createdAt'] ?? '') as String) ?? DateTime.now(),
+    doneAt: DateTime.tryParse((map['doneAt'] ?? '') as String),
+    focusOnly: map['focusOnly'] == true,
+  );
 }
 
 class TodoStep {
@@ -202,10 +203,10 @@ class TodoStep {
   Map<String, dynamic> toMap() => {'id': id, 'text': text, 'done': done};
 
   factory TodoStep.fromMap(Map<String, dynamic> map) => TodoStep(
-        id: map['id'] as String,
-        text: (map['text'] ?? '') as String,
-        done: (map['done'] ?? false) as bool,
-      );
+    id: map['id'] as String,
+    text: (map['text'] ?? '') as String,
+    done: (map['done'] ?? false) as bool,
+  );
 }
 
 Color todoPriorityColor(BuildContext context, TodoPriority priority) =>

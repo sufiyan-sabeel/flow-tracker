@@ -17,10 +17,10 @@ class _Chrome {
       context.colors.inverseSurface.withValues(alpha: 0.92);
 
   static TextStyle tooltipText(BuildContext context) => TextStyle(
-        color: context.colors.onInverseSurface,
-        fontSize: 12,
-        fontWeight: FontWeight.w700,
-      );
+    color: context.colors.onInverseSurface,
+    fontSize: 12,
+    fontWeight: FontWeight.w700,
+  );
 }
 
 class TrendChart extends StatelessWidget {
@@ -66,123 +66,127 @@ class TrendChart extends StatelessWidget {
           height: height,
           child: DotField(
             child: LineChart(
-            duration: const Duration(milliseconds: 700),
-            curve: Curves.easeOutCubic,
-            LineChartData(
-              minX: 0,
-              maxX: (values.length - 1).toDouble(),
-              minY: 0,
-              maxY: maxY,
-              clipData: const FlClipData.all(),
-              gridData: axisGrid(context, scale.step, top: scale.top),
-              titlesData: FlTitlesData(
-                topTitles: const AxisTitles(),
-                rightTitles: const AxisTitles(),
-                bottomTitles: const AxisTitles(),
-                leftTitles: axisLeftTitles(
-                  context,
-                  interval: scale.step,
-                  top: scale.top,
-                  format: axisFormat ?? label,
+              duration: const Duration(milliseconds: 700),
+              curve: Curves.easeOutCubic,
+              LineChartData(
+                minX: 0,
+                maxX: (values.length - 1).toDouble(),
+                minY: 0,
+                maxY: maxY,
+                clipData: const FlClipData.all(),
+                gridData: axisGrid(context, scale.step, top: scale.top),
+                titlesData: FlTitlesData(
+                  topTitles: const AxisTitles(),
+                  rightTitles: const AxisTitles(),
+                  bottomTitles: const AxisTitles(),
+                  leftTitles: axisLeftTitles(
+                    context,
+                    interval: scale.step,
+                    top: scale.top,
+                    format: axisFormat ?? label,
+                  ),
                 ),
-              ),
-              borderData: FlBorderData(show: false),
-              lineTouchData: LineTouchData(
-                getTouchedSpotIndicator: (bar, indexes) => [
-                  for (final _ in indexes)
-                    TouchedSpotIndicatorData(
-                      FlLine(color: color.withValues(alpha: 0.5), strokeWidth: 1),
-                      FlDotData(
-                        getDotPainter: (_, __, ___, ____) => FlDotCirclePainter(
-                          radius: 5,
-                          color: color,
-                          strokeWidth: 2,
-                          strokeColor: context.colors.surface,
+                borderData: FlBorderData(show: false),
+                lineTouchData: LineTouchData(
+                  getTouchedSpotIndicator: (bar, indexes) => [
+                    for (final _ in indexes)
+                      TouchedSpotIndicatorData(
+                        FlLine(
+                          color: color.withValues(alpha: 0.5),
+                          strokeWidth: 1,
+                        ),
+                        FlDotData(
+                          getDotPainter: (_, __, ___, ____) =>
+                              FlDotCirclePainter(
+                                radius: 5,
+                                color: color,
+                                strokeWidth: 2,
+                                strokeColor: context.colors.surface,
+                              ),
                         ),
                       ),
-                    ),
-                ],
-                touchTooltipData: LineTouchTooltipData(
-                  getTooltipColor: (_) => _Chrome.tooltip(context),
-                  tooltipRoundedRadius: 10,
-                  getTooltipItems: (spots) => [
-                    for (final spot in spots)
-                      LineTooltipItem(
-                        '${label(spot.y)}\n'
-                        '${format.format(startDate.add(Duration(days: spot.x.toInt())))}',
-                        _Chrome.tooltipText(context),
-                      ),
                   ],
-                ),
-              ),
-
-              extraLinesData: ExtraLinesData(
-                horizontalLines: [
-                  HorizontalLine(
-                    y: average,
-                    color: context.tokens.muted.withValues(alpha: 0.55),
-                    strokeWidth: 1,
-                    dashArray: const [4, 4],
-                    label: HorizontalLineLabel(
-                      show: true,
-                      alignment: Alignment.topRight,
-                      padding: const EdgeInsets.only(bottom: 2, right: 2),
-                      style: statLabel(context),
-                      labelResolver: (_) =>
-                          '${context.l10n.average_short} ${label(average)}',
-                    ),
+                  touchTooltipData: LineTouchTooltipData(
+                    getTooltipColor: (_) => _Chrome.tooltip(context),
+                    tooltipRoundedRadius: 10,
+                    getTooltipItems: (spots) => [
+                      for (final spot in spots)
+                        LineTooltipItem(
+                          '${label(spot.y)}\n'
+                          '${format.format(startDate.add(Duration(days: spot.x.toInt())))}',
+                          _Chrome.tooltipText(context),
+                        ),
+                    ],
                   ),
-                  if (goal != null && goal > 0)
+                ),
+
+                extraLinesData: ExtraLinesData(
+                  horizontalLines: [
                     HorizontalLine(
-                      y: goal,
-                      color: color.withValues(alpha: 0.45),
+                      y: average,
+                      color: context.tokens.muted.withValues(alpha: 0.55),
                       strokeWidth: 1,
-                      dashArray: const [5, 5],
+                      dashArray: const [4, 4],
                       label: HorizontalLineLabel(
                         show: true,
-                        alignment: Alignment.bottomLeft,
-                        padding: const EdgeInsets.only(top: 2, left: 2),
+                        alignment: Alignment.topRight,
+                        padding: const EdgeInsets.only(bottom: 2, right: 2),
                         style: statLabel(context),
-                        labelResolver: (_) => label(goal),
+                        labelResolver: (_) =>
+                            '${context.l10n.average_short} ${label(average)}',
                       ),
                     ),
-                ],
-              ),
-              lineBarsData: [
-                LineChartBarData(
-                  spots: [
-                    for (var i = 0; i < values.length; i++)
-                      FlSpot(i.toDouble(), values[i]),
+                    if (goal != null && goal > 0)
+                      HorizontalLine(
+                        y: goal,
+                        color: color.withValues(alpha: 0.45),
+                        strokeWidth: 1,
+                        dashArray: const [5, 5],
+                        label: HorizontalLineLabel(
+                          show: true,
+                          alignment: Alignment.bottomLeft,
+                          padding: const EdgeInsets.only(top: 2, left: 2),
+                          style: statLabel(context),
+                          labelResolver: (_) => label(goal),
+                        ),
+                      ),
                   ],
-                  isCurved: !stepped,
-                  curveSmoothness: 0.28,
-                  preventCurveOverShooting: true,
-                  isStepLineChart: stepped,
-                  lineChartStepData: const LineChartStepData(
-                    stepDirection: LineChartStepData.stepDirectionForward,
-                  ),
-                  gradient: LinearGradient(
-                    colors: [color.withValues(alpha: 0.5), color],
-                  ),
-                  barWidth: 3,
-                  isStrokeCapRound: true,
-                  isStrokeJoinRound: true,
-                  dotData: const FlDotData(show: false),
-                  belowBarData: BarAreaData(
-                    show: true,
+                ),
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: [
+                      for (var i = 0; i < values.length; i++)
+                        FlSpot(i.toDouble(), values[i]),
+                    ],
+                    isCurved: !stepped,
+                    curveSmoothness: 0.28,
+                    preventCurveOverShooting: true,
+                    isStepLineChart: stepped,
+                    lineChartStepData: const LineChartStepData(
+                      stepDirection: LineChartStepData.stepDirectionForward,
+                    ),
                     gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        color.withValues(alpha: 0.26),
-                        color.withValues(alpha: 0.01),
-                      ],
+                      colors: [color.withValues(alpha: 0.5), color],
+                    ),
+                    barWidth: 3,
+                    isStrokeCapRound: true,
+                    isStrokeJoinRound: true,
+                    dotData: const FlDotData(show: false),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          color.withValues(alpha: 0.26),
+                          color.withValues(alpha: 0.01),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
           ),
         ),
         const SizedBox(height: 6),
@@ -215,7 +219,9 @@ class HourArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final maxValue = values.isEmpty ? 0 : values.reduce((a, b) => a > b ? a : b);
+    final maxValue = values.isEmpty
+        ? 0
+        : values.reduce((a, b) => a > b ? a : b);
     final scale = axisScale(maxValue.toDouble(), lines: 2);
     final maxY = scale.maxY;
     var peak = 0;
@@ -227,102 +233,102 @@ class HourArea extends StatelessWidget {
       height: height,
       child: DotField(
         child: LineChart(
-        duration: const Duration(milliseconds: 700),
-        curve: Curves.easeOutCubic,
-        LineChartData(
-          minX: 0,
-          maxX: 23,
-          minY: 0,
-          maxY: maxY,
-          clipData: const FlClipData.all(),
-          gridData: axisGrid(context, scale.step, top: scale.top),
-          borderData: FlBorderData(show: false),
-          lineTouchData: LineTouchData(
-            touchTooltipData: LineTouchTooltipData(
-              getTooltipColor: (_) => _Chrome.tooltip(context),
-              tooltipRoundedRadius: 10,
-              getTooltipItems: (spots) => [
-                for (final spot in spots)
-                  LineTooltipItem(
-                    '${spot.y.round()}\n${spot.x.toInt().toString().padLeft(2, '0')}:00',
-                    _Chrome.tooltipText(context),
-                  ),
-              ],
+          duration: const Duration(milliseconds: 700),
+          curve: Curves.easeOutCubic,
+          LineChartData(
+            minX: 0,
+            maxX: 23,
+            minY: 0,
+            maxY: maxY,
+            clipData: const FlClipData.all(),
+            gridData: axisGrid(context, scale.step, top: scale.top),
+            borderData: FlBorderData(show: false),
+            lineTouchData: LineTouchData(
+              touchTooltipData: LineTouchTooltipData(
+                getTooltipColor: (_) => _Chrome.tooltip(context),
+                tooltipRoundedRadius: 10,
+                getTooltipItems: (spots) => [
+                  for (final spot in spots)
+                    LineTooltipItem(
+                      '${spot.y.round()}\n${spot.x.toInt().toString().padLeft(2, '0')}:00',
+                      _Chrome.tooltipText(context),
+                    ),
+                ],
+              ),
             ),
-          ),
-          titlesData: FlTitlesData(
-            leftTitles: axisLeftTitles(
-              context,
-              interval: scale.step,
-              top: scale.top,
-              format: (value) => '${value.round()}',
-            ),
-            topTitles: const AxisTitles(),
-            rightTitles: const AxisTitles(),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 20,
-                interval: 6,
-                getTitlesWidget: (value, _) => Padding(
-                  padding: const EdgeInsets.only(top: 6),
-                  child: Text(
-                    '${value.toInt().toString().padLeft(2, '0')}h',
-                    textScaler: axisTextScaler(context),
-                    style: statLabel(context),
+            titlesData: FlTitlesData(
+              leftTitles: axisLeftTitles(
+                context,
+                interval: scale.step,
+                top: scale.top,
+                format: (value) => '${value.round()}',
+              ),
+              topTitles: const AxisTitles(),
+              rightTitles: const AxisTitles(),
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 20,
+                  interval: 6,
+                  getTitlesWidget: (value, _) => Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Text(
+                      '${value.toInt().toString().padLeft(2, '0')}h',
+                      textScaler: axisTextScaler(context),
+                      style: statLabel(context),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
 
-          extraLinesData: ExtraLinesData(
-            verticalLines: [
-              if (maxValue > 0)
-                VerticalLine(
-                  x: peak.toDouble(),
-                  color: color.withValues(alpha: 0.55),
-                  strokeWidth: 1,
-                  dashArray: const [4, 4],
-                  label: VerticalLineLabel(
-                    show: true,
-                    alignment: Alignment.topCenter,
-                    padding: const EdgeInsets.only(left: 4, bottom: 4),
-                    style: statNumber(context, 11),
-                    labelResolver: (_) =>
-                        '${peak.toString().padLeft(2, '0')}h',
+            extraLinesData: ExtraLinesData(
+              verticalLines: [
+                if (maxValue > 0)
+                  VerticalLine(
+                    x: peak.toDouble(),
+                    color: color.withValues(alpha: 0.55),
+                    strokeWidth: 1,
+                    dashArray: const [4, 4],
+                    label: VerticalLineLabel(
+                      show: true,
+                      alignment: Alignment.topCenter,
+                      padding: const EdgeInsets.only(left: 4, bottom: 4),
+                      style: statNumber(context, 11),
+                      labelResolver: (_) =>
+                          '${peak.toString().padLeft(2, '0')}h',
+                    ),
+                  ),
+              ],
+            ),
+            lineBarsData: [
+              LineChartBarData(
+                spots: [
+                  for (var i = 0; i < values.length; i++)
+                    FlSpot(i.toDouble(), values[i].toDouble()),
+                ],
+                isCurved: true,
+                curveSmoothness: 0.25,
+                preventCurveOverShooting: true,
+                isStrokeCapRound: true,
+                isStrokeJoinRound: true,
+                color: color,
+                barWidth: 2.5,
+                dotData: const FlDotData(show: false),
+                belowBarData: BarAreaData(
+                  show: true,
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      color.withValues(alpha: 0.34),
+                      color.withValues(alpha: 0.01),
+                    ],
                   ),
                 ),
+              ),
             ],
           ),
-          lineBarsData: [
-            LineChartBarData(
-              spots: [
-                for (var i = 0; i < values.length; i++)
-                  FlSpot(i.toDouble(), values[i].toDouble()),
-              ],
-              isCurved: true,
-              curveSmoothness: 0.25,
-              preventCurveOverShooting: true,
-              isStrokeCapRound: true,
-              isStrokeJoinRound: true,
-              color: color,
-              barWidth: 2.5,
-              dotData: const FlDotData(show: false),
-              belowBarData: BarAreaData(
-                show: true,
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    color.withValues(alpha: 0.34),
-                    color.withValues(alpha: 0.01),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
         ),
       ),
     );
@@ -404,8 +410,9 @@ class MonthlyLine extends StatelessWidget {
                         fontWeight: peak ? FontWeight.w800 : FontWeight.w600,
                         color: peak
                             ? color
-                            : context.tokens.muted
-                                .withValues(alpha: index > last ? 0.45 : 1),
+                            : context.tokens.muted.withValues(
+                                alpha: index > last ? 0.45 : 1,
+                              ),
                       ),
                     ),
                   );

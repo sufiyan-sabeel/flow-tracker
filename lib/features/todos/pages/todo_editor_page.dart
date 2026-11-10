@@ -37,7 +37,9 @@ import 'package:flow_tracker/features/habits/widgets/focus_only_dialog.dart';
 
 Color notePageColor(BuildContext context, int paper) {
   if (paper < 0) return Colors.transparent;
-  if (Theme.of(context).brightness == Brightness.light) return paperColor(paper);
+  if (Theme.of(context).brightness == Brightness.light) {
+    return paperColor(paper);
+  }
   return sheetColor(context, paper);
 }
 
@@ -46,12 +48,11 @@ Future<bool?> openTodoEditor(
   Todo? todo,
   String project = '',
   String date = '',
-}) =>
-    AppNavigator.pushRoute(
-      TodoNoteRoute(
-        page: TodoEditorPage(todo: todo, project: project, date: date),
-      ),
-    );
+}) => AppNavigator.pushRoute(
+  TodoNoteRoute(
+    page: TodoEditorPage(todo: todo, project: project, date: date),
+  ),
+);
 
 class TodoEditorPage extends StatefulWidget {
   const TodoEditorPage({
@@ -71,7 +72,7 @@ class TodoEditorPage extends StatefulWidget {
 
 class _Item {
   _Item(this.id, String text, {this.done = false})
-      : controller = TextEditingController(text: text);
+    : controller = TextEditingController(text: text);
 
   final String id;
   final TextEditingController controller;
@@ -87,11 +88,11 @@ class _Item {
 class _TodoEditorPageState extends State<TodoEditorPage> with ShortcutHost {
   @override
   Map<AppShortcut, VoidCallback> get shortcuts => {
-        AppShortcut.save: () => Navigator.of(context).pop(),
-        AppShortcut.create: () {},
-        AppShortcut.createFolder: () {},
-        AppShortcut.find: () {},
-      };
+    AppShortcut.save: () => Navigator.of(context).pop(),
+    AppShortcut.create: () {},
+    AppShortcut.createFolder: () {},
+    AppShortcut.find: () {},
+  };
 
   late final _title = TextEditingController(text: widget.todo?.title ?? '');
   late final _body = TextEditingController(text: widget.todo?.body ?? '');
@@ -135,23 +136,23 @@ class _TodoEditorPageState extends State<TodoEditorPage> with ShortcutHost {
   }
 
   String _snapshot() => jsonEncode([
-        _title.text.trim(),
-        _body.text.trim(),
-        _date,
-        _minutes,
-        _estimate,
-        _focusOnly,
-        _priority.name,
-        _paper,
-        _cover,
-        _done,
-        _pinned,
-        _repeat?.toMap(),
-        _photos,
-        _tags,
-        _project,
-        [for (final step in _steps) step.toMap()],
-      ]);
+    _title.text.trim(),
+    _body.text.trim(),
+    _date,
+    _minutes,
+    _estimate,
+    _focusOnly,
+    _priority.name,
+    _paper,
+    _cover,
+    _done,
+    _pinned,
+    _repeat?.toMap(),
+    _photos,
+    _tags,
+    _project,
+    [for (final step in _steps) step.toMap()],
+  ]);
 
   @override
   void initState() {
@@ -198,14 +199,14 @@ class _TodoEditorPageState extends State<TodoEditorPage> with ShortcutHost {
   }
 
   List<TodoStep> get _steps => [
-        for (final item in _items)
-          if (item.controller.text.trim().isNotEmpty)
-            TodoStep(
-              id: item.id,
-              text: item.controller.text.trim(),
-              done: item.done,
-            ),
-      ];
+    for (final item in _items)
+      if (item.controller.text.trim().isNotEmpty)
+        TodoStep(
+          id: item.id,
+          text: item.controller.text.trim(),
+          done: item.done,
+        ),
+  ];
 
   void _leave() {
     _gone = true;
@@ -339,7 +340,8 @@ class _TodoEditorPageState extends State<TodoEditorPage> with ShortcutHost {
       _ when _date == today.addDays(1).dayKey => 1,
       _ => 2,
     };
-    final picked = _date.isEmpty ||
+    final picked =
+        _date.isEmpty ||
             _date == today.dayKey ||
             _date == today.addDays(1).dayKey
         ? null
@@ -423,9 +425,9 @@ class _TodoEditorPageState extends State<TodoEditorPage> with ShortcutHost {
   }
 
   void _setDate(DateTime day) => _edit(() {
-        _date = day.dayKey;
-        _repeat = _repeat?.anchoredTo(day);
-      });
+    _date = day.dayKey;
+    _repeat = _repeat?.anchoredTo(day);
+  });
 
   Future<void> _pickRepeat() {
     final today = AppClock.today();
@@ -443,12 +445,12 @@ class _TodoEditorPageState extends State<TodoEditorPage> with ShortcutHost {
       onSkip: repeat == null || _date.isEmpty || _done
           ? null
           : () => _edit(() {
-                final current = _repeat;
-                if (current == null) return;
-                _date = current
-                    .after(parseDayKey(_date), today: today, skipping: true)
-                    .dayKey;
-              }),
+              final current = _repeat;
+              if (current == null) return;
+              _date = current
+                  .after(parseDayKey(_date), today: today, skipping: true)
+                  .dayKey;
+            }),
     );
   }
 
@@ -483,58 +485,58 @@ class _TodoEditorPageState extends State<TodoEditorPage> with ShortcutHost {
   }
 
   void _toggleFocusOnly() => _edit(() {
-        _focusOnly = !_focusOnly;
-        if (_focusOnly) {
-          _focusSetEstimate = _estimate == null;
-          _estimate ??= 25;
-        } else if (_focusSetEstimate) {
-          _estimate = null;
-          _focusSetEstimate = false;
-        }
-      });
+    _focusOnly = !_focusOnly;
+    if (_focusOnly) {
+      _focusSetEstimate = _estimate == null;
+      _estimate ??= 25;
+    } else if (_focusSetEstimate) {
+      _estimate = null;
+      _focusSetEstimate = false;
+    }
+  });
 
   Future<void> _pickPriority() => showTodoPriorityPicker(
-        context,
-        selected: _priority,
-        onPicked: (priority) => _edit(() => _priority = priority),
-      );
+    context,
+    selected: _priority,
+    onPicked: (priority) => _edit(() => _priority = priority),
+  );
 
   Future<void> _pickPaper() => showTodoPaperPicker(
-        context,
-        selected: _paper,
-        cover: _cover,
-        onPicked: (index) => _edit(() => _paper = index),
-        onCover: (path) {
-          if (mounted) _edit(() => _cover = path);
-        },
-      );
+    context,
+    selected: _paper,
+    cover: _cover,
+    onPicked: (index) => _edit(() => _paper = index),
+    onCover: (path) {
+      if (mounted) _edit(() => _cover = path);
+    },
+  );
 
   Future<void> _pickProject() => showTodoProjectPicker(
-        context,
-        selected: _project,
-        onChanged: (picked) => _edit(() => _project = picked),
-      );
+    context,
+    selected: _project,
+    onChanged: (picked) => _edit(() => _project = picked),
+  );
 
   Future<void> _pickTags() => showTodoTagPicker(
-        context,
-        selected: _tags,
-        onChanged: (picked) => _edit(() => _tags = picked),
-      );
+    context,
+    selected: _tags,
+    onChanged: (picked) => _edit(() => _tags = picked),
+  );
 
   Future<void> _add() => showOptionSheet(
-        context,
-        title: context.l10n.todo_add,
-        options: [
-          context.l10n.todo_list_item,
-          context.l10n.note_take_photo,
-          context.l10n.note_pick_photo,
-        ],
-        index: -1,
-        onSelected: (index) {
-          if (index == 0) return _addItem(_items.length);
-          unawaited(_addPhoto(fromCamera: index == 1));
-        },
-      );
+    context,
+    title: context.l10n.todo_add,
+    options: [
+      context.l10n.todo_list_item,
+      context.l10n.note_take_photo,
+      context.l10n.note_pick_photo,
+    ],
+    index: -1,
+    onSelected: (index) {
+      if (index == 0) return _addItem(_items.length);
+      unawaited(_addPhoto(fromCamera: index == 1));
+    },
+  );
 
   Future<void> _addPhoto({bool fromCamera = false}) async {
     final path = await CoverStorage.store(
@@ -548,8 +550,9 @@ class _TodoEditorPageState extends State<TodoEditorPage> with ShortcutHost {
     final item = _Item(DateTime.now().microsecondsSinceEpoch.toString(), '')
       ..controller.addListener(_schedule);
     _edit(() => _items.insert(at, item));
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => item.focus.requestFocus());
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => item.focus.requestFocus(),
+    );
   }
 
   void _removeItem(_Item item) {
@@ -617,296 +620,341 @@ class _TodoEditorPageState extends State<TodoEditorPage> with ShortcutHost {
                       )
                     : const SizedBox.expand(),
               ),
-          AnimatedContainer(
-          duration: const Duration(milliseconds: 260),
-          color: page,
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            body: SafeArea(
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: wide ? 720 : double.infinity),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(6, 6, 10, 0),
-                        child: Row(
-                          children: [
-                            IconButton(
-                              tooltip: MaterialLocalizations.of(context)
-                                  .backButtonTooltip,
-                              icon: Icon(LucideIcons.arrowLeft, color: ink),
-                              onPressed: _close,
-                            ),
-                            const Spacer(),
-                            _Tool(
-                              icon: _pinned
-                                  ? LucideIcons.pinOff
-                                  : LucideIcons.pin,
-                              label: _pinned
-                                  ? context.l10n.todo_unpin
-                                  : context.l10n.todo_pin,
-                              ink: ink,
-                              active: _pinned,
-                              onTap: () => _edit(() => _pinned = !_pinned),
-                            ),
-                            if (widget.todo != null)
-                              _Tool(
-                                icon: _done
-                                    ? LucideIcons.undo2
-                                    : LucideIcons.checkCheck,
-                                label: _done
-                                    ? context.l10n.a11y_mark_not_done(_title.text)
-                                    : context.l10n.a11y_mark_done(_title.text),
-                                ink: ink,
-                                active: _done,
-                                onTap: _toggleDone,
-                              ),
-                            if (widget.todo != null)
-                              _Tool(
-                                icon: LucideIcons.trash2,
-                                label: context.l10n.delete,
-                                ink: ink,
-                                onTap: _confirmDelete,
-                              ),
-                            const SizedBox(width: 6),
-                            _SaveButton(
-                              onTap: () => Navigator.of(context).pop(),
-                            ),
-                          ],
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 260),
+                color: page,
+                child: Scaffold(
+                  backgroundColor: Colors.transparent,
+                  body: SafeArea(
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: wide ? 720 : double.infinity,
                         ),
-                      ),
-                      Expanded(
-                        child: ListView(
-                          padding: const EdgeInsets.fromLTRB(22, 10, 22, 24),
+                        child: Column(
                           children: [
-                            if (_photos.isNotEmpty) ...[
-                              TodoPhotoGrid(
-                                paths: _photos,
-                                onRemove: (index) =>
-                                    _edit(() => _photos.removeAt(index)),
-                              ),
-                              const SizedBox(height: 16),
-                            ],
-                            TextField(
-                              controller: _title,
-                              focusNode: _titleFocus,
-                              maxLines: null,
-                              keyboardType: TextInputType.text,
-                              textInputAction: TextInputAction.next,
-                              textCapitalization: TextCapitalization.sentences,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.deny('\n'),
-                              ],
-                              onSubmitted: (_) => _bodyFocus.requestFocus(),
-                              style: TextStyle(
-                                fontSize: 23,
-                                fontWeight: FontWeight.w600,
-                                height: 1.25,
-                                color: ink,
-                                decoration:
-                                    _done ? TextDecoration.lineThrough : null,
-                                decorationColor: soft,
-                              ),
-                              decoration: _bare(context.l10n.todo_title_hint, soft),
-                            ),
-                            const SizedBox(height: 8),
-                            TextField(
-                              controller: _body,
-                              focusNode: _bodyFocus,
-                              maxLines: null,
-                              keyboardType: TextInputType.multiline,
-                              textCapitalization: TextCapitalization.sentences,
-                              style: TextStyle(
-                                fontSize: 16,
-                                height: 1.5,
-                                color: ink,
-                              ),
-                              decoration: _bare(context.l10n.todo_body_hint, soft),
-                            ),
-                            if (_items.isNotEmpty) ...[
-                              const SizedBox(height: 10),
-                              ReorderableListView(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                buildDefaultDragHandles: false,
-                                padding: EdgeInsets.zero,
-                                onReorder: _moveItem,
-                                proxyDecorator: (child, _, __) => Material(
-                                  color: _paper < 0 ? context.colors.surface : page,
-                                  elevation: 3,
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: child,
-                                ),
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(6, 6, 10, 0),
+                              child: Row(
                                 children: [
-                                  for (final (index, item) in _items.indexed)
-                                    _ItemRow(
-                                      key: ValueKey(item.id),
-                                      item: item,
-                                      index: index,
-                                      ink: ink,
-                                      soft: soft,
-                                      done: item.done || _done,
-                                      onToggle: _done
-                                          ? null
-                                          : () => _edit(
-                                                () => item.done = !item.done,
-                                              ),
-                                      onSubmit: () => _submitItem(item),
-                                      onRemove: () => _removeItem(item),
+                                  IconButton(
+                                    tooltip: MaterialLocalizations.of(
+                                      context,
+                                    ).backButtonTooltip,
+                                    icon: Icon(
+                                      LucideIcons.arrowLeft,
+                                      color: ink,
                                     ),
+                                    onPressed: _close,
+                                  ),
+                                  const Spacer(),
+                                  _Tool(
+                                    icon: _pinned
+                                        ? LucideIcons.pinOff
+                                        : LucideIcons.pin,
+                                    label: _pinned
+                                        ? context.l10n.todo_unpin
+                                        : context.l10n.todo_pin,
+                                    ink: ink,
+                                    active: _pinned,
+                                    onTap: () =>
+                                        _edit(() => _pinned = !_pinned),
+                                  ),
+                                  if (widget.todo != null)
+                                    _Tool(
+                                      icon: _done
+                                          ? LucideIcons.undo2
+                                          : LucideIcons.checkCheck,
+                                      label: _done
+                                          ? context.l10n.a11y_mark_not_done(
+                                              _title.text,
+                                            )
+                                          : context.l10n.a11y_mark_done(
+                                              _title.text,
+                                            ),
+                                      ink: ink,
+                                      active: _done,
+                                      onTap: _toggleDone,
+                                    ),
+                                  if (widget.todo != null)
+                                    _Tool(
+                                      icon: LucideIcons.trash2,
+                                      label: context.l10n.delete,
+                                      ink: ink,
+                                      onTap: _confirmDelete,
+                                    ),
+                                  const SizedBox(width: 6),
+                                  _SaveButton(
+                                    onTap: () => Navigator.of(context).pop(),
+                                  ),
                                 ],
                               ),
-                            ],
-                            _AddItem(
-                              label: context.l10n.todo_list_item,
-                              soft: soft,
-                              onTap: () => _addItem(_items.length),
                             ),
-                            const SizedBox(height: 14),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 10,
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              children: [
-                                if (_priority != TodoPriority.none)
-                                  GestureDetector(
-                                    onTap: _pickPriority,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(3),
-                                      child: TodoSticker(
-                                        priority: _priority,
-                                        turn: -0.05,
-                                        scale: 1.15,
-                                      ),
+                            Expanded(
+                              child: ListView(
+                                padding: const EdgeInsets.fromLTRB(
+                                  22,
+                                  10,
+                                  22,
+                                  24,
+                                ),
+                                children: [
+                                  if (_photos.isNotEmpty) ...[
+                                    TodoPhotoGrid(
+                                      paths: _photos,
+                                      onRemove: (index) =>
+                                          _edit(() => _photos.removeAt(index)),
+                                    ),
+                                    const SizedBox(height: 16),
+                                  ],
+                                  TextField(
+                                    controller: _title,
+                                    focusNode: _titleFocus,
+                                    maxLines: null,
+                                    keyboardType: TextInputType.text,
+                                    textInputAction: TextInputAction.next,
+                                    textCapitalization:
+                                        TextCapitalization.sentences,
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.deny('\n'),
+                                    ],
+                                    onSubmitted: (_) =>
+                                        _bodyFocus.requestFocus(),
+                                    style: TextStyle(
+                                      fontSize: 23,
+                                      fontWeight: FontWeight.w600,
+                                      height: 1.25,
+                                      color: ink,
+                                      decoration: _done
+                                          ? TextDecoration.lineThrough
+                                          : null,
+                                      decorationColor: soft,
+                                    ),
+                                    decoration: _bare(
+                                      context.l10n.todo_title_hint,
+                                      soft,
                                     ),
                                   ),
-                                if (_date.isNotEmpty)
-                                  _Chip(
-                                    icon: _minutes == null
-                                        ? LucideIcons.calendar
-                                        : LucideIcons.clock,
-                                    label: _dueLabel(context),
-                                    ink: ink,
-                                    onTap: _pickDate,
+                                  const SizedBox(height: 8),
+                                  TextField(
+                                    controller: _body,
+                                    focusNode: _bodyFocus,
+                                    maxLines: null,
+                                    keyboardType: TextInputType.multiline,
+                                    textCapitalization:
+                                        TextCapitalization.sentences,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      height: 1.5,
+                                      color: ink,
+                                    ),
+                                    decoration: _bare(
+                                      context.l10n.todo_body_hint,
+                                      soft,
+                                    ),
                                   ),
-                                if (_repeat != null && _date.isNotEmpty)
-                                  _Chip(
-                                    icon: LucideIcons.repeat,
-                                    label: todoRepeatLabel(context, _repeat!),
-                                    ink: ink,
-                                    onTap: _pickRepeat,
+                                  if (_items.isNotEmpty) ...[
+                                    const SizedBox(height: 10),
+                                    ReorderableListView(
+                                      shrinkWrap: true,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      buildDefaultDragHandles: false,
+                                      padding: EdgeInsets.zero,
+                                      onReorder: _moveItem,
+                                      proxyDecorator: (child, _, __) =>
+                                          Material(
+                                            color: _paper < 0
+                                                ? context.colors.surface
+                                                : page,
+                                            elevation: 3,
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                            child: child,
+                                          ),
+                                      children: [
+                                        for (final (index, item)
+                                            in _items.indexed)
+                                          _ItemRow(
+                                            key: ValueKey(item.id),
+                                            item: item,
+                                            index: index,
+                                            ink: ink,
+                                            soft: soft,
+                                            done: item.done || _done,
+                                            onToggle: _done
+                                                ? null
+                                                : () => _edit(
+                                                    () =>
+                                                        item.done = !item.done,
+                                                  ),
+                                            onSubmit: () => _submitItem(item),
+                                            onRemove: () => _removeItem(item),
+                                          ),
+                                      ],
+                                    ),
+                                  ],
+                                  _AddItem(
+                                    label: context.l10n.todo_list_item,
+                                    soft: soft,
+                                    onTap: () => _addItem(_items.length),
                                   ),
-                                if (_estimate != null)
-                                  _Chip(
-                                    icon: _focusOnly
-                                        ? LucideIcons.timer
-                                        : LucideIcons.hourglass,
-                                    label: formatMinutes(_estimate!.toDouble()),
-                                    ink: ink,
-                                    onTap: _pickEstimate,
+                                  const SizedBox(height: 14),
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 10,
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
+                                    children: [
+                                      if (_priority != TodoPriority.none)
+                                        GestureDetector(
+                                          onTap: _pickPriority,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(3),
+                                            child: TodoSticker(
+                                              priority: _priority,
+                                              turn: -0.05,
+                                              scale: 1.15,
+                                            ),
+                                          ),
+                                        ),
+                                      if (_date.isNotEmpty)
+                                        _Chip(
+                                          icon: _minutes == null
+                                              ? LucideIcons.calendar
+                                              : LucideIcons.clock,
+                                          label: _dueLabel(context),
+                                          ink: ink,
+                                          onTap: _pickDate,
+                                        ),
+                                      if (_repeat != null && _date.isNotEmpty)
+                                        _Chip(
+                                          icon: LucideIcons.repeat,
+                                          label: todoRepeatLabel(
+                                            context,
+                                            _repeat!,
+                                          ),
+                                          ink: ink,
+                                          onTap: _pickRepeat,
+                                        ),
+                                      if (_estimate != null)
+                                        _Chip(
+                                          icon: _focusOnly
+                                              ? LucideIcons.timer
+                                              : LucideIcons.hourglass,
+                                          label: formatMinutes(
+                                            _estimate!.toDouble(),
+                                          ),
+                                          ink: ink,
+                                          onTap: _pickEstimate,
+                                        ),
+                                      if (project != null)
+                                        _Chip(
+                                          icon: CategoryIcons.resolve(
+                                            project.icon,
+                                          ),
+                                          label: project.name,
+                                          ink: ink,
+                                          tint: project.color,
+                                          onTap: _pickProject,
+                                        ),
+                                      for (final tag in tags.resolve(_tags))
+                                        _Chip(
+                                          icon: CategoryIcons.resolve(tag.icon),
+                                          label: tag.name,
+                                          ink: ink,
+                                          tint: tag.color,
+                                          onTap: _pickTags,
+                                        ),
+                                    ],
                                   ),
-                                if (project != null)
-                                  _Chip(
-                                    icon: CategoryIcons.resolve(project.icon),
-                                    label: project.name,
-                                    ink: ink,
-                                    tint: project.color,
-                                    onTap: _pickProject,
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
+                              child: LayoutBuilder(
+                                builder: (context, box) => FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: SizedBox(
+                                    width: box.maxWidth < 360
+                                        ? 360
+                                        : box.maxWidth,
+                                    child: Row(
+                                      children: [
+                                        _Tool(
+                                          icon: LucideIcons.squarePlus,
+                                          label: context.l10n.todo_add,
+                                          ink: ink,
+                                          onTap: _add,
+                                        ),
+                                        _Tool(
+                                          icon: LucideIcons.palette,
+                                          label: context.l10n.todo_paper,
+                                          ink: ink,
+                                          active: _paper >= 0,
+                                          onTap: _pickPaper,
+                                        ),
+                                        _Tool(
+                                          icon: LucideIcons.folder,
+                                          label: context.l10n.todo_project,
+                                          ink: ink,
+                                          active: _project.isNotEmpty,
+                                          onTap: _pickProject,
+                                        ),
+                                        _Tool(
+                                          icon: LucideIcons.tag,
+                                          label: context.l10n.todo_tags,
+                                          ink: ink,
+                                          active: _tags.isNotEmpty,
+                                          onTap: _pickTags,
+                                        ),
+                                        _Tool(
+                                          icon: LucideIcons.hourglass,
+                                          label: context.l10n.todo_estimate,
+                                          ink: ink,
+                                          active: _estimate != null,
+                                          onTap: _pickEstimate,
+                                        ),
+                                        _Tool(
+                                          icon: LucideIcons.timer,
+                                          label: context.l10n.todo_focus_only,
+                                          ink: ink,
+                                          active: _focusOnly,
+                                          onTap: _toggleFocusOnly,
+                                        ),
+                                        _Tool(
+                                          icon: LucideIcons.flag,
+                                          label: context.l10n.todo_priority,
+                                          ink: ink,
+                                          active:
+                                              _priority != TodoPriority.none,
+                                          onTap: _pickPriority,
+                                        ),
+                                        const Spacer(),
+                                        _Tool(
+                                          icon: _date.isEmpty
+                                              ? LucideIcons.calendar
+                                              : LucideIcons.calendarCheck,
+                                          label: context.l10n.todo_date,
+                                          ink: ink,
+                                          active: _date.isNotEmpty,
+                                          onTap: _pickDate,
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                for (final tag in tags.resolve(_tags))
-                                  _Chip(
-                                    icon: CategoryIcons.resolve(tag.icon),
-                                    label: tag.name,
-                                    ink: ink,
-                                    tint: tag.color,
-                                    onTap: _pickTags,
-                                  ),
-                              ],
+                                ),
+                              ),
                             ),
                           ],
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
-                        child: LayoutBuilder(
-                          builder: (context, box) => FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: SizedBox(
-                              width: box.maxWidth < 360 ? 360 : box.maxWidth,
-                              child: Row(
-                          children: [
-                            _Tool(
-                              icon: LucideIcons.squarePlus,
-                              label: context.l10n.todo_add,
-                              ink: ink,
-                              onTap: _add,
-                            ),
-                            _Tool(
-                              icon: LucideIcons.palette,
-                              label: context.l10n.todo_paper,
-                              ink: ink,
-                              active: _paper >= 0,
-                              onTap: _pickPaper,
-                            ),
-                            _Tool(
-                              icon: LucideIcons.folder,
-                              label: context.l10n.todo_project,
-                              ink: ink,
-                              active: _project.isNotEmpty,
-                              onTap: _pickProject,
-                            ),
-                            _Tool(
-                              icon: LucideIcons.tag,
-                              label: context.l10n.todo_tags,
-                              ink: ink,
-                              active: _tags.isNotEmpty,
-                              onTap: _pickTags,
-                            ),
-                            _Tool(
-                              icon: LucideIcons.hourglass,
-                              label: context.l10n.todo_estimate,
-                              ink: ink,
-                              active: _estimate != null,
-                              onTap: _pickEstimate,
-                            ),
-                            _Tool(
-                              icon: LucideIcons.timer,
-                              label: context.l10n.todo_focus_only,
-                              ink: ink,
-                              active: _focusOnly,
-                              onTap: _toggleFocusOnly,
-                            ),
-                            _Tool(
-                              icon: LucideIcons.flag,
-                              label: context.l10n.todo_priority,
-                              ink: ink,
-                              active: _priority != TodoPriority.none,
-                              onTap: _pickPriority,
-                            ),
-                            const Spacer(),
-                            _Tool(
-                              icon: _date.isEmpty
-                                  ? LucideIcons.calendar
-                                  : LucideIcons.calendarCheck,
-                              label: context.l10n.todo_date,
-                              ink: ink,
-                              active: _date.isNotEmpty,
-                              onTap: _pickDate,
-                            ),
-                          ],
-                        ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
-        ),
             ],
           ),
         ),
@@ -924,15 +972,15 @@ class _TodoEditorPageState extends State<TodoEditorPage> with ShortcutHost {
 }
 
 InputDecoration _bare(String hint, Color soft) => InputDecoration(
-      isDense: true,
-      filled: false,
-      border: InputBorder.none,
-      enabledBorder: InputBorder.none,
-      focusedBorder: InputBorder.none,
-      contentPadding: const EdgeInsets.symmetric(vertical: 4),
-      hintText: hint,
-      hintStyle: TextStyle(color: soft),
-    );
+  isDense: true,
+  filled: false,
+  border: InputBorder.none,
+  enabledBorder: InputBorder.none,
+  focusedBorder: InputBorder.none,
+  contentPadding: const EdgeInsets.symmetric(vertical: 4),
+  hintText: hint,
+  hintStyle: TextStyle(color: soft),
+);
 
 class _SaveButton extends StatelessWidget {
   const _SaveButton({required this.onTap});
@@ -1125,7 +1173,11 @@ class _ItemRow extends StatelessWidget {
 }
 
 class _AddItem extends StatelessWidget {
-  const _AddItem({required this.label, required this.soft, required this.onTap});
+  const _AddItem({
+    required this.label,
+    required this.soft,
+    required this.onTap,
+  });
 
   final String label;
   final Color soft;
