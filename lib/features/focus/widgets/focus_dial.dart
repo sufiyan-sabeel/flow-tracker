@@ -264,9 +264,9 @@ class _FlowSpinState extends State<_FlowSpin>
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-        animation: _turn,
-        builder: (context, _) => widget.builder(_turn.value),
-      );
+    animation: _turn,
+    builder: (context, _) => widget.builder(_turn.value),
+  );
 }
 
 class _DialPainter extends CustomPainter {
@@ -350,7 +350,8 @@ class _DialPainter extends CustomPainter {
             endAngle: tail,
           ).createShader(rect),
       );
-      final head = center +
+      final head =
+          center +
           Offset(math.cos(start + tail), math.sin(start + tail)) * radius;
       canvas.drawCircle(
         head,

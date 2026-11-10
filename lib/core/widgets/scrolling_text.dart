@@ -71,9 +71,9 @@ class _ScrollingLineState extends State<ScrollingLine>
   }
 
   void _scheduleTune() => WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted || !_scroll.hasClients) return;
-        _tune(_scroll.position.maxScrollExtent);
-      });
+    if (!mounted || !_scroll.hasClients) return;
+    _tune(_scroll.position.maxScrollExtent);
+  });
 
   void _tune(double overflow) {
     if (overflow == _overflow) return;
@@ -91,8 +91,10 @@ class _ScrollingLineState extends State<ScrollingLine>
     _travel = TweenSequence<double>([
       TweenSequenceItem(tween: ConstantTween(0), weight: pause.toDouble()),
       TweenSequenceItem(
-        tween: Tween(begin: 0.0, end: overflow)
-            .chain(CurveTween(curve: Curves.easeInOut)),
+        tween: Tween(
+          begin: 0.0,
+          end: overflow,
+        ).chain(CurveTween(curve: Curves.easeInOut)),
         weight: crossing.toDouble(),
       ),
       TweenSequenceItem(
@@ -100,8 +102,10 @@ class _ScrollingLineState extends State<ScrollingLine>
         weight: pause.toDouble(),
       ),
       TweenSequenceItem(
-        tween: Tween(begin: overflow, end: 0.0)
-            .chain(CurveTween(curve: Curves.easeInOut)),
+        tween: Tween(
+          begin: overflow,
+          end: 0.0,
+        ).chain(CurveTween(curve: Curves.easeInOut)),
         weight: crossing.toDouble(),
       ),
     ]).animate(_controller);
@@ -140,8 +144,12 @@ class _ScrollingLineState extends State<ScrollingLine>
       shaderCallback: (bounds) => LinearGradient(
         begin: Alignment.centerLeft,
         end: Alignment.centerRight,
-        colors: const [Colors.transparent, Colors.white, Colors.white,
-            Colors.transparent],
+        colors: const [
+          Colors.transparent,
+          Colors.white,
+          Colors.white,
+          Colors.transparent,
+        ],
         stops: const [0, 0.04, 0.9, 1],
       ).createShader(bounds),
       child: line,

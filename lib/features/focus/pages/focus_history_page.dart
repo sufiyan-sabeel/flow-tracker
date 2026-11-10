@@ -73,8 +73,9 @@ class _FocusHistoryPageState extends State<FocusHistoryPage> {
 
     final focus = context.read<FocusController>();
     final habits = context.read<HabitsController>();
-    final chosen =
-        focus.sessions.where((s) => _selected.contains(s.id)).toList();
+    final chosen = focus.sessions
+        .where((s) => _selected.contains(s.id))
+        .toList();
     for (final session in chosen) {
       await countFocusTime(habits, focus, session, undo: true);
     }
@@ -178,11 +179,12 @@ class _FocusHistoryPageState extends State<FocusHistoryPage> {
     final express = style.isExpressStyle;
     final minimal = style.isMinimalStyle;
     final habitId = widget.habitId;
-    final sessions = context
-        .select<FocusController, List<FocusSession>>((f) => f.sessions)
-        .where((s) => habitId == null || s.habitId == habitId)
-        .toList()
-      ..sort((a, b) => b.startedAt.compareTo(a.startedAt));
+    final sessions =
+        context
+            .select<FocusController, List<FocusSession>>((f) => f.sessions)
+            .where((s) => habitId == null || s.habitId == habitId)
+            .toList()
+          ..sort((a, b) => b.startedAt.compareTo(a.startedAt));
 
     final days = <String, List<FocusSession>>{};
     for (final session in sessions) {
@@ -224,8 +226,10 @@ class _FocusHistoryPageState extends State<FocusHistoryPage> {
                           _DayHeader(
                             day: parseDayKey(day.key),
                             sessions: day.value.length,
-                            seconds:
-                                day.value.fold(0, (sum, s) => sum + s.seconds),
+                            seconds: day.value.fold(
+                              0,
+                              (sum, s) => sum + s.seconds,
+                            ),
                           ),
                           for (final session in day.value)
                             _SessionTile(
@@ -356,16 +360,16 @@ class _SessionTile extends StatelessWidget {
               color: selected
                   ? scheme.primary.withValues(alpha: 0.16)
                   : express
-                      ? expressSurface(context)
-                      : scheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                  ? expressSurface(context)
+                  : scheme.surfaceContainerHighest.withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(
                 express ? (selected ? 26 : 22) : 16,
               ),
               border: selected
                   ? Border.all(color: scheme.primary, width: 1.5)
                   : express
-                      ? expressHairline(context)
-                      : Border.all(color: Colors.transparent, width: 1.5),
+                  ? expressHairline(context)
+                  : Border.all(color: Colors.transparent, width: 1.5),
             ),
             child: Row(
               children: [
@@ -379,33 +383,33 @@ class _SessionTile extends StatelessWidget {
                     child: selected
                         ? Icon(LucideIcons.check, size: 19, color: color)
                         : habit == null
-                            ? Icon(LucideIcons.timer, size: 18, color: color)
-                            : HabitGlyph(
-                                glyph: habit.icon,
-                                color: color,
-                                size: 18,
-                              ),
+                        ? Icon(LucideIcons.timer, size: 18, color: color)
+                        : HabitGlyph(
+                            glyph: habit.icon,
+                            color: color,
+                            size: 18,
+                          ),
                   )
                 else
                   Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: color.withValues(alpha: 0.14),
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: color.withValues(alpha: 0.14),
+                    ),
+                    child: Center(
+                      child: selected
+                          ? Icon(LucideIcons.check, size: 20, color: color)
+                          : habit == null
+                          ? Icon(LucideIcons.timer, size: 18, color: color)
+                          : HabitGlyph(
+                              glyph: habit.icon,
+                              color: color,
+                              size: 18,
+                            ),
+                    ),
                   ),
-                  child: Center(
-                    child: selected
-                        ? Icon(LucideIcons.check, size: 20, color: color)
-                        : habit == null
-                            ? Icon(LucideIcons.timer, size: 18, color: color)
-                            : HabitGlyph(
-                                glyph: habit.icon,
-                                color: color,
-                                size: 18,
-                              ),
-                  ),
-                ),
                 const SizedBox(width: 14),
                 Expanded(
                   child: Column(

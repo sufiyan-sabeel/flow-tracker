@@ -45,7 +45,9 @@ class FocusPill extends StatelessWidget {
             Icon(LucideIcons.timer, size: 16, color: ink),
             const SizedBox(width: 6),
             Text(
-              active ? formatDuration(focus.displaySeconds) : context.l10n.focus,
+              active
+                  ? formatDuration(focus.displaySeconds)
+                  : context.l10n.focus,
               style: TextStyle(
                 fontSize: 13.5,
                 fontWeight: FontWeight.w700,
@@ -61,7 +63,11 @@ class FocusPill extends StatelessWidget {
     if (compact && !active) {
       return IconButton(
         onPressed: open,
-        icon: Icon(LucideIcons.timer, size: 22, color: context.colors.onSurface),
+        icon: Icon(
+          LucideIcons.timer,
+          size: 22,
+          color: context.colors.onSurface,
+        ),
       );
     }
 

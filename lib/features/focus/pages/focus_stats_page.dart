@@ -45,7 +45,9 @@ class _FocusStatsPageState extends State<FocusStatsPage> {
       for (final entry in stats.perHabit.entries)
         (
           name: habits.byId(entry.key)?.name ?? context.l10n.focus_free_session,
-          color: habits.byId(entry.key)?.color.shownIn(context) ?? context.tokens.muted,
+          color:
+              habits.byId(entry.key)?.color.shownIn(context) ??
+              context.tokens.muted,
           count: entry.value,
         ),
     ]..sort((a, b) => b.count.compareTo(a.count));
@@ -79,216 +81,217 @@ class _FocusStatsPageState extends State<FocusStatsPage> {
 
     final title = habit?.name ?? context.l10n.focus_stats;
     final body = stats.sessionCount == 0
-          ? AppEmptyState(
-              icon: LucideIcons.timer,
-              title: context.l10n.no_data_yet,
-              message: context.l10n.focus_history_empty_sub,
-            )
-          : ListView(
-              padding: context.pagePadding(16, 8, 16, 28),
-              children: [
-                StatReveal(
-                  child: StatPair(
-                    left: MiniStat(
-                      icon: LucideIcons.sun,
-                      color: accent,
-                      value: formatHoursShort(stats.todaySeconds),
-                      label: context.l10n.today,
-                    ),
-                    right: MiniStat(
-                      icon: LucideIcons.calendarDays,
-                      color: context.tokens.info,
-                      value: formatHoursShort(stats.weekSeconds),
-                      label: context.l10n.week,
-                    ),
+        ? AppEmptyState(
+            icon: LucideIcons.timer,
+            title: context.l10n.no_data_yet,
+            message: context.l10n.focus_history_empty_sub,
+          )
+        : ListView(
+            padding: context.pagePadding(16, 8, 16, 28),
+            children: [
+              StatReveal(
+                child: StatPair(
+                  left: MiniStat(
+                    icon: LucideIcons.sun,
+                    color: accent,
+                    value: formatHoursShort(stats.todaySeconds),
+                    label: context.l10n.today,
+                  ),
+                  right: MiniStat(
+                    icon: LucideIcons.calendarDays,
+                    color: context.tokens.info,
+                    value: formatHoursShort(stats.weekSeconds),
+                    label: context.l10n.week,
                   ),
                 ),
-                const SizedBox(height: 12),
-                StatReveal(
-                  child: StatPair(
-                    left: MiniStat(
-                      icon: LucideIcons.calendarRange,
-                      color: context.tokens.warning,
-                      value: formatHoursShort(stats.monthSeconds),
-                      label: context.l10n.month,
-                    ),
-                    right: MiniStat(
-                      icon: LucideIcons.timer,
-                      color: context.tokens.success,
-                      value: formatHoursShort(stats.totalSeconds),
-                      label: context.l10n.total,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                StatReveal(
-                  child: StatPair(
-                    left: MiniStat(
-                      icon: LucideIcons.circlePlay,
-                      color: accent,
-                      value: '${stats.sessionCount}',
-                      label: context.l10n.focus_sessions,
-                    ),
-                    right: MiniStat(
-                      icon: LucideIcons.activity,
-                      color: context.tokens.info,
-                      value: formatHoursShort(stats.averageSeconds),
-                      label: context.l10n.focus_average,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                StatReveal(
-                  child: MiniStat(
-                    icon: LucideIcons.flame,
+              ),
+              const SizedBox(height: 12),
+              StatReveal(
+                child: StatPair(
+                  left: MiniStat(
+                    icon: LucideIcons.calendarRange,
                     color: context.tokens.warning,
-                    value: context.l10n.count_days(stats.streak),
-                    label: context.l10n.focus_streak,
-                    wide: true,
+                    value: formatHoursShort(stats.monthSeconds),
+                    label: context.l10n.month,
+                  ),
+                  right: MiniStat(
+                    icon: LucideIcons.timer,
+                    color: context.tokens.success,
+                    value: formatHoursShort(stats.totalSeconds),
+                    label: context.l10n.total,
                   ),
                 ),
+              ),
+              const SizedBox(height: 12),
+              StatReveal(
+                child: StatPair(
+                  left: MiniStat(
+                    icon: LucideIcons.circlePlay,
+                    color: accent,
+                    value: '${stats.sessionCount}',
+                    label: context.l10n.focus_sessions,
+                  ),
+                  right: MiniStat(
+                    icon: LucideIcons.activity,
+                    color: context.tokens.info,
+                    value: formatHoursShort(stats.averageSeconds),
+                    label: context.l10n.focus_average,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              StatReveal(
+                child: MiniStat(
+                  icon: LucideIcons.flame,
+                  color: context.tokens.warning,
+                  value: context.l10n.count_days(stats.streak),
+                  label: context.l10n.focus_streak,
+                  wide: true,
+                ),
+              ),
+              const SizedBox(height: 16),
+              StatReveal(
+                child: StatCard(
+                  title: context.l10n.focus_total,
+                  icon: LucideIcons.chartColumn,
+                  color: accent,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Segmented(
+                          options: [
+                            context.l10n.week,
+                            context.l10n.month,
+                            context.l10n.year,
+                          ],
+                          index: FocusRange.values.indexOf(_range),
+                          onChanged: (index) => setState(() {
+                            _range = FocusRange.values[index];
+                            _offset = 0;
+                          }),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      FocusPeriodBar(
+                        range: _range,
+                        offset: _offset,
+                        stats: stats,
+                        accent: accent,
+                        onOffset: (value) => setState(() => _offset = value),
+                      ),
+                      const SizedBox(height: 14),
+                      FocusRangeBars(
+                        stats: stats,
+                        range: _range,
+                        color: accent,
+                        stacks: widget.habitId == null
+                            ? focusStacks(context, stats, accent)
+                            : null,
+                      ),
+                      if (focusChangeLine(context, stats)
+                          case final change?) ...[
+                        const SizedBox(height: 10),
+                        Text(change, style: statLabel(context)),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+              if (stats.measured > 0) ...[
                 const SizedBox(height: 16),
                 StatReveal(
                   child: StatCard(
-                    title: context.l10n.focus_total,
-                    icon: LucideIcons.chartColumn,
+                    title: context.l10n.focus_plan_vs_real,
+                    icon: LucideIcons.scale,
+                    color: accent,
+                    child: FocusPlanFacts(
+                      stats: stats,
+                      headline: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                        color: context.colors.onSurface,
+                      ),
+                      body: statLabel(context),
+                    ),
+                  ),
+                ),
+              ],
+              if (stats.rangeSeconds > 0) ...[
+                const SizedBox(height: 16),
+                StatReveal(
+                  child: StatCard(
+                    title: context.l10n.focus_by_hour,
+                    icon: LucideIcons.clock,
                     color: accent,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Segmented(
-                            options: [
-                              context.l10n.week,
-                              context.l10n.month,
-                              context.l10n.year,
-                            ],
-                            index: FocusRange.values.indexOf(_range),
-                            onChanged: (index) => setState(() {
-                              _range = FocusRange.values[index];
-                              _offset = 0;
-                            }),
+                        Text(
+                          context.l10n.focus_busiest(
+                            focusHour(context, stats.busiestHour),
                           ),
+                          style: statLabel(context),
                         ),
                         const SizedBox(height: 12),
-                        FocusPeriodBar(
-                          range: _range,
-                          offset: _offset,
-                          stats: stats,
-                          accent: accent,
-                          onOffset: (value) => setState(() => _offset = value),
-                        ),
-                        const SizedBox(height: 14),
-                        FocusRangeBars(
-                          stats: stats,
-                          range: _range,
-                          color: accent,
-                          stacks: widget.habitId == null
-                              ? focusStacks(context, stats, accent)
-                              : null,
-                        ),
-                        if (focusChangeLine(context, stats) case final change?) ...[
-                          const SizedBox(height: 10),
-                          Text(change, style: statLabel(context)),
-                        ],
+                        FocusHourBars(stats: stats, color: accent),
                       ],
                     ),
                   ),
                 ),
-                if (stats.measured > 0) ...[
-                  const SizedBox(height: 16),
-                  StatReveal(
-                    child: StatCard(
-                      title: context.l10n.focus_plan_vs_real,
-                      icon: LucideIcons.scale,
-                      color: accent,
-                      child: FocusPlanFacts(
-                        stats: stats,
-                        headline: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w800,
-                          color: context.colors.onSurface,
-                        ),
-                        body: statLabel(context),
-                      ),
-                    ),
-                  ),
-                ],
-                if (stats.rangeSeconds > 0) ...[
-                  const SizedBox(height: 16),
-                  StatReveal(
-                    child: StatCard(
-                      title: context.l10n.focus_by_hour,
-                      icon: LucideIcons.clock,
-                      color: accent,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            context.l10n.focus_busiest(
-                              focusHour(context, stats.busiestHour),
-                            ),
-                            style: statLabel(context),
-                          ),
-                          const SizedBox(height: 12),
-                          FocusHourBars(stats: stats, color: accent),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  StatReveal(
-                    child: StatCard(
-                      title: context.l10n.focus_by_weekday,
-                      icon: LucideIcons.calendarDays,
-                      color: accent,
-                      child: FocusWeekdayBars(stats: stats, color: accent),
-                    ),
-                  ),
-                ],
                 const SizedBox(height: 16),
                 StatReveal(
                   child: StatCard(
-                    title: context.l10n.focus_heatmap,
-                    icon: LucideIcons.grid2x2,
+                    title: context.l10n.focus_by_weekday,
+                    icon: LucideIcons.calendarDays,
                     color: accent,
-                    child: FocusHeat(stats: stats, color: accent),
+                    child: FocusWeekdayBars(stats: stats, color: accent),
                   ),
                 ),
-                if (widget.habitId == null && stats.perHabit.length > 1) ...[
-                  const SizedBox(height: 16),
-                  StatReveal(
-                    child: StatCard(
-                      title: context.l10n.by_habit,
-                      icon: LucideIcons.listOrdered,
-                      color: accent,
-                      child: HabitRanking(
-                        entries: _ranking(stats, habits, accent),
-                        format: formatHoursShort,
-                      ),
-                    ),
-                  ),
-                ],
-                if (stats.perLabel.isNotEmpty) ...[
-                  const SizedBox(height: 16),
-                  StatReveal(
-                    child: StatCard(
-                      title: context.l10n.by_label,
-                      icon: LucideIcons.tag,
-                      color: accent,
-                      child: HabitRanking(
-                        entries: [
-                          for (final entry in stats.labelRanking)
-                            (name: entry.key, color: accent, count: entry.value),
-                        ],
-                        format: formatHoursShort,
-                      ),
-                    ),
-                  ),
-                ],
               ],
-            );
+              const SizedBox(height: 16),
+              StatReveal(
+                child: StatCard(
+                  title: context.l10n.focus_heatmap,
+                  icon: LucideIcons.grid2x2,
+                  color: accent,
+                  child: FocusHeat(stats: stats, color: accent),
+                ),
+              ),
+              if (widget.habitId == null && stats.perHabit.length > 1) ...[
+                const SizedBox(height: 16),
+                StatReveal(
+                  child: StatCard(
+                    title: context.l10n.by_habit,
+                    icon: LucideIcons.listOrdered,
+                    color: accent,
+                    child: HabitRanking(
+                      entries: _ranking(stats, habits, accent),
+                      format: formatHoursShort,
+                    ),
+                  ),
+                ),
+              ],
+              if (stats.perLabel.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                StatReveal(
+                  child: StatCard(
+                    title: context.l10n.by_label,
+                    icon: LucideIcons.tag,
+                    color: accent,
+                    child: HabitRanking(
+                      entries: [
+                        for (final entry in stats.labelRanking)
+                          (name: entry.key, color: accent, count: entry.value),
+                      ],
+                      format: formatHoursShort,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          );
 
     return Scaffold(
       appBar: AppBar(

@@ -41,16 +41,23 @@ String focusSessionLine(BuildContext context, FocusSession session) {
 String? focusChangeLine(BuildContext context, FocusStats stats) {
   final change = stats.change;
   if (change == null) return null;
-  final sign = change > 0 ? '+' : change < 0 ? '−' : '';
-  return context.l10n.focus_vs_previous('$sign${focusPercent(context, change)}');
+  final sign = change > 0
+      ? '+'
+      : change < 0
+      ? '−'
+      : '';
+  return context.l10n.focus_vs_previous(
+    '$sign${focusPercent(context, change)}',
+  );
 }
 
 String focusHour(BuildContext context, int hour) =>
     TimeOfDay(hour: hour, minute: 0).format(context);
 
 String focusPauses(BuildContext context, double perSession) =>
-    NumberFormat.decimalPattern(Localizations.localeOf(context).toString())
-        .format((perSession * 10).round() / 10);
+    NumberFormat.decimalPattern(
+      Localizations.localeOf(context).toString(),
+    ).format((perSession * 10).round() / 10);
 
 List<List<(double, Color)>>? focusStacks(
   BuildContext context,
@@ -155,7 +162,8 @@ class FocusPlanFacts extends StatelessWidget {
   List<Widget> _perHabit(BuildContext context) {
     final habits = context.read<HabitsController>();
     final rows = [
-      for (final MapEntry(key: id, value: overrun) in stats.overrunByHabit.entries)
+      for (final MapEntry(key: id, value: overrun)
+          in stats.overrunByHabit.entries)
         if (habits.byId(id) case final habit?) (habit, overrun),
     ]..sort((a, b) => b.$2.abs().compareTo(a.$2.abs()));
     if (rows.length < 2) return const [];

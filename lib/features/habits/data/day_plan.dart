@@ -56,30 +56,31 @@ class DayPlan {
   }) {
     final due = habits.where((h) => isDueOn(h, day)).toList();
 
-    final planned = [
-      for (final habit in due)
-        for (final (start, minutes) in habit.planTimes)
-          DaySlot(
-            start: start,
-            end: (start + minutes).clamp(start, Habit.dayMinutes),
-            habit: habit,
-          ),
-      for (final todo in todos.where((t) => t.minutes != null))
-        DaySlot(
-          start: todo.minutes!,
-          end: todo.minutes! + (todo.estimate ?? 0),
-          todo: todo,
-        ),
-    ]..sort((a, b) {
-        final byStart = a.start.compareTo(b.start);
-        if (byStart != 0) return byStart;
-        final byEnd = a.end.compareTo(b.end);
-        if (byEnd != 0) return byEnd;
-        if ((a.habit == null) != (b.habit == null)) {
-          return a.habit == null ? 1 : -1;
-        }
-        return (a.habit?.order ?? 0).compareTo(b.habit?.order ?? 0);
-      });
+    final planned =
+        [
+          for (final habit in due)
+            for (final (start, minutes) in habit.planTimes)
+              DaySlot(
+                start: start,
+                end: (start + minutes).clamp(start, Habit.dayMinutes),
+                habit: habit,
+              ),
+          for (final todo in todos.where((t) => t.minutes != null))
+            DaySlot(
+              start: todo.minutes!,
+              end: todo.minutes! + (todo.estimate ?? 0),
+              todo: todo,
+            ),
+        ]..sort((a, b) {
+          final byStart = a.start.compareTo(b.start);
+          if (byStart != 0) return byStart;
+          final byEnd = a.end.compareTo(b.end);
+          if (byEnd != 0) return byEnd;
+          if ((a.habit == null) != (b.habit == null)) {
+            return a.habit == null ? 1 : -1;
+          }
+          return (a.habit?.order ?? 0).compareTo(b.habit?.order ?? 0);
+        });
 
     final slots = <DaySlot>[];
     var reached = -1;

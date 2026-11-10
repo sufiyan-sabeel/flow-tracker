@@ -14,9 +14,9 @@ enum FocusHabitAction { defaults, clearToday }
 
 String focusDefaultsLabel(BuildContext context, Habit habit) =>
     habit.focusBreakMinutes > 0
-        ? '${habit.focusMinutes} / ${habit.focusBreakMinutes} '
-            '${context.l10n.unit_min_short}'
-        : context.l10n.minutes_short('${habit.focusMinutes}');
+    ? '${habit.focusMinutes} / ${habit.focusBreakMinutes} '
+          '${context.l10n.unit_min_short}'
+    : context.l10n.minutes_short('${habit.focusMinutes}');
 
 Future<FocusHabitAction?> showFocusHabitSheet(
   BuildContext context, {

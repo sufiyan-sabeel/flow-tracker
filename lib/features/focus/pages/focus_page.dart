@@ -70,7 +70,9 @@ class FocusPage extends StatefulWidget implements FullWidthPage {
 
 class _FocusPageState extends State<FocusPage> with ShortcutHost {
   @override
-  Map<AppShortcut, VoidCallback> get shortcuts => {AppShortcut.toggle: _toggleRunning};
+  Map<AppShortcut, VoidCallback> get shortcuts => {
+    AppShortcut.toggle: _toggleRunning,
+  };
 
   bool _leaving = false;
   final _confetti = ValueNotifier(0);
@@ -209,7 +211,9 @@ class _FocusPageState extends State<FocusPage> with ShortcutHost {
     });
     context.read<SettingsController>().setFocusSimple(_big);
     SystemChrome.setEnabledSystemUIMode(
-      _big || _immersive ? SystemUiMode.immersiveSticky : SystemUiMode.edgeToEdge,
+      _big || _immersive
+          ? SystemUiMode.immersiveSticky
+          : SystemUiMode.edgeToEdge,
     );
   }
 
@@ -232,7 +236,9 @@ class _FocusPageState extends State<FocusPage> with ShortcutHost {
     DesktopWindow.setFullscreen(_immersive);
     context.read<SettingsController>().setFocusFullscreen(_immersive);
     SystemChrome.setEnabledSystemUIMode(
-      _immersive || _big ? SystemUiMode.immersiveSticky : SystemUiMode.edgeToEdge,
+      _immersive || _big
+          ? SystemUiMode.immersiveSticky
+          : SystemUiMode.edgeToEdge,
     );
   }
 
@@ -273,7 +279,10 @@ class _FocusPageState extends State<FocusPage> with ShortcutHost {
         '${focusSessionLine(context, draft)}  ·  '
             '${context.l10n.focus_pause_count(draft.pauses)}',
       if (pending > 0) context.l10n.focus_end_tasks(pending),
-      if (!reached && focus.isPomodoro && !focus.isBreak && settings.focusWholeRounds)
+      if (!reached &&
+          focus.isPomodoro &&
+          !focus.isBreak &&
+          settings.focusWholeRounds)
         context.l10n.focus_end_drop,
     ];
 
@@ -283,7 +292,9 @@ class _FocusPageState extends State<FocusPage> with ShortcutHost {
         reached: reached,
         addsTime: habit?.isTimeAmount ?? false,
         lines: lines,
-        accent: habit?.color.shownIn(dialog) ?? Theme.of(dialog).colorScheme.primary,
+        accent:
+            habit?.color.shownIn(dialog) ??
+            Theme.of(dialog).colorScheme.primary,
       ),
     );
     if (result == null || !mounted) return;
@@ -344,8 +355,9 @@ class _FocusPageState extends State<FocusPage> with ShortcutHost {
         : habit == null
         ? tag
         : '${habit.name} · $tag';
-    final leadMinutes =
-        starting ? (widget.startMinutes ?? focus.targetMinutes) : focus.targetMinutes;
+    final leadMinutes = starting
+        ? (widget.startMinutes ?? focus.targetMinutes)
+        : focus.targetMinutes;
     final inset = MediaQuery.viewInsetsOf(context).bottom;
     final active = context.select<FocusController, bool>((f) => f.isActive);
 
@@ -356,10 +368,15 @@ class _FocusPageState extends State<FocusPage> with ShortcutHost {
       });
     }
 
-    final style = ClockStyle
-        .values[settings.focusClockStyle.clamp(0, ClockStyle.values.length - 1)];
+    final style =
+        ClockStyle.values[settings.focusClockStyle.clamp(
+          0,
+          ClockStyle.values.length - 1,
+        )];
     final onBreak = context.select<FocusController, bool>((f) => f.isBreak);
-    final longBreak = context.select<FocusController, bool>((f) => f.isLongBreak);
+    final longBreak = context.select<FocusController, bool>(
+      (f) => f.isLongBreak,
+    );
     final switchIn = context.select<FocusController, int>((f) => f.switchIn);
     final label = switchIn > 0
         ? (onBreak ? context.l10n.focus_back_in : context.l10n.focus_break_in)(
@@ -376,251 +393,295 @@ class _FocusPageState extends State<FocusPage> with ShortcutHost {
         resizeToAvoidBottomInset: false,
         body: Stack(
           children: [
-        FocusBackground(
-          scene: settings.focusScene,
-          imagePath: settings.focusImage,
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onDoubleTap: _toggleBig,
-                ),
-              ),
-              SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final landscape = constraints.maxWidth > constraints.maxHeight;
-                final typing = inset > 0;
-
-                final listHeight = typing
-                    ? (constraints.maxHeight * 0.32).clamp(110.0, 240.0)
-                    : isMobile
-                    ? 156.0
-                    : 232.0;
-                final tasks = habit == null
-                    ? FocusFreeTaskList(focus: focus, maxHeight: listHeight)
-                    : FocusTaskList(habit: habit, maxHeight: listHeight);
-
-                final header = AnimatedBuilder(
-                  animation: focus,
-                  builder: (context, _) => _TopBar(
-                    immersive: _immersive,
-                    onImmersive: _toggleImmersive,
-                    onBig: _openSimple,
-                    onTarget: leading || !focus.isActive || focus.isBreak
-                        ? null
-                        : () => showFocusRetimeSheet(context),
-                    onHabit: leading || !focus.isActive || !focus.isBreak
-                        ? null
-                        : () => _switchHabit(habits),
-                    title: title,
-                    target: (leading ? leadMinutes : focus.targetMinutes) <= 0
-                        ? context.l10n.focus_flowtime
-                        : focus.isPomodoro && !leading
-                            ? '${context.l10n.minutes_short('${focus.targetMinutes}')}  ·  ${context.l10n.focus_round(focus.round)}'
-                            : context.l10n.minutes_short(
-                                '${leading ? leadMinutes : focus.targetMinutes}',
-                              ),
-                  ),
-                );
-
-                final dial = AnimatedBuilder(
-                  animation: focus,
-                  builder: (context, _) {
-                    final paused = !leading && focus.isActive && !focus.isRunning;
-                    final accent = habit?.color.shownIn(context) ?? context.colors.primary;
-                    return AnimatedOpacity(
-                      opacity: paused ? (style == ClockStyle.ring ? 0.7 : 0.55) : 1,
-                      duration: const Duration(milliseconds: 300),
-                      child: TweenAnimationBuilder<Color?>(
-                        tween: ColorTween(
-                          end: paused ? const Color(0xFF8A8A92) : accent,
-                        ),
-                        duration: const Duration(milliseconds: 300),
-                        builder: (context, color, _) => FocusClock(
-                          style: style,
-                          row: landscape,
-                          seconds: leading
-                              ? (leadMinutes <= 0 ? 0 : leadMinutes * 60)
-                              : focus.displaySeconds,
-                          progress: leading ? 0 : focus.progress,
-                          color: color ?? accent,
-                          label: paused ? context.l10n.focus_paused : label,
-                          size: _clockSize(constraints, landscape),
-                          paused: paused,
-                          resting: onBreak && switchIn == 0 && !leading,
-                        ),
-                      ),
-                    );
-                  },
-                );
-
-                final clock = GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: _toggleRunning,
-                  onDoubleTap: _toggleBig,
-                  child: dial,
-                );
-
-                final controls = AnimatedBuilder(
-                  animation: focus,
-                  builder: (context, _) => _Controls(
-                    running: focus.isRunning,
-                    onReset: _restart,
-                    awaiting: focus.isAwaiting || focus.switchIn > 0,
-                    finished: focus.isFinished,
-                    onSkip: focus.isBreak ? focus.skipBreak : null,
-                    onAddMinute: focus.isFlow ? null : focus.addMinute,
-                    onToggle: _toggleRunning,
-                    onStop: _confirmStop,
-                  ),
-                );
-
-                if (_big) {
-                  final face = Column(
-                    children: [
-                      SizedBox(
-                        width: double.infinity,
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 400),
-                          child: _tip
-                              ? const _ZenTip()
-                              : _ZenLabel(
-                                  text: title,
-                                  color: habit?.color.shownIn(context) ?? context.colors.primary,
-                                ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Expanded(
-                        child: FractionallySizedBox(
-                          widthFactor: 0.92,
-                          heightFactor: 0.92,
-                          child: FittedBox(fit: BoxFit.contain, child: clock),
-                        ),
-                      ),
-                    ],
-                  );
-                  final rail = AnimatedBuilder(
-                    animation: focus,
-                    builder: (context, _) => _ZenControls(
-                      vertical: landscape,
-                      running: focus.isRunning,
-                      awaiting: focus.isAwaiting || focus.switchIn > 0,
-                      finished: focus.isFinished,
-                      onToggle: _toggleRunning,
-                      onSkip: focus.isBreak ? focus.skipBreak : null,
-                      onAddMinute: focus.isFlow ? null : focus.addMinute,
-                      onStop: _confirmStop,
+            FocusBackground(
+              scene: settings.focusScene,
+              imagePath: settings.focusImage,
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onDoubleTap: _toggleBig,
                     ),
-                  );
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(18, 12, 18, 16),
-                    child: landscape
-                        ? Row(
-                            children: [
-                              Expanded(child: face),
-                              const SizedBox(width: 16),
-                              rail,
-                            ],
-                          )
-                        : Column(
-                            children: [
-                              Expanded(child: face),
-                              const SizedBox(height: 20),
-                              rail,
-                            ],
-                          ),
-                  );
-                }
+                  ),
+                  SafeArea(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final landscape =
+                            constraints.maxWidth > constraints.maxHeight;
+                        final typing = inset > 0;
 
-                if (landscape) {
-                  return Column(
-                    children: [
-                      header,
-                      Expanded(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(20, 8, 12, 18),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Flexible(
-                                      child: FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: clock,
-                                      ),
-                                    ),
-                                    if (!typing) ...[
-                                      const SizedBox(height: 24),
-                                      controls,
-                                    ],
-                                  ],
+                        final listHeight = typing
+                            ? (constraints.maxHeight * 0.32).clamp(110.0, 240.0)
+                            : isMobile
+                            ? 156.0
+                            : 232.0;
+                        final tasks = habit == null
+                            ? FocusFreeTaskList(
+                                focus: focus,
+                                maxHeight: listHeight,
+                              )
+                            : FocusTaskList(
+                                habit: habit,
+                                maxHeight: listHeight,
+                              );
+
+                        final header = AnimatedBuilder(
+                          animation: focus,
+                          builder: (context, _) => _TopBar(
+                            immersive: _immersive,
+                            onImmersive: _toggleImmersive,
+                            onBig: _openSimple,
+                            onTarget:
+                                leading || !focus.isActive || focus.isBreak
+                                ? null
+                                : () => showFocusRetimeSheet(context),
+                            onHabit:
+                                leading || !focus.isActive || !focus.isBreak
+                                ? null
+                                : () => _switchHabit(habits),
+                            title: title,
+                            target:
+                                (leading ? leadMinutes : focus.targetMinutes) <=
+                                    0
+                                ? context.l10n.focus_flowtime
+                                : focus.isPomodoro && !leading
+                                ? '${context.l10n.minutes_short('${focus.targetMinutes}')}  ·  ${context.l10n.focus_round(focus.round)}'
+                                : context.l10n.minutes_short(
+                                    '${leading ? leadMinutes : focus.targetMinutes}',
+                                  ),
+                          ),
+                        );
+
+                        final dial = AnimatedBuilder(
+                          animation: focus,
+                          builder: (context, _) {
+                            final paused =
+                                !leading && focus.isActive && !focus.isRunning;
+                            final accent =
+                                habit?.color.shownIn(context) ??
+                                context.colors.primary;
+                            return AnimatedOpacity(
+                              opacity: paused
+                                  ? (style == ClockStyle.ring ? 0.7 : 0.55)
+                                  : 1,
+                              duration: const Duration(milliseconds: 300),
+                              child: TweenAnimationBuilder<Color?>(
+                                tween: ColorTween(
+                                  end: paused
+                                      ? const Color(0xFF8A8A92)
+                                      : accent,
+                                ),
+                                duration: const Duration(milliseconds: 300),
+                                builder: (context, color, _) => FocusClock(
+                                  style: style,
+                                  row: landscape,
+                                  seconds: leading
+                                      ? (leadMinutes <= 0
+                                            ? 0
+                                            : leadMinutes * 60)
+                                      : focus.displaySeconds,
+                                  progress: leading ? 0 : focus.progress,
+                                  color: color ?? accent,
+                                  label: paused
+                                      ? context.l10n.focus_paused
+                                      : label,
+                                  size: _clockSize(constraints, landscape),
+                                  paused: paused,
+                                  resting: onBreak && switchIn == 0 && !leading,
                                 ),
                               ),
-                            ),
-                            Expanded(
-                              key: const ValueKey('focus-tasks'),
-                              child: SingleChildScrollView(
-                                padding: const EdgeInsets.fromLTRB(8, 8, 20, 20),
-                                child: Align(
-                                  alignment: Alignment.topCenter,
-                                  child: ConstrainedBox(
-                                    constraints:
-                                        const BoxConstraints(maxWidth: 420),
-                                    child: tasks,
+                            );
+                          },
+                        );
+
+                        final clock = GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: _toggleRunning,
+                          onDoubleTap: _toggleBig,
+                          child: dial,
+                        );
+
+                        final controls = AnimatedBuilder(
+                          animation: focus,
+                          builder: (context, _) => _Controls(
+                            running: focus.isRunning,
+                            onReset: _restart,
+                            awaiting: focus.isAwaiting || focus.switchIn > 0,
+                            finished: focus.isFinished,
+                            onSkip: focus.isBreak ? focus.skipBreak : null,
+                            onAddMinute: focus.isFlow ? null : focus.addMinute,
+                            onToggle: _toggleRunning,
+                            onStop: _confirmStop,
+                          ),
+                        );
+
+                        if (_big) {
+                          final face = Column(
+                            children: [
+                              SizedBox(
+                                width: double.infinity,
+                                child: AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 400),
+                                  child: _tip
+                                      ? const _ZenTip()
+                                      : _ZenLabel(
+                                          text: title,
+                                          color:
+                                              habit?.color.shownIn(context) ??
+                                              context.colors.primary,
+                                        ),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Expanded(
+                                child: FractionallySizedBox(
+                                  widthFactor: 0.92,
+                                  heightFactor: 0.92,
+                                  child: FittedBox(
+                                    fit: BoxFit.contain,
+                                    child: clock,
                                   ),
                                 ),
                               ),
+                            ],
+                          );
+                          final rail = AnimatedBuilder(
+                            animation: focus,
+                            builder: (context, _) => _ZenControls(
+                              vertical: landscape,
+                              running: focus.isRunning,
+                              awaiting: focus.isAwaiting || focus.switchIn > 0,
+                              finished: focus.isFinished,
+                              onToggle: _toggleRunning,
+                              onSkip: focus.isBreak ? focus.skipBreak : null,
+                              onAddMinute: focus.isFlow
+                                  ? null
+                                  : focus.addMinute,
+                              onStop: _confirmStop,
                             ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: inset),
-                    ],
-                  );
-                }
+                          );
+                          return Padding(
+                            padding: const EdgeInsets.fromLTRB(18, 12, 18, 16),
+                            child: landscape
+                                ? Row(
+                                    children: [
+                                      Expanded(child: face),
+                                      const SizedBox(width: 16),
+                                      rail,
+                                    ],
+                                  )
+                                : Column(
+                                    children: [
+                                      Expanded(child: face),
+                                      const SizedBox(height: 20),
+                                      rail,
+                                    ],
+                                  ),
+                          );
+                        }
 
-                return Column(
-                  children: [
-                    header,
-                    Expanded(
-                      child: Center(
-                        child: FittedBox(fit: BoxFit.scaleDown, child: clock),
-                      ),
+                        if (landscape) {
+                          return Column(
+                            children: [
+                              header,
+                              Expanded(
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                          20,
+                                          8,
+                                          12,
+                                          18,
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Flexible(
+                                              child: FittedBox(
+                                                fit: BoxFit.scaleDown,
+                                                child: clock,
+                                              ),
+                                            ),
+                                            if (!typing) ...[
+                                              const SizedBox(height: 24),
+                                              controls,
+                                            ],
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      key: const ValueKey('focus-tasks'),
+                                      child: SingleChildScrollView(
+                                        padding: const EdgeInsets.fromLTRB(
+                                          8,
+                                          8,
+                                          20,
+                                          20,
+                                        ),
+                                        child: Align(
+                                          alignment: Alignment.topCenter,
+                                          child: ConstrainedBox(
+                                            constraints: const BoxConstraints(
+                                              maxWidth: 420,
+                                            ),
+                                            child: tasks,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: inset),
+                            ],
+                          );
+                        }
+
+                        return Column(
+                          children: [
+                            header,
+                            Expanded(
+                              child: Center(
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: clock,
+                                ),
+                              ),
+                            ),
+                            if (!typing) ...[
+                              KeyedSubtree(
+                                key: const ValueKey('focus-controls'),
+                                child: controls,
+                              ),
+                              const SizedBox(height: 22),
+                            ],
+                            Padding(
+                              key: const ValueKey('focus-tasks'),
+                              padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+                              child: tasks,
+                            ),
+                            SizedBox(height: inset),
+                          ],
+                        );
+                      },
                     ),
-                    if (!typing) ...[
-                      KeyedSubtree(
-                        key: const ValueKey('focus-controls'),
-                        child: controls,
-                      ),
-                      const SizedBox(height: 22),
-                    ],
-                    Padding(
-                      key: const ValueKey('focus-tasks'),
-                      padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
-                      child: tasks,
-                    ),
-                    SizedBox(height: inset),
-                  ],
-                );
-              },
+                  ),
+                ],
+              ),
             ),
-          ),
-            ],
-          ),
-        ),
             Positioned.fill(
               child: RepaintBoundary(
                 child: ValueListenableBuilder<int>(
                   valueListenable: _confetti,
-                  builder: (context, trigger, _) =>
-                      IgnorePointer(child: CelebrationOverlay(trigger: trigger)),
+                  builder: (context, trigger, _) => IgnorePointer(
+                    child: CelebrationOverlay(trigger: trigger),
+                  ),
                 ),
               ),
             ),
@@ -679,7 +740,11 @@ class _TopBar extends StatelessWidget {
                     if (row > 0) const SizedBox(height: 14),
                     Row(
                       children: [
-                        for (var i = row; i < row + 2 && i < labels.length; i++) ...[
+                        for (
+                          var i = row;
+                          i < row + 2 && i < labels.length;
+                          i++
+                        ) ...[
                           if (i > row) const SizedBox(width: 12),
                           Expanded(
                             child: ClockPreview(
@@ -704,8 +769,9 @@ class _TopBar extends StatelessWidget {
             builder: (_, s, __) => Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
               decoration: BoxDecoration(
-                color: context.colors.surfaceContainerHighest
-                    .withValues(alpha: 0.5),
+                color: context.colors.surfaceContainerHighest.withValues(
+                  alpha: 0.5,
+                ),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: ListTile(
@@ -756,150 +822,156 @@ class _TopBar extends StatelessWidget {
           builder: (_, box) {
             final columns = ((box.maxWidth + 12) / 172).floor().clamp(3, 5);
             final tile = hasVideoScenes
-                ? ((box.maxWidth - 12 * (columns - 1)) / columns).floorToDouble()
+                ? ((box.maxWidth - 12 * (columns - 1)) / columns)
+                      .floorToDouble()
                 : 124.0;
             final tiles = <Widget>[
-            SizedBox(
-              width: tile,
-              child: FocusScenePreview(
-                scene: 0,
-                imagePath: '',
-                selected: s.focusScene == 0 && s.focusImage.isEmpty,
-                onTap: () {
-                  s.setFocusScene(0);
-                  s.setFocusImage('');
-                },
-              ),
-            ),
-            for (var i = 1; i < focusSceneCount; i++)
-              if (!s.isSceneHidden(i) && !hasVideoScenes)
-                SizedBox(
-                  width: tile,
-                  child: FocusScenePreview(
-                    scene: i,
-                    imagePath: '',
-                    selected: s.focusScene == i && s.focusImage.isEmpty,
-                    onTap: () {
-                      s.setFocusScene(i);
-                      s.setFocusImage('');
-                    },
-                    onLongPress: () async {
-                            if (await showDeleteSheet(sheetContext)) {
-                              await s.hideScene(i);
-                            }
-                          },
-                  ),
+              SizedBox(
+                width: tile,
+                child: FocusScenePreview(
+                  scene: 0,
+                  imagePath: '',
+                  selected: s.focusScene == 0 && s.focusImage.isEmpty,
+                  onTap: () {
+                    s.setFocusScene(0);
+                    s.setFocusImage('');
+                  },
                 ),
-            if (hasVideoScenes)
-              for (var i = 0; i < focusVideoScenes.length; i++)
-                if (!s.isSceneHidden(kFirstVideoScene + i))
+              ),
+              for (var i = 1; i < focusSceneCount; i++)
+                if (!s.isSceneHidden(i) && !hasVideoScenes)
                   SizedBox(
                     width: tile,
                     child: FocusScenePreview(
-                      scene: kFirstVideoScene + i,
+                      scene: i,
                       imagePath: '',
-                      selected: s.focusScene == kFirstVideoScene + i &&
-                          s.focusImage.isEmpty,
+                      selected: s.focusScene == i && s.focusImage.isEmpty,
                       onTap: () {
-                        s.setFocusScene(kFirstVideoScene + i);
+                        s.setFocusScene(i);
                         s.setFocusImage('');
                       },
                       onLongPress: () async {
                         if (await showDeleteSheet(sheetContext)) {
-                          await s.hideScene(kFirstVideoScene + i);
+                          await s.hideScene(i);
                         }
                       },
                     ),
                   ),
-            for (final path in s.focusImages)
+              if (hasVideoScenes)
+                for (var i = 0; i < focusVideoScenes.length; i++)
+                  if (!s.isSceneHidden(kFirstVideoScene + i))
+                    SizedBox(
+                      width: tile,
+                      child: FocusScenePreview(
+                        scene: kFirstVideoScene + i,
+                        imagePath: '',
+                        selected:
+                            s.focusScene == kFirstVideoScene + i &&
+                            s.focusImage.isEmpty,
+                        onTap: () {
+                          s.setFocusScene(kFirstVideoScene + i);
+                          s.setFocusImage('');
+                        },
+                        onLongPress: () async {
+                          if (await showDeleteSheet(sheetContext)) {
+                            await s.hideScene(kFirstVideoScene + i);
+                          }
+                        },
+                      ),
+                    ),
+              for (final path in s.focusImages)
+                SizedBox(
+                  width: tile,
+                  child: AspectRatio(
+                    aspectRatio: 0.78,
+                    child: Stack(
+                      children: [
+                        Positioned.fill(
+                          child: Semantics(
+                            button: true,
+                            label: sheetContext.l10n.app_background,
+                            child: GestureDetector(
+                              onTap: () {
+                                s.setFocusImage(path);
+                                s.setFocusScene(kCustomScene);
+                              },
+                              onLongPress: () async {
+                                if (await showDeleteSheet(sheetContext)) {
+                                  await s.removeFocusImage(path);
+                                }
+                              },
+                              child: AnimatedScale(
+                                scale: s.focusImage == path ? 1 : 0.94,
+                                duration: const Duration(milliseconds: 320),
+                                curve: Curves.easeOutBack,
+                                child: Container(
+                                  padding: EdgeInsets.all(
+                                    s.focusImage == path ? 2.5 : 0,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: s.focusImage == path
+                                        ? Border.all(
+                                            color: sheetContext.colors.primary,
+                                            width: 2.5,
+                                          )
+                                        : null,
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(
+                                      s.focusImage == path ? 12 : 14,
+                                    ),
+                                    child: isFocusVideo(path)
+                                        ? const FocusVideoTile()
+                                        : File(path).existsSync()
+                                        ? Image.file(
+                                            File(path),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : ColoredBox(
+                                            color: sheetContext
+                                                .colors
+                                                .surfaceContainerHighest,
+                                            child: const SizedBox.expand(),
+                                          ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               SizedBox(
                 width: tile,
                 child: AspectRatio(
                   aspectRatio: 0.78,
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: Semantics(
-                          button: true,
-                          label: sheetContext.l10n.app_background,
-                          child: GestureDetector(
-                            onTap: () {
-                              s.setFocusImage(path);
-                              s.setFocusScene(kCustomScene);
-                            },
-                            onLongPress: () async {
-                              if (await showDeleteSheet(sheetContext)) {
-                                await s.removeFocusImage(path);
-                              }
-                            },
-                            child: AnimatedScale(
-                              scale: s.focusImage == path ? 1 : 0.94,
-                              duration: const Duration(milliseconds: 320),
-                              curve: Curves.easeOutBack,
-                              child: Container(
-                              padding: EdgeInsets.all(
-                                s.focusImage == path ? 2.5 : 0,
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16),
-                                border: s.focusImage == path
-                                    ? Border.all(
-                                        color: sheetContext.colors.primary,
-                                        width: 2.5,
-                                      )
-                                    : null,
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(
-                                  s.focusImage == path ? 12 : 14,
-                                ),
-                                child: isFocusVideo(path)
-                                    ? const FocusVideoTile()
-                                    : File(path).existsSync()
-                                    ? Image.file(File(path), fit: BoxFit.cover)
-                                    : ColoredBox(
-                                        color: sheetContext
-                                            .colors.surfaceContainerHighest,
-                                        child: const SizedBox.expand(),
-                                      ),
-                              ),
-                            ),
-                            ),
-                          ),
+                  child: Semantics(
+                    button: true,
+                    label: sheetContext.l10n.add_image,
+                    child: GestureDetector(
+                      onTap: pickImage,
+                      child: Container(
+                        margin: EdgeInsets.symmetric(
+                          horizontal: tile * 0.03,
+                          vertical: tile / 0.78 * 0.03,
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            SizedBox(
-              width: tile,
-              child: AspectRatio(
-                aspectRatio: 0.78,
-                child: Semantics(
-                  button: true,
-                  label: sheetContext.l10n.add_image,
-                  child: GestureDetector(
-                    onTap: pickImage,
-                    child: Container(
-                      margin: EdgeInsets.symmetric(
-                        horizontal: tile * 0.03,
-                        vertical: tile / 0.78 * 0.03,
-                      ),
-                      decoration: BoxDecoration(
-                        color: sheetContext.colors.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Icon(
-                        LucideIcons.imagePlus,
-                        size: 20,
-                        color: sheetContext.tokens.muted,
+                        decoration: BoxDecoration(
+                          color: sheetContext.colors.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Icon(
+                          LucideIcons.imagePlus,
+                          size: 20,
+                          color: sheetContext.tokens.muted,
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
             ];
             return Column(
               mainAxisSize: MainAxisSize.min,
@@ -911,17 +983,17 @@ class _TopBar extends StatelessWidget {
                     child: Wrap(spacing: 12, runSpacing: 12, children: tiles),
                   )
                 else
-                SizedBox(
-                  height: tile / 0.78 + 12,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    clipBehavior: Clip.none,
-                    padding: const EdgeInsets.symmetric(vertical: 6),
-                    itemCount: tiles.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 12),
-                    itemBuilder: (_, index) => tiles[index],
+                  SizedBox(
+                    height: tile / 0.78 + 12,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      clipBehavior: Clip.none,
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      itemCount: tiles.length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 12),
+                      itemBuilder: (_, index) => tiles[index],
+                    ),
                   ),
-                ),
                 if (s.hiddenScenes.isNotEmpty)
                   TextButton(
                     onPressed: s.restoreScenes,
@@ -993,21 +1065,21 @@ class _TopBar extends StatelessWidget {
                 ),
                 const SizedBox(height: 1),
                 Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          target,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 12.5,
-                            color: Colors.white.withValues(alpha: 0.75),
-                          ),
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        target,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          color: Colors.white.withValues(alpha: 0.75),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -1047,7 +1119,9 @@ class _TopBar extends StatelessWidget {
                 ),
                 if (!isMobile)
                   (
-                    icon: immersive ? LucideIcons.minimize2 : LucideIcons.maximize2,
+                    icon: immersive
+                        ? LucideIcons.minimize2
+                        : LucideIcons.maximize2,
                     label: immersive
                         ? context.l10n.focus_exit_fullscreen
                         : context.l10n.focus_fullscreen,
@@ -1061,7 +1135,8 @@ class _TopBar extends StatelessWidget {
                 (
                   icon: LucideIcons.circleHelp,
                   label: context.l10n.focus_resources,
-                  onTap: () => SettingsActions.openUrl(context, '$kSiteUrl/resources/'),
+                  onTap: () =>
+                      SettingsActions.openUrl(context, '$kSiteUrl/resources/'),
                 ),
               ],
             ),
@@ -1116,7 +1191,11 @@ class _Controls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final skip = onSkip;
-    final icon = _toggleIcon(running: running, awaiting: awaiting, finished: finished);
+    final icon = _toggleIcon(
+      running: running,
+      awaiting: awaiting,
+      finished: finished,
+    );
     final buttons = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -1158,7 +1237,12 @@ class _Controls extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    _toggleLabel(context, running: running, awaiting: awaiting, finished: finished),
+                    _toggleLabel(
+                      context,
+                      running: running,
+                      awaiting: awaiting,
+                      finished: finished,
+                    ),
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -1332,8 +1416,17 @@ class _ZenControls extends StatelessWidget {
     final minute = onAddMinute;
     final items = <Widget>[
       _ZenButton(
-        icon: _toggleIcon(running: running, awaiting: awaiting, finished: finished),
-        label: _toggleLabel(context, running: running, awaiting: awaiting, finished: finished),
+        icon: _toggleIcon(
+          running: running,
+          awaiting: awaiting,
+          finished: finished,
+        ),
+        label: _toggleLabel(
+          context,
+          running: running,
+          awaiting: awaiting,
+          finished: finished,
+        ),
         onTap: onToggle,
         big: true,
       ),

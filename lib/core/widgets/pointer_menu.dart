@@ -20,7 +20,8 @@ Future<void> showPointerMenu(
       return CustomSingleChildLayout(
         delegate: _PointerLayout(at),
         child: Material(
-          color: theme.bottomSheetTheme.backgroundColor ??
+          color:
+              theme.bottomSheetTheme.backgroundColor ??
               theme.colorScheme.surfaceContainerLow,
           elevation: 8,
           shadowColor: Colors.black54,

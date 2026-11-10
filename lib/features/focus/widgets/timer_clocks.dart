@@ -14,10 +14,10 @@ const _flipBleed = 0.08;
 
 TextStyle _digitWeight(BuildContext context, FontWeight weight) =>
     Theme.of(context).textTheme.bodyMedium?.fontFamily == ExpressType.family
-        ? TextStyle(
-            fontVariations: [FontVariation('wght', weight.value.toDouble())],
-          )
-        : TextStyle(fontWeight: weight);
+    ? TextStyle(
+        fontVariations: [FontVariation('wght', weight.value.toDouble())],
+      )
+    : TextStyle(fontWeight: weight);
 
 class FocusClock extends StatelessWidget {
   const FocusClock({
@@ -50,23 +50,23 @@ class FocusClock extends StatelessWidget {
   Widget build(BuildContext context) {
     return switch (style) {
       ClockStyle.ring => _RingClock(
-          seconds: seconds,
-          progress: progress,
-          color: color,
-          label: label,
-          size: size,
-          paused: paused,
-          resting: resting,
-        ),
+        seconds: seconds,
+        progress: progress,
+        color: color,
+        label: label,
+        size: size,
+        paused: paused,
+        resting: resting,
+      ),
       ClockStyle.flip => _FlipClock(seconds: seconds, size: size, row: row),
       ClockStyle.dots => _DotsClock(seconds: seconds, size: size),
       ClockStyle.plain => _PlainClock(
-          seconds: seconds,
-          label: label,
-          size: size,
-          paused: paused,
-          resting: resting,
-        ),
+        seconds: seconds,
+        label: label,
+        size: size,
+        paused: paused,
+        resting: resting,
+      ),
     };
   }
 }
@@ -209,7 +209,11 @@ class _RingClock extends StatelessWidget {
               SizedBox(
                 width: size * 0.6,
                 child: paused || resting
-                    ? _Pulse(key: ValueKey(paused), slow: !paused, child: caption)
+                    ? _Pulse(
+                        key: ValueKey(paused),
+                        slow: !paused,
+                        child: caption,
+                      )
                     : caption,
               ),
             ],
@@ -412,7 +416,11 @@ class _DotTextPainter extends CustomPainter {
 }
 
 class _FlipClock extends StatelessWidget {
-  const _FlipClock({required this.seconds, required this.size, this.row = false});
+  const _FlipClock({
+    required this.seconds,
+    required this.size,
+    this.row = false,
+  });
 
   final int seconds;
   final double size;
@@ -620,7 +628,9 @@ class ClockPreview extends StatelessWidget {
                 ),
                 borderRadius: BorderRadius.circular(22),
                 border: Border.all(
-                  color: selected ? color : Colors.white.withValues(alpha: 0.08),
+                  color: selected
+                      ? color
+                      : Colors.white.withValues(alpha: 0.08),
                   width: selected ? 2 : 1,
                 ),
                 boxShadow: [
@@ -652,7 +662,9 @@ class ClockPreview extends StatelessWidget {
               style: DefaultTextStyle.of(context).style.copyWith(
                 fontSize: 13,
                 fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
-                color: selected ? color : Theme.of(context).colorScheme.onSurface,
+                color: selected
+                    ? color
+                    : Theme.of(context).colorScheme.onSurface,
               ),
               child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
             ),

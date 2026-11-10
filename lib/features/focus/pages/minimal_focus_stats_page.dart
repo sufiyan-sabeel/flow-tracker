@@ -54,7 +54,9 @@ class _MinimalFocusStatsPageState extends State<MinimalFocusStatsPage> {
       for (final entry in stats.perHabit.entries)
         (
           name: habits.byId(entry.key)?.name ?? context.l10n.focus_free_session,
-          color: habits.byId(entry.key)?.color.shownIn(context) ?? context.tokens.muted,
+          color:
+              habits.byId(entry.key)?.color.shownIn(context) ??
+              context.tokens.muted,
           seconds: entry.value,
         ),
     ]..sort((a, b) => b.seconds.compareTo(a.seconds));
@@ -195,7 +197,9 @@ class _MinimalFocusStatsPageState extends State<MinimalFocusStatsPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 6),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                ),
                                 child: Text(
                                   context.l10n.focus_busiest(
                                     focusHour(context, stats.busiestHour),

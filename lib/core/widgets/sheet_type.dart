@@ -8,7 +8,11 @@ import 'package:flow_tracker/features/settings/state/settings_controller.dart';
 int sheetStyle(BuildContext context) =>
     context.watch<SettingsController>().appStyle;
 
-TextStyle sheetTitleStyle(BuildContext context, {double size = 20, Color? color}) {
+TextStyle sheetTitleStyle(
+  BuildContext context, {
+  double size = 20,
+  Color? color,
+}) {
   final tone = color ?? context.colors.onSurface;
   switch (sheetStyle(context)) {
     case 1:
@@ -24,7 +28,11 @@ TextStyle sheetTitleStyle(BuildContext context, {double size = 20, Color? color}
   }
 }
 
-TextStyle sheetHeadingStyle(BuildContext context, {double size = 15, Color? color}) {
+TextStyle sheetHeadingStyle(
+  BuildContext context, {
+  double size = 15,
+  Color? color,
+}) {
   final tone = color ?? context.colors.onSurface;
   switch (sheetStyle(context)) {
     case 1:
@@ -65,13 +73,22 @@ TextStyle sheetOptionStyle(
   }
 }
 
-TextStyle sheetLabelStyle(BuildContext context, {double size = 13, Color? color}) {
+TextStyle sheetLabelStyle(
+  BuildContext context, {
+  double size = 13,
+  Color? color,
+}) {
   final tone = color ?? context.tokens.muted;
   switch (sheetStyle(context)) {
     case 1:
       return MinimalType.label(color: tone, size: size);
     case 2:
-      return ExpressType.headline.at(size, weight: 750, spacing: 0.2, color: tone);
+      return ExpressType.headline.at(
+        size,
+        weight: 750,
+        spacing: 0.2,
+        color: tone,
+      );
     default:
       return TextStyle(
         fontSize: size,
@@ -82,12 +99,21 @@ TextStyle sheetLabelStyle(BuildContext context, {double size = 13, Color? color}
   }
 }
 
-TextStyle sheetFigureStyle(BuildContext context, {double size = 40, Color? color}) {
+TextStyle sheetFigureStyle(
+  BuildContext context, {
+  double size = 40,
+  Color? color,
+}) {
   switch (sheetStyle(context)) {
     case 1:
       return MinimalType.figure(size, color: color);
     case 2:
-      return ExpressType.display.at(size, weight: 900, color: color, tabular: true);
+      return ExpressType.display.at(
+        size,
+        weight: 900,
+        color: color,
+        tabular: true,
+      );
     default:
       return TextStyle(
         fontSize: size,
@@ -97,7 +123,11 @@ TextStyle sheetFigureStyle(BuildContext context, {double size = 40, Color? color
   }
 }
 
-TextStyle sheetActionStyle(BuildContext context, {double size = 15, Color? color}) {
+TextStyle sheetActionStyle(
+  BuildContext context, {
+  double size = 15,
+  Color? color,
+}) {
   switch (sheetStyle(context)) {
     case 1:
       return MinimalType.title(size, color: color, weight: 700);
@@ -112,7 +142,11 @@ TextStyle sheetActionStyle(BuildContext context, {double size = 15, Color? color
   }
 }
 
-TextStyle sheetBodyStyle(BuildContext context, {double size = 13.5, Color? color}) {
+TextStyle sheetBodyStyle(
+  BuildContext context, {
+  double size = 13.5,
+  Color? color,
+}) {
   final tone = color ?? context.tokens.muted;
   switch (sheetStyle(context)) {
     case 1:
@@ -147,8 +181,9 @@ class SheetTitle extends StatelessWidget {
 
     if (trailing == null) return title;
     return Row(
-      crossAxisAlignment:
-          subtitle == null ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      crossAxisAlignment: subtitle == null
+          ? CrossAxisAlignment.center
+          : CrossAxisAlignment.start,
       children: [
         Expanded(child: title),
         const SizedBox(width: 12),

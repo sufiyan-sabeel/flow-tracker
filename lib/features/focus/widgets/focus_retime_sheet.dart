@@ -36,18 +36,18 @@ class _RetimeState extends State<_Retime> {
   FocusMode get _mode => _minutes <= 0
       ? FocusMode.flow
       : _pomodoro
-          ? FocusMode.pomodoro
-          : FocusMode.timer;
+      ? FocusMode.pomodoro
+      : FocusMode.timer;
 
   void _setMode(FocusMode mode) => setState(() {
-        if (mode == FocusMode.flow) {
-          if (_minutes > 0) _lastMinutes = _minutes;
-          _minutes = 0;
-          return;
-        }
-        if (_minutes <= 0) _minutes = _lastMinutes;
-        _pomodoro = mode == FocusMode.pomodoro;
-      });
+    if (mode == FocusMode.flow) {
+      if (_minutes > 0) _lastMinutes = _minutes;
+      _minutes = 0;
+      return;
+    }
+    if (_minutes <= 0) _minutes = _lastMinutes;
+    _pomodoro = mode == FocusMode.pomodoro;
+  });
 
   Future<int?> _keypad(String title, int value, int max) async {
     final picked = await showNumberKeypadDialog(
@@ -76,7 +76,10 @@ class _RetimeState extends State<_Retime> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(context.l10n.focus_change_timer, style: sheetTitleStyle(context)),
+          Text(
+            context.l10n.focus_change_timer,
+            style: sheetTitleStyle(context),
+          ),
           const SizedBox(height: 4),
           Text(context.l10n.focus_retime_hint, style: sheetBodyStyle(context)),
           const SizedBox(height: 16),
@@ -94,8 +97,11 @@ class _RetimeState extends State<_Retime> {
               value: _minutes,
               onPick: (value) => setState(() => _minutes = value),
               onCustom: () async {
-                final value =
-                    await _keypad(context.l10n.focus_duration, _minutes, 600);
+                final value = await _keypad(
+                  context.l10n.focus_duration,
+                  _minutes,
+                  600,
+                );
                 if (value != null && mounted) setState(() => _minutes = value);
               },
             ),
@@ -107,8 +113,11 @@ class _RetimeState extends State<_Retime> {
                 title: context.l10n.focus_break,
                 onPick: (value) => setState(() => _breakMinutes = value),
                 onCustom: () async {
-                  final value =
-                      await _keypad(context.l10n.focus_break, _breakMinutes, 120);
+                  final value = await _keypad(
+                    context.l10n.focus_break,
+                    _breakMinutes,
+                    120,
+                  );
                   if (value != null && mounted) {
                     setState(() => _breakMinutes = value);
                   }

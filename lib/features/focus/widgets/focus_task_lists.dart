@@ -12,7 +12,10 @@ import 'package:flow_tracker/features/habits/state/habits_controller.dart';
 
 class FocusTaskList extends StatefulWidget {
   const FocusTaskList({
-    super.key,required this.habit, required this.maxHeight});
+    super.key,
+    required this.habit,
+    required this.maxHeight,
+  });
 
   final Habit habit;
   final double maxHeight;
@@ -60,9 +63,9 @@ class _FocusTaskListState extends State<FocusTaskList> {
             title: _controllers[step.id]?.text.trim() ?? step.title,
           ),
       ];
-      context
-          .read<HabitsController>()
-          .update(widget.habit.copyWith(substeps: steps));
+      context.read<HabitsController>().update(
+        widget.habit.copyWith(substeps: steps),
+      );
     });
   }
 
@@ -73,19 +76,18 @@ class _FocusTaskListState extends State<FocusTaskList> {
     );
     _newStepId = step.id;
     context.read<HabitsController>().update(
-          widget.habit.copyWith(substeps: [...widget.habit.substeps, step]),
-        );
+      widget.habit.copyWith(substeps: [...widget.habit.substeps, step]),
+    );
   }
 
   void _remove(Substep step) {
     _controllers.remove(step.id)?.dispose();
     _focusNodes.remove(step.id)?.dispose();
     context.read<HabitsController>().update(
-          widget.habit.copyWith(
-            substeps:
-                widget.habit.substeps.where((s) => s.id != step.id).toList(),
-          ),
-        );
+      widget.habit.copyWith(
+        substeps: widget.habit.substeps.where((s) => s.id != step.id).toList(),
+      ),
+    );
   }
 
   @override
@@ -94,8 +96,9 @@ class _FocusTaskListState extends State<FocusTaskList> {
     final checked =
         widget.habit.completions[today.dayKey]?.steps ?? const <String>{};
     final habits = context.read<HabitsController>();
-    final done =
-        widget.habit.substeps.where((s) => checked.contains(s.id)).toList();
+    final done = widget.habit.substeps
+        .where((s) => checked.contains(s.id))
+        .toList();
     final steps = [
       ...widget.habit.substeps.where((s) => !checked.contains(s.id)),
       if (_showDone) ...done,
@@ -159,8 +162,11 @@ class _FocusTaskListState extends State<FocusTaskList> {
                                   ),
                                 ),
                                 child: checked.contains(step.id)
-                                    ? const Icon(LucideIcons.check,
-                                        size: 14, color: Colors.black)
+                                    ? const Icon(
+                                        LucideIcons.check,
+                                        size: 14,
+                                        color: Colors.black,
+                                      )
                                     : null,
                               ),
                             ),
@@ -217,8 +223,11 @@ class _FocusTaskListState extends State<FocusTaskList> {
         Center(
           child: TextButton.icon(
             onPressed: _add,
-            icon: Icon(LucideIcons.plus,
-                size: 16, color: Colors.white.withValues(alpha: 0.75)),
+            icon: Icon(
+              LucideIcons.plus,
+              size: 16,
+              color: Colors.white.withValues(alpha: 0.75),
+            ),
             label: Text(
               context.l10n.focus_tasks,
               style: TextStyle(
@@ -234,10 +243,12 @@ class _FocusTaskListState extends State<FocusTaskList> {
   }
 }
 
-
 class FocusFreeTaskList extends StatefulWidget {
   const FocusFreeTaskList({
-    super.key,required this.focus, required this.maxHeight});
+    super.key,
+    required this.focus,
+    required this.maxHeight,
+  });
 
   final FocusController focus;
   final double maxHeight;
@@ -282,7 +293,8 @@ class _FocusFreeTaskListState extends State<FocusFreeTaskList> {
                           button: true,
                           selected: task.done,
                           child: GestureDetector(
-                            onTap: () => setState(() => focus.toggleTask(task.id)),
+                            onTap: () =>
+                                setState(() => focus.toggleTask(task.id)),
                             behavior: HitTestBehavior.opaque,
                             child: Padding(
                               padding: const EdgeInsets.symmetric(vertical: 10),
@@ -300,8 +312,11 @@ class _FocusFreeTaskListState extends State<FocusFreeTaskList> {
                                   ),
                                 ),
                                 child: task.done
-                                    ? const Icon(LucideIcons.check,
-                                        size: 14, color: Colors.black)
+                                    ? const Icon(
+                                        LucideIcons.check,
+                                        size: 14,
+                                        color: Colors.black,
+                                      )
                                     : null,
                               ),
                             ),
@@ -318,8 +333,9 @@ class _FocusFreeTaskListState extends State<FocusFreeTaskList> {
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
-                              color: Colors.white
-                                  .withValues(alpha: task.done ? 0.5 : 1),
+                              color: Colors.white.withValues(
+                                alpha: task.done ? 0.5 : 1,
+                              ),
                               decoration: task.done
                                   ? TextDecoration.lineThrough
                                   : null,
@@ -357,8 +373,11 @@ class _FocusFreeTaskListState extends State<FocusFreeTaskList> {
         Center(
           child: TextButton.icon(
             onPressed: () => setState(focus.addTask),
-            icon: Icon(LucideIcons.plus,
-                size: 16, color: Colors.white.withValues(alpha: 0.75)),
+            icon: Icon(
+              LucideIcons.plus,
+              size: 16,
+              color: Colors.white.withValues(alpha: 0.75),
+            ),
             label: Text(
               context.l10n.focus_tasks,
               style: TextStyle(

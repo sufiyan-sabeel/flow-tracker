@@ -28,20 +28,20 @@ class Category {
       );
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'name': name,
-        'color': color.toARGB32(),
-        'icon': icon,
-        'order': order,
-      };
+    'id': id,
+    'name': name,
+    'color': color.toARGB32(),
+    'icon': icon,
+    'order': order,
+  };
 
   factory Category.fromMap(Map<String, dynamic> map) => Category(
-        id: map['id'] as String,
-        name: map['name'] as String,
-        color: Color(map['color'] as int),
-        icon: (map['icon'] ?? 'folder') as String,
-        order: ((map['order'] ?? 0) as num).toInt(),
-      );
+    id: map['id'] as String,
+    name: map['name'] as String,
+    color: Color(map['color'] as int),
+    icon: (map['icon'] ?? 'folder') as String,
+    order: ((map['order'] ?? 0) as num).toInt(),
+  );
 
   String toJson() => json.encode(toMap());
 

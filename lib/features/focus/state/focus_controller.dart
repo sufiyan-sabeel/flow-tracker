@@ -217,7 +217,8 @@ class FocusController extends ChangeNotifier {
 
   FocusSession get draft {
     final now = DateTime.now();
-    final finished = !isFlow && _since != null && elapsedAt(now) >= targetSeconds;
+    final finished =
+        !isFlow && _since != null && elapsedAt(now) >= targetSeconds;
     return FocusSession(
       id: '',
       habitId: _habitId,
@@ -232,7 +233,9 @@ class FocusController extends ChangeNotifier {
 
   int _spanTo(DateTime end) {
     final began = _began;
-    return began == null ? 0 : end.difference(began).inSeconds.clamp(0, 1 << 30);
+    return began == null
+        ? 0
+        : end.difference(began).inSeconds.clamp(0, 1 << 30);
   }
 
   bool get isFlow => _targetMinutes <= 0;
@@ -262,7 +265,9 @@ class FocusController extends ChangeNotifier {
     _habitId = habitId;
     _todoId = todoId;
     _label = label;
-    if (label.isNotEmpty && todoId.isEmpty) unawaited(rememberLabel(habitId, label));
+    if (label.isNotEmpty && todoId.isEmpty) {
+      unawaited(rememberLabel(habitId, label));
+    }
     _targetMinutes = targetMinutes;
     _focusMinutes = targetMinutes;
     _breakMinutes = targetMinutes <= 0 ? 0 : breakMinutes;
@@ -363,7 +368,8 @@ class FocusController extends ChangeNotifier {
     _switchIn = 0;
     unawaited(FocusAudio.stopAlert());
     final at = DateTime.now();
-    final raw = _accumulated + (_since == null ? 0 : at.difference(_since!).inSeconds);
+    final raw =
+        _accumulated + (_since == null ? 0 : at.difference(_since!).inSeconds);
     _accumulated = isFlow ? raw : raw.clamp(0, targetSeconds);
     if (_since != null) _since = at;
     _focusMinutes = minutes;
@@ -429,14 +435,16 @@ class FocusController extends ChangeNotifier {
 
   Future<FocusSession?> stop({required bool completed, DateTime? at}) async {
     final endedAt = at ?? DateTime.now();
-    final dropped = isPomodoro &&
+    final dropped =
+        isPomodoro &&
         !completed &&
         LocalStore.setting('focusWholeRounds', false);
     final seconds = _isBreak || dropped ? 0 : elapsedAt(endedAt);
     final habitId = _habitId;
     final label = _label;
     final target = _focusMinutes;
-    final finished = !isFlow && _since != null && elapsedAt(endedAt) >= targetSeconds;
+    final finished =
+        !isFlow && _since != null && elapsedAt(endedAt) >= targetSeconds;
     final span = _isBreak ? 0 : _spanTo(finished ? _phaseEnd : endedAt);
     final pauses = _pauses;
     _stopTicker();
@@ -611,7 +619,9 @@ class FocusController extends ChangeNotifier {
   Future<(String, String)> _endTexts({required bool breakEnded}) async {
     final strings = await NotificationService().localizations();
     if (breakEnded) return (strings.focus_break_over, strings.focus_notif_back);
-    if (isPomodoro) return (strings.focus_done_title, strings.focus_notif_break);
+    if (isPomodoro) {
+      return (strings.focus_done_title, strings.focus_notif_break);
+    }
     return (strings.focus_done_title, strings.focus_notif_body);
   }
 
@@ -669,33 +679,33 @@ class FocusController extends ChangeNotifier {
       final label = _awaiting
           ? strings.focus_continue
           : _switchIn > 0
-          ? (_isBreak ? strings.focus_back_in : strings.focus_break_in)('$_switchIn')
+          ? (_isBreak ? strings.focus_back_in : strings.focus_break_in)(
+              '$_switchIn',
+            )
           : done
           ? strings.focus_target_reached
           : _isBreak
-              ? (isLongBreak ? strings.focus_long_break : strings.focus_break)
-              : !isRunning
-                  ? strings.focus_paused
-                  : isFlow
-                      ? strings.focus_flowtime
-                      : strings.focus_notif_running;
+          ? (isLongBreak ? strings.focus_long_break : strings.focus_break)
+          : !isRunning
+          ? strings.focus_paused
+          : isFlow
+          ? strings.focus_flowtime
+          : strings.focus_notif_running;
       final phase = _awaiting
           ? 'waiting'
           : done
           ? 'done'
           : _isBreak
-              ? 'break'
-              : isRunning
-                  ? 'running'
-                  : 'paused';
+          ? 'break'
+          : isRunning
+          ? 'running'
+          : 'paused';
       final (endTitle, endBody) = await _endTexts(breakEnded: _isBreak);
       final always = isPomodoro && LocalStore.setting('focusHold', false);
       await FocusService.show(
         habitId: _habitId,
         title: name ?? strings.focus,
-        state: isPomodoro
-            ? '$label  ·  ${strings.focus_round(_round)}'
-            : label,
+        state: isPomodoro ? '$label  ·  ${strings.focus_round(_round)}' : label,
         phase: phase,
         running: isRunning && !done,
         done: done,
@@ -748,8 +758,12 @@ class FocusController extends ChangeNotifier {
         'state': '$label  ·  ${strings.focus_round(round)}',
         'phase': onBreak ? 'break' : 'running',
         'hold': always || (onBreak && !auto),
-        'endTitle': onBreak ? strings.focus_break_over : strings.focus_done_title,
-        'endBody': onBreak ? strings.focus_notif_back : strings.focus_notif_break,
+        'endTitle': onBreak
+            ? strings.focus_break_over
+            : strings.focus_done_title,
+        'endBody': onBreak
+            ? strings.focus_notif_back
+            : strings.focus_notif_break,
       });
     }
     return phases;
@@ -795,13 +809,16 @@ class FocusController extends ChangeNotifier {
       .fold(0, (sum, session) => sum + session.seconds);
 
   int secondsForHabitSince(String habitId, DateTime from) => _sessions
-      .where((s) =>
-          s.habitId == habitId && !s.startedAt.atMidnight.isBefore(from))
+      .where(
+        (s) => s.habitId == habitId && !s.startedAt.atMidnight.isBefore(from),
+      )
       .fold(0, (sum, session) => sum + session.seconds);
 
   List<FocusSession> sessionsForHabitOnDay(String habitId, DateTime day) =>
       _sessions
-          .where((s) => s.habitId == habitId && s.countedOn.dayKey == day.dayKey)
+          .where(
+            (s) => s.habitId == habitId && s.countedOn.dayKey == day.dayKey,
+          )
           .toList();
 
   Map<String, int> get _secondsPerDay => _perDay ??= _sumPerDay();

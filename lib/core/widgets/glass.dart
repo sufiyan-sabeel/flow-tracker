@@ -196,8 +196,9 @@ class _EdgeBlurState extends State<EdgeBlur> {
   void initState() {
     super.initState();
     if (_program != null || !ImageFilter.isShaderFilterSupported) return;
-    (_loading ??= FragmentProgram.fromAsset('assets/shaders/edge_fade.frag'))
-        .then((program) {
+    (_loading ??= FragmentProgram.fromAsset(
+      'assets/shaders/edge_fade.frag',
+    )).then((program) {
       _program = program;
       if (mounted) setState(() {});
     }, onError: (_) {});
@@ -282,8 +283,10 @@ class _EdgeBlurState extends State<EdgeBlur> {
             if (!glass)
               const SizedBox.shrink()
             else if (program != null)
-              for (final filter
-                  in _layers(program, MediaQuery.devicePixelRatioOf(context)))
+              for (final filter in _layers(
+                program,
+                MediaQuery.devicePixelRatioOf(context),
+              ))
                 Positioned.fill(
                   child: ClipRect(
                     child: BackdropFilter(
@@ -305,7 +308,14 @@ class _EdgeBlurState extends State<EdgeBlur> {
                         ? Alignment.bottomCenter
                         : Alignment.topCenter,
                     colors: [
-                      for (final alpha in const [0.82, 0.62, 0.38, 0.17, 0.05, 0.0])
+                      for (final alpha in const [
+                        0.82,
+                        0.62,
+                        0.38,
+                        0.17,
+                        0.05,
+                        0.0,
+                      ])
                         tone.withValues(alpha: alpha * widget.shade),
                     ],
                     stops: const [0, 0.2, 0.42, 0.64, 0.84, 1],

@@ -15,20 +15,20 @@ enum HabitInterval { daily, weekly, monthly, weekdays, everyXDays }
 
 extension HabitIntervalLabel on HabitInterval {
   String get label => switch (this) {
-        HabitInterval.daily => 'Daily',
-        HabitInterval.weekly => 'Weekly',
-        HabitInterval.monthly => 'Monthly',
-        HabitInterval.weekdays => 'Days',
-        HabitInterval.everyXDays => 'Interval',
-      };
+    HabitInterval.daily => 'Daily',
+    HabitInterval.weekly => 'Weekly',
+    HabitInterval.monthly => 'Monthly',
+    HabitInterval.weekdays => 'Days',
+    HabitInterval.everyXDays => 'Interval',
+  };
 
   String get unit => switch (this) {
-        HabitInterval.daily => 'day',
-        HabitInterval.weekly => 'week',
-        HabitInterval.monthly => 'month',
-        HabitInterval.weekdays => 'day',
-        HabitInterval.everyXDays => 'day',
-      };
+    HabitInterval.daily => 'day',
+    HabitInterval.weekly => 'week',
+    HabitInterval.monthly => 'month',
+    HabitInterval.weekdays => 'day',
+    HabitInterval.everyXDays => 'day',
+  };
 
   bool get isDaySpecific =>
       this == HabitInterval.weekdays || this == HabitInterval.everyXDays;
@@ -121,10 +121,10 @@ class Habit {
   final ScheduleUnit scheduleUnit;
 
   int get scheduleSpanDays => switch (scheduleUnit) {
-        ScheduleUnit.days => scheduleEvery,
-        ScheduleUnit.weeks => scheduleEvery * 7,
-        ScheduleUnit.months => scheduleEvery * 31,
-      };
+    ScheduleUnit.days => scheduleEvery,
+    ScheduleUnit.weeks => scheduleEvery * 7,
+    ScheduleUnit.months => scheduleEvery * 31,
+  };
 
   final List<Reminder> reminders;
 
@@ -139,8 +139,7 @@ class Habit {
         if (day.isBefore(start)) return false;
         if (fromLastDone) return _dueSinceLastDone(day, start);
         if (scheduleUnit == ScheduleUnit.months) {
-          final months =
-              (day.year - start.year) * 12 + day.month - start.month;
+          final months = (day.year - start.year) * 12 + day.month - start.month;
           if (months < 0 || months % scheduleEvery != 0) return false;
           if (monthWeekday) return _sameWeekdaySlot(day, start);
           final last = DateTime(day.year, day.month + 1, 0).day;
@@ -255,23 +254,25 @@ class Habit {
   double get _readToday => completions[AppClock.today().dayKey]?.count ?? 0;
 
   Habit newBook(double pages) => copyWith(
-        bookPages: pages,
-        bookSince: AppClock.today(),
-        bookSkip: _readToday,
-        bookStart: 0,
-        pastReads: finishedReads,
-      );
+    bookPages: pages,
+    bookSince: AppClock.today(),
+    bookSkip: _readToday,
+    bookStart: 0,
+    pastReads: finishedReads,
+  );
 
   Habit atPage(double page) => copyWith(
-        bookSince: AppClock.today(),
-        bookSkip: _readToday,
-        bookStart: page,
-        pastReads: finishedReads,
-      );
+    bookSince: AppClock.today(),
+    bookSkip: _readToday,
+    bookStart: page,
+    pastReads: finishedReads,
+  );
 
   Habit keepBook(Habit before) {
     if (!tracksBook || bookPages == before.bookPages) return this;
-    if (before.bookPages <= 0 && !startedAt.isBefore(AppClock.today())) return this;
+    if (before.bookPages <= 0 && !startedAt.isBefore(AppClock.today())) {
+      return this;
+    }
     return copyWith(
       bookSince: AppClock.today(),
       bookSkip: _readToday,
@@ -338,7 +339,9 @@ class Habit {
       isTimeAmount ? formatMinutes(value) : formatAmount(value);
 
   bool get needsFocusSession =>
-      focusOnly && (kind == HabitKind.positive || isTimeAmount) && substeps.isEmpty;
+      focusOnly &&
+      (kind == HabitKind.positive || isTimeAmount) &&
+      substeps.isEmpty;
 
   bool blocksManualCheck(DateTime date, {bool fromFocus = false}) =>
       needsFocusSession && !fromFocus && (isTimeAmount || !isCompletedOn(date));
@@ -354,7 +357,8 @@ class Habit {
   final Map<String, double> pastGoals;
 
   late final List<(int, double)> _goalSteps = [
-    for (final entry in pastGoals.entries) (dayKeyEpoch(entry.key), entry.value),
+    for (final entry in pastGoals.entries)
+      (dayKeyEpoch(entry.key), entry.value),
   ]..sort((a, b) => a.$1.compareTo(b.$1));
 
   double? _pastGoalAt(int epochDay) {
@@ -460,8 +464,7 @@ class Habit {
     if (cursor.isAfter(AppClock.today()) || cursor.isBefore(startedAt)) {
       return false;
     }
-    if (interval == HabitInterval.weekly ||
-        interval == HabitInterval.monthly) {
+    if (interval == HabitInterval.weekly || interval == HabitInterval.monthly) {
       if (isPausedOn(cursor) || isCompletedOn(cursor)) return false;
       return (_periodDone[_periodOf(cursor)] ?? 0) >= targetFrequency;
     }
@@ -504,12 +507,15 @@ class Habit {
 
   bool isDoneEntry(Completion entry) {
     if (!hasSubsteps) {
-      final past = pastGoals.isEmpty ? null : _pastGoalAt(dayKeyEpoch(entry.date));
+      final past = pastGoals.isEmpty
+          ? null
+          : _pastGoalAt(dayKeyEpoch(entry.date));
       return reaches(entry.count, goal: past);
     }
     bool checked(Substep step) => entry.steps.contains(step.id);
     if (!anySteps) return substeps.every(checked);
-    return substeps.where(checked).length >= stepsNeeded.clamp(1, substeps.length);
+    return substeps.where(checked).length >=
+        stepsNeeded.clamp(1, substeps.length);
   }
 
   bool get hasGoal => perDayTarget > 0;
@@ -551,8 +557,8 @@ class Habit {
 
   QuantProgress _capped(double count, double limit) =>
       reaches(count, goal: limit)
-          ? const QuantProgress(laps: 1, fraction: 0)
-          : QuantProgress(laps: 0, fraction: count > 0 ? 1 : 0);
+      ? const QuantProgress(laps: 1, fraction: 0)
+      : QuantProgress(laps: 0, fraction: count > 0 ? 1 : 0);
 
   double fillTargetOn(DateTime date) {
     final target = pastGoalOn(date) ?? effectiveTarget;
@@ -751,14 +757,16 @@ class Habit {
 
       case HabitInterval.monthly:
         var monthStart = DateTime(now.year, now.month, 1);
-        final monthEnd =
-            DateTime(now.year, now.month + 1, 1).addDays(-1);
+        final monthEnd = DateTime(now.year, now.month + 1, 1).addDays(-1);
         var streak = 0;
         if (_countInRange(monthStart, monthEnd) >= targetFrequency) streak++;
         monthStart = DateTime(monthStart.year, monthStart.month - 1, 1);
         while (true) {
-          final end = DateTime(monthStart.year, monthStart.month + 1, 1)
-              .addDays(-1);
+          final end = DateTime(
+            monthStart.year,
+            monthStart.month + 1,
+            1,
+          ).addDays(-1);
           if (_countInRange(monthStart, end) < targetFrequency) break;
           streak++;
           monthStart = DateTime(monthStart.year, monthStart.month - 1, 1);
@@ -874,8 +882,7 @@ class Habit {
         var best = 0;
         var run = 0;
         while (!start.isAfter(end)) {
-          if (_countInRange(start, start.addDays(6)) >=
-              targetFrequency) {
+          if (_countInRange(start, start.addDays(6)) >= targetFrequency) {
             run++;
           } else {
             run = 0;
@@ -891,8 +898,7 @@ class Habit {
         var best = 0;
         var run = 0;
         while (!start.isAfter(end)) {
-          final mEnd = DateTime(start.year, start.month + 1, 1)
-              .addDays(-1);
+          final mEnd = DateTime(start.year, start.month + 1, 1).addDays(-1);
           if (_countInRange(start, mEnd) >= targetFrequency) {
             run++;
           } else {
@@ -1033,182 +1039,187 @@ class Habit {
   }
 
   Habit rebuildId(String id, {int? order}) => Habit.fromMap({
-        ...toMap(),
-        'id': id,
-        if (order != null) 'order': order,
-      });
+    ...toMap(),
+    'id': id,
+    if (order != null) 'order': order,
+  });
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'name': name,
-        'icon': icon,
-        'category': category,
-        'description': description,
-        'color': color.toARGB32(),
-        'order': order,
-        'numberOfCompletionsPerDay': perDayTarget,
-        'completions':
-            completions.map((key, value) => MapEntry(key, value.toMap())),
-        'interval': interval.index,
-        'targetFrequency': targetFrequency,
-        'scheduleWeekdays': scheduleWeekdays,
-        'scheduleEvery': scheduleEvery,
-        'scheduleUnit': scheduleUnit.index,
-        'reminders': reminders.map((r) => r.toMap()).toList(),
-        'coverPath': coverPath,
-        'coverClarity': coverClarity,
-        'createdAt': createdAt.toIso8601String(),
-        if (scheduleStart != null) 'scheduleStart': scheduleStart!.dayKey,
-        if (fromLastDone) 'fromLastDone': true,
-        if (monthWeekday) 'monthWeekday': true,
-        'kind': kind.index,
-        'dailyCost': dailyCost,
-        if (trackSpent) 'trackSpent': true,
-        if (cleanGoal > 0) 'cleanGoal': cleanGoal,
-        if (totalGoal > 0) 'totalGoal': totalGoal,
-        'unitLabel': unitLabel,
-        'incrementAmount': incrementAmount,
-        'quantKind': quantKind.index,
-        'bookCoverPath': bookCoverPath,
-        if (bookPages > 0) 'bookPages': bookPages,
-        if (bookSince != null) 'bookSince': bookSince!.dayKey,
-        if (bookSkip > 0) 'bookSkip': bookSkip,
-        if (bookStart > 0) 'bookStart': bookStart,
-        if (readsBefore > 0) 'readsBefore': readsBefore,
-        if (pastReads.isNotEmpty)
-          'pastReads': pastReads.map((read) => read.toMap()).toList(),
-        if (soundUri.isNotEmpty) 'soundUri': soundUri,
-        if (soundUri.isNotEmpty) 'soundName': soundName,
-        'focusMinutes': focusMinutes,
-        'focusBreakMinutes': focusBreakMinutes,
-        'focusOnly': focusOnly,
-        'tracking': tracking,
-        if (healthSteps) 'healthSteps': true,
-        'anyAmount': anyAmount,
-        if (atMost) 'atMost': true,
-        'anySteps': anySteps,
-        'stepsNeeded': stepsNeeded,
-        'difficulty': difficulty,
-        'startMinute': startMinute,
-        'durationMinutes': durationMinutes,
-        if (moreTimes.isNotEmpty)
-          'moreTimes': [for (final (start, minutes) in moreTimes) [start, minutes]],
-        'substeps': substeps.map((s) => s.toMap()).toList(),
-        'vacations': vacations.map((v) => v.toMap()).toList(),
-        'restDays': restDays,
-        if (missReasons.isNotEmpty) 'missReasons': missReasons,
-        if (pastGoals.isNotEmpty) 'pastGoals': pastGoals,
-        if (archivedAt != null) 'archivedAt': archivedAt!.toIso8601String(),
-      };
+    'id': id,
+    'name': name,
+    'icon': icon,
+    'category': category,
+    'description': description,
+    'color': color.toARGB32(),
+    'order': order,
+    'numberOfCompletionsPerDay': perDayTarget,
+    'completions': completions.map(
+      (key, value) => MapEntry(key, value.toMap()),
+    ),
+    'interval': interval.index,
+    'targetFrequency': targetFrequency,
+    'scheduleWeekdays': scheduleWeekdays,
+    'scheduleEvery': scheduleEvery,
+    'scheduleUnit': scheduleUnit.index,
+    'reminders': reminders.map((r) => r.toMap()).toList(),
+    'coverPath': coverPath,
+    'coverClarity': coverClarity,
+    'createdAt': createdAt.toIso8601String(),
+    if (scheduleStart != null) 'scheduleStart': scheduleStart!.dayKey,
+    if (fromLastDone) 'fromLastDone': true,
+    if (monthWeekday) 'monthWeekday': true,
+    'kind': kind.index,
+    'dailyCost': dailyCost,
+    if (trackSpent) 'trackSpent': true,
+    if (cleanGoal > 0) 'cleanGoal': cleanGoal,
+    if (totalGoal > 0) 'totalGoal': totalGoal,
+    'unitLabel': unitLabel,
+    'incrementAmount': incrementAmount,
+    'quantKind': quantKind.index,
+    'bookCoverPath': bookCoverPath,
+    if (bookPages > 0) 'bookPages': bookPages,
+    if (bookSince != null) 'bookSince': bookSince!.dayKey,
+    if (bookSkip > 0) 'bookSkip': bookSkip,
+    if (bookStart > 0) 'bookStart': bookStart,
+    if (readsBefore > 0) 'readsBefore': readsBefore,
+    if (pastReads.isNotEmpty)
+      'pastReads': pastReads.map((read) => read.toMap()).toList(),
+    if (soundUri.isNotEmpty) 'soundUri': soundUri,
+    if (soundUri.isNotEmpty) 'soundName': soundName,
+    'focusMinutes': focusMinutes,
+    'focusBreakMinutes': focusBreakMinutes,
+    'focusOnly': focusOnly,
+    'tracking': tracking,
+    if (healthSteps) 'healthSteps': true,
+    'anyAmount': anyAmount,
+    if (atMost) 'atMost': true,
+    'anySteps': anySteps,
+    'stepsNeeded': stepsNeeded,
+    'difficulty': difficulty,
+    'startMinute': startMinute,
+    'durationMinutes': durationMinutes,
+    if (moreTimes.isNotEmpty)
+      'moreTimes': [
+        for (final (start, minutes) in moreTimes) [start, minutes],
+      ],
+    'substeps': substeps.map((s) => s.toMap()).toList(),
+    'vacations': vacations.map((v) => v.toMap()).toList(),
+    'restDays': restDays,
+    if (missReasons.isNotEmpty) 'missReasons': missReasons,
+    if (pastGoals.isNotEmpty) 'pastGoals': pastGoals,
+    if (archivedAt != null) 'archivedAt': archivedAt!.toIso8601String(),
+  };
 
   factory Habit.fromMap(Map<String, dynamic> map) => Habit(
-        id: map['id'] as String,
-        name: map['name'] as String,
-        icon: (map['icon'] ?? 'target') as String,
-        category: (map['category'] ?? '') as String,
-        description: (map['description'] ?? '') as String,
-        color: Color(map['color'] as int),
-        order: (map['order'] ?? 0) as int,
-        perDayTarget:
-            ((map['numberOfCompletionsPerDay'] ?? 1) as num).toDouble(),
-        completions: (map['completions'] as Map?)?.map(
-              (key, value) => MapEntry(
-                key as String,
-                Completion.fromMap(Map<String, dynamic>.from(value as Map)),
-              ),
-            ) ??
-            const {},
-        interval: HabitInterval.values[(map['interval'] ?? 0) as int],
-        targetFrequency: math.max(1, (map['targetFrequency'] ?? 1) as int),
-        scheduleWeekdays: (map['scheduleWeekdays'] as List?)
-                ?.map((e) => e as int)
-                .toList() ??
-            const [],
-        scheduleEvery: (map['scheduleEvery'] ?? 2) as int,
-        scheduleUnit: ScheduleUnit.values[((map['scheduleUnit'] ?? 0) as num)
-            .toInt()
-            .clamp(0, ScheduleUnit.values.length - 1)],
-        reminders: map['reminders'] == null
-            ? const []
-            : (map['reminders'] as List)
-                .map((r) => Reminder.fromMap(Map<String, dynamic>.from(r as Map)))
-                .toList(),
-        coverPath: (map['coverPath'] ?? '') as String,
-        coverClarity: ((map['coverClarity'] ?? 100) as num).toInt(),
-        createdAt: map['createdAt'] != null
-            ? DateTime.tryParse(map['createdAt'] as String)
-            : null,
-        scheduleStart: map['scheduleStart'] is String
-            ? parseDayKey(map['scheduleStart'] as String)
-            : null,
-        fromLastDone: map['fromLastDone'] == true,
-        monthWeekday: map['monthWeekday'] == true,
-        kind: HabitKind.values[(map['kind'] ?? 0) as int],
-        dailyCost: ((map['dailyCost'] ?? 0) as num).toDouble(),
-        trackSpent: map['trackSpent'] == true,
-        cleanGoal: (map['cleanGoal'] as num?)?.toInt() ?? 0,
-        totalGoal: (map['totalGoal'] as num?)?.toDouble() ?? 0,
-        unitLabel: (map['unitLabel'] ?? '') as String,
-        incrementAmount: ((map['incrementAmount'] ?? 1) as num).toDouble(),
-        quantKind: QuantKind.values[(map['quantKind'] ?? 0) as int],
-        bookCoverPath: (map['bookCoverPath'] ?? '') as String,
-        bookPages: (map['bookPages'] as num?)?.toDouble() ?? 0,
-        bookSince: map['bookSince'] is String
-            ? parseDayKey(map['bookSince'] as String)
-            : null,
-        bookSkip: (map['bookSkip'] as num?)?.toDouble() ?? 0,
-        bookStart: (map['bookStart'] as num?)?.toDouble() ?? 0,
-        readsBefore: (map['readsBefore'] as num?)?.toInt() ?? 0,
-        pastReads: map['pastReads'] == null
-            ? const []
-            : (map['pastReads'] as List)
-                .map((r) => BookRead.fromMap(Map<String, dynamic>.from(r as Map)))
-                .toList(),
-        soundUri: (map['soundUri'] ?? '') as String,
-        soundName: (map['soundName'] ?? '') as String,
-        focusMinutes: ((map['focusMinutes'] ?? 25) as num).toInt(),
-        focusBreakMinutes:
-            ((map['focusBreakMinutes'] ?? 0) as num).toInt(),
-        focusOnly: (map['focusOnly'] ?? false) as bool,
-        tracking: (map['tracking'] ?? false) as bool,
-        healthSteps: map['healthSteps'] == true,
-        anyAmount: (map['anyAmount'] ?? false) as bool,
-        atMost: map['atMost'] == true,
-        anySteps: (map['anySteps'] ?? false) as bool,
-        stepsNeeded: (map['stepsNeeded'] as num?)?.toInt() ?? 1,
-        difficulty: ((map['difficulty'] ?? 0) as num).toInt().clamp(0, 3),
-        startMinute: ((map['startMinute'] ?? -1) as num).toInt(),
-        durationMinutes: ((map['durationMinutes'] ?? 0) as num).toInt(),
-        moreTimes: [
-          for (final time in (map['moreTimes'] as List?) ?? const [])
-            if (time is List && time.length == 2)
-              ((time[0] as num).toInt(), (time[1] as num).toInt()),
-        ],
-        substeps: map['substeps'] == null
-            ? const []
-            : (map['substeps'] as List)
-                .map((s) => Substep.fromMap(Map<String, dynamic>.from(s as Map)))
-                .toList(),
-        vacations: map['vacations'] == null
-            ? const []
-            : (map['vacations'] as List)
-                .map((v) =>
-                    VacationPeriod.fromMap(Map<String, dynamic>.from(v as Map)))
-                .toList(),
-        restDays:
-            (map['restDays'] as List?)?.map((e) => e as int).toList() ?? const [],
-        missReasons: map['missReasons'] == null
-            ? const {}
-            : Map<String, String>.from(map['missReasons'] as Map),
-        pastGoals: map['pastGoals'] == null
-            ? const {}
-            : (map['pastGoals'] as Map).map(
-                (key, value) => MapEntry(key as String, (value as num).toDouble()),
-              ),
-        archivedAt: map['archivedAt'] == null
-            ? null
-            : DateTime.tryParse(map['archivedAt'] as String),
-      );
+    id: map['id'] as String,
+    name: map['name'] as String,
+    icon: (map['icon'] ?? 'target') as String,
+    category: (map['category'] ?? '') as String,
+    description: (map['description'] ?? '') as String,
+    color: Color(map['color'] as int),
+    order: (map['order'] ?? 0) as int,
+    perDayTarget: ((map['numberOfCompletionsPerDay'] ?? 1) as num).toDouble(),
+    completions:
+        (map['completions'] as Map?)?.map(
+          (key, value) => MapEntry(
+            key as String,
+            Completion.fromMap(Map<String, dynamic>.from(value as Map)),
+          ),
+        ) ??
+        const {},
+    interval: HabitInterval.values[(map['interval'] ?? 0) as int],
+    targetFrequency: math.max(1, (map['targetFrequency'] ?? 1) as int),
+    scheduleWeekdays:
+        (map['scheduleWeekdays'] as List?)?.map((e) => e as int).toList() ??
+        const [],
+    scheduleEvery: (map['scheduleEvery'] ?? 2) as int,
+    scheduleUnit:
+        ScheduleUnit.values[((map['scheduleUnit'] ?? 0) as num).toInt().clamp(
+          0,
+          ScheduleUnit.values.length - 1,
+        )],
+    reminders: map['reminders'] == null
+        ? const []
+        : (map['reminders'] as List)
+              .map((r) => Reminder.fromMap(Map<String, dynamic>.from(r as Map)))
+              .toList(),
+    coverPath: (map['coverPath'] ?? '') as String,
+    coverClarity: ((map['coverClarity'] ?? 100) as num).toInt(),
+    createdAt: map['createdAt'] != null
+        ? DateTime.tryParse(map['createdAt'] as String)
+        : null,
+    scheduleStart: map['scheduleStart'] is String
+        ? parseDayKey(map['scheduleStart'] as String)
+        : null,
+    fromLastDone: map['fromLastDone'] == true,
+    monthWeekday: map['monthWeekday'] == true,
+    kind: HabitKind.values[(map['kind'] ?? 0) as int],
+    dailyCost: ((map['dailyCost'] ?? 0) as num).toDouble(),
+    trackSpent: map['trackSpent'] == true,
+    cleanGoal: (map['cleanGoal'] as num?)?.toInt() ?? 0,
+    totalGoal: (map['totalGoal'] as num?)?.toDouble() ?? 0,
+    unitLabel: (map['unitLabel'] ?? '') as String,
+    incrementAmount: ((map['incrementAmount'] ?? 1) as num).toDouble(),
+    quantKind: QuantKind.values[(map['quantKind'] ?? 0) as int],
+    bookCoverPath: (map['bookCoverPath'] ?? '') as String,
+    bookPages: (map['bookPages'] as num?)?.toDouble() ?? 0,
+    bookSince: map['bookSince'] is String
+        ? parseDayKey(map['bookSince'] as String)
+        : null,
+    bookSkip: (map['bookSkip'] as num?)?.toDouble() ?? 0,
+    bookStart: (map['bookStart'] as num?)?.toDouble() ?? 0,
+    readsBefore: (map['readsBefore'] as num?)?.toInt() ?? 0,
+    pastReads: map['pastReads'] == null
+        ? const []
+        : (map['pastReads'] as List)
+              .map((r) => BookRead.fromMap(Map<String, dynamic>.from(r as Map)))
+              .toList(),
+    soundUri: (map['soundUri'] ?? '') as String,
+    soundName: (map['soundName'] ?? '') as String,
+    focusMinutes: ((map['focusMinutes'] ?? 25) as num).toInt(),
+    focusBreakMinutes: ((map['focusBreakMinutes'] ?? 0) as num).toInt(),
+    focusOnly: (map['focusOnly'] ?? false) as bool,
+    tracking: (map['tracking'] ?? false) as bool,
+    healthSteps: map['healthSteps'] == true,
+    anyAmount: (map['anyAmount'] ?? false) as bool,
+    atMost: map['atMost'] == true,
+    anySteps: (map['anySteps'] ?? false) as bool,
+    stepsNeeded: (map['stepsNeeded'] as num?)?.toInt() ?? 1,
+    difficulty: ((map['difficulty'] ?? 0) as num).toInt().clamp(0, 3),
+    startMinute: ((map['startMinute'] ?? -1) as num).toInt(),
+    durationMinutes: ((map['durationMinutes'] ?? 0) as num).toInt(),
+    moreTimes: [
+      for (final time in (map['moreTimes'] as List?) ?? const [])
+        if (time is List && time.length == 2)
+          ((time[0] as num).toInt(), (time[1] as num).toInt()),
+    ],
+    substeps: map['substeps'] == null
+        ? const []
+        : (map['substeps'] as List)
+              .map((s) => Substep.fromMap(Map<String, dynamic>.from(s as Map)))
+              .toList(),
+    vacations: map['vacations'] == null
+        ? const []
+        : (map['vacations'] as List)
+              .map(
+                (v) =>
+                    VacationPeriod.fromMap(Map<String, dynamic>.from(v as Map)),
+              )
+              .toList(),
+    restDays:
+        (map['restDays'] as List?)?.map((e) => e as int).toList() ?? const [],
+    missReasons: map['missReasons'] == null
+        ? const {}
+        : Map<String, String>.from(map['missReasons'] as Map),
+    pastGoals: map['pastGoals'] == null
+        ? const {}
+        : (map['pastGoals'] as Map).map(
+            (key, value) => MapEntry(key as String, (value as num).toDouble()),
+          ),
+    archivedAt: map['archivedAt'] == null
+        ? null
+        : DateTime.tryParse(map['archivedAt'] as String),
+  );
 
   String toJson() => json.encode(toMap());
 

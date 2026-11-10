@@ -31,16 +31,15 @@ class Completion {
     List<int>? marks,
     Set<String>? steps,
     double? spent,
-  }) =>
-      Completion(
-        date: date,
-        count: count ?? this.count,
-        hour: hour ?? this.hour,
-        minute: minute ?? this.minute,
-        marks: marks ?? this.marks,
-        steps: steps ?? this.steps,
-        spent: spent ?? this.spent,
-      );
+  }) => Completion(
+    date: date,
+    count: count ?? this.count,
+    hour: hour ?? this.hour,
+    minute: minute ?? this.minute,
+    marks: marks ?? this.marks,
+    steps: steps ?? this.steps,
+    spent: spent ?? this.spent,
+  );
 
   List<int> get times {
     if (marks.isNotEmpty) return marks;
@@ -62,27 +61,27 @@ class Completion {
   }
 
   Map<String, dynamic> toMap() => {
-        'date': date,
-        'numberOfCompletions': count,
-        if (hour != null) 'hour': hour,
-        if (minute != null) 'minute': minute,
-        if (marks.isNotEmpty) 'marks': marks,
-        if (steps.isNotEmpty) 'steps': steps.toList(),
-        if (spent > 0) 'spent': spent,
-      };
+    'date': date,
+    'numberOfCompletions': count,
+    if (hour != null) 'hour': hour,
+    if (minute != null) 'minute': minute,
+    if (marks.isNotEmpty) 'marks': marks,
+    if (steps.isNotEmpty) 'steps': steps.toList(),
+    if (spent > 0) 'spent': spent,
+  };
 
   factory Completion.fromMap(Map<String, dynamic> map) => Completion(
-        date: map['date'] as String,
-        count: ((map['numberOfCompletions'] ?? map['count'] ?? 1) as num)
-            .toDouble(),
-        hour: map['hour'] as int?,
-        minute: map['minute'] as int?,
-        marks: map['marks'] == null
-            ? const []
-            : [...(map['marks'] as List).map((e) => (e as num).toInt())],
-        steps: map['steps'] == null
-            ? const {}
-            : {...(map['steps'] as List).map((e) => e as String)},
-        spent: (map['spent'] as num?)?.toDouble() ?? 0,
-      );
+    date: map['date'] as String,
+    count: ((map['numberOfCompletions'] ?? map['count'] ?? 1) as num)
+        .toDouble(),
+    hour: map['hour'] as int?,
+    minute: map['minute'] as int?,
+    marks: map['marks'] == null
+        ? const []
+        : [...(map['marks'] as List).map((e) => (e as num).toInt())],
+    steps: map['steps'] == null
+        ? const {}
+        : {...(map['steps'] as List).map((e) => e as String)},
+    spent: (map['spent'] as num?)?.toDouble() ?? 0,
+  );
 }

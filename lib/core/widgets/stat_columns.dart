@@ -61,8 +61,8 @@ class StatColumns extends StatelessWidget {
           final column = stay && last != null
               ? last
               : left.length <= right.length
-                  ? left
-                  : right;
+              ? left
+              : right;
           if (column.isEmpty) {
             while (group.isNotEmpty && group.first is SizedBox) {
               group.removeAt(0);

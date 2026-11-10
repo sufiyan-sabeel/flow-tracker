@@ -47,8 +47,9 @@ class _FocusLog extends StatefulWidget {
 class _FocusLogState extends State<_FocusLog> {
   late String _habitId = widget.habitId;
   late DateTime _day = widget.editing?.startedAt.atMidnight ?? AppClock.today();
-  late TimeOfDay _time =
-      TimeOfDay.fromDateTime(widget.editing?.startedAt ?? AppClock.now());
+  late TimeOfDay _time = TimeOfDay.fromDateTime(
+    widget.editing?.startedAt ?? AppClock.now(),
+  );
   late int _minutes = widget.editing == null
       ? 25
       : (widget.editing!.seconds / 60).round().clamp(1, 24 * 60);
@@ -79,18 +80,18 @@ class _FocusLogState extends State<_FocusLog> {
       await focus.removeSessions({old.id});
     }
     final session = await focus.addSession(
-          habitId: _habitId,
-          startedAt: DateTime(
-            _day.year,
-            _day.month,
-            _day.day,
-            _time.hour,
-            _time.minute,
-          ),
-          minutes: _minutes,
-          label: old?.label ?? '',
-          completed: old?.completed ?? true,
-        );
+      habitId: _habitId,
+      startedAt: DateTime(
+        _day.year,
+        _day.month,
+        _day.day,
+        _time.hour,
+        _time.minute,
+      ),
+      minutes: _minutes,
+      label: old?.label ?? '',
+      completed: old?.completed ?? true,
+    );
     await creditFocusRound(habits, focus, session, on: session.countedOn);
     if (mounted) Navigator.of(context).pop(true);
   }
@@ -180,20 +181,20 @@ class _FocusLogState extends State<_FocusLog> {
               )
             else
               SizedBox(
-              height: 50,
-              child: FilledButton(
-                onPressed: _save,
-                style: FilledButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+                height: 50,
+                child: FilledButton(
+                  onPressed: _save,
+                  style: FilledButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: Text(
+                    context.l10n.save,
+                    style: sheetActionStyle(context),
                   ),
                 ),
-                child: Text(
-                  context.l10n.save,
-                  style: sheetActionStyle(context),
-                ),
               ),
-            ),
           ],
         ),
       ),

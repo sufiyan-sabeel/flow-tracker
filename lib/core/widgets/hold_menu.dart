@@ -372,8 +372,9 @@ class _HaloButton extends StatelessWidget {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: (on ? tone : Colors.black)
-                            .withValues(alpha: on ? 0.45 : 0.28),
+                        color: (on ? tone : Colors.black).withValues(
+                          alpha: on ? 0.45 : 0.28,
+                        ),
                         blurRadius: on ? 22 : 16,
                         offset: const Offset(0, 8),
                       ),
@@ -385,8 +386,8 @@ class _HaloButton extends StatelessWidget {
                     color: on
                         ? Colors.white
                         : action.danger
-                            ? tone
-                            : scheme.onSurface,
+                        ? tone
+                        : scheme.onSurface,
                   ),
                 ),
               );
@@ -414,7 +415,9 @@ class _HaloLabel extends StatelessWidget {
     final width = MediaQuery.sizeOf(context).width;
     final action = this.action;
     if (action == null) return const SizedBox.shrink();
-    final tone = action.danger ? context.tokens.danger : context.colors.onSurface;
+    final tone = action.danger
+        ? context.tokens.danger
+        : context.colors.onSurface;
     return Positioned(
       left: 12,
       right: 12,
@@ -437,8 +440,10 @@ class _HaloLabel extends StatelessWidget {
                 ),
               ),
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 7,
+                ),
                 decoration: BoxDecoration(
                   color: context.colors.surface,
                   borderRadius: BorderRadius.circular(14),
@@ -467,4 +472,3 @@ class _HaloLabel extends StatelessWidget {
     );
   }
 }
-

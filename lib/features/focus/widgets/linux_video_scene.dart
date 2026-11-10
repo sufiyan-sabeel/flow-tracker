@@ -37,8 +37,9 @@ class _LinuxVideoSceneState extends State<LinuxVideoScene> {
     final file = widget.file;
     if (!file.existsSync()) return;
     try {
-      final scene = await _channel
-          .invokeMapMethod<String, Object?>('open', {'path': file.path});
+      final scene = await _channel.invokeMapMethod<String, Object?>('open', {
+        'path': file.path,
+      });
       if (scene == null) return;
       final id = scene['id'] as int;
       if (!mounted) {

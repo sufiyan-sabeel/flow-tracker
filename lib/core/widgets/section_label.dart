@@ -17,7 +17,10 @@ class SectionLabel extends StatelessWidget {
     final express = style.isExpressStyle;
     final minimal = style.isMinimalStyle;
     return Padding(
-      padding: EdgeInsets.only(left: express ? 6 : 4, bottom: minimal ? 12 : 10),
+      padding: EdgeInsets.only(
+        left: express ? 6 : 4,
+        bottom: minimal ? 12 : 10,
+      ),
       child: Row(
         children: [
           Expanded(

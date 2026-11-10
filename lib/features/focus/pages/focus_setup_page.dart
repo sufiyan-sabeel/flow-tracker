@@ -470,49 +470,49 @@ class _FocusSetupPageState extends State<FocusSetupPage> with ShortcutHost {
               right: 0,
               bottom: 0,
               child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-              child: Entrance(
-                delay: _entrance + const Duration(milliseconds: 120),
-                child: express
-                    ? ExpressButton(
-                        label: _startLabel(),
-                        icon: LucideIcons.play,
-                        expand: true,
-                        onPressed: _start,
-                      )
-                    : minimal
-                    ? MinimalButton(
-                        icon: LucideIcons.play,
-                        label: _startLabel(),
-                        onPressed: _start,
-                        expand: true,
-                      )
-                    : SizedBox(
-                        height: 54,
-                        width: double.infinity,
-                        child: FilledButton.icon(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                child: Entrance(
+                  delay: _entrance + const Duration(milliseconds: 120),
+                  child: express
+                      ? ExpressButton(
+                          label: _startLabel(),
+                          icon: LucideIcons.play,
+                          expand: true,
                           onPressed: _start,
-                          icon: const Icon(LucideIcons.play, size: 18),
-                          label: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              _startLabel(),
-                              maxLines: 1,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w800,
+                        )
+                      : minimal
+                      ? MinimalButton(
+                          icon: LucideIcons.play,
+                          label: _startLabel(),
+                          onPressed: _start,
+                          expand: true,
+                        )
+                      : SizedBox(
+                          height: 54,
+                          width: double.infinity,
+                          child: FilledButton.icon(
+                            onPressed: _start,
+                            icon: const Icon(LucideIcons.play, size: 18),
+                            label: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                _startLabel(),
+                                maxLines: 1,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
+                            style: FilledButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
                               ),
                             ),
                           ),
-                          style: FilledButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
                         ),
-                      ),
+                ),
               ),
-            ),
             ),
           ],
         ),

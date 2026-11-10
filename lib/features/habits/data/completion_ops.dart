@@ -8,8 +8,7 @@ int _nowMinutes() {
   return now.hour * 60 + now.minute;
 }
 
-bool _isFuture(DateTime date) =>
-    date.atMidnight.isAfter(AppClock.today());
+bool _isFuture(DateTime date) => date.atMidnight.isAfter(AppClock.today());
 
 class CompletionOps {
   const CompletionOps._();
@@ -65,7 +64,8 @@ class CompletionOps {
         steps: steps,
         hour: AppClock.wallNow().hour,
         minute: AppClock.wallNow().minute,
-        marks: checked ? (entry?.plus(_nowMinutes()) ?? [_nowMinutes()])
+        marks: checked
+            ? (entry?.plus(_nowMinutes()) ?? [_nowMinutes()])
             : (entry?.marks ?? const []),
       );
     }
@@ -85,8 +85,7 @@ class CompletionOps {
         steps: all,
         hour: AppClock.wallNow().hour,
         minute: AppClock.wallNow().minute,
-        marks: completions[date.dayKey]?.plus(_nowMinutes()) ??
-            [_nowMinutes()],
+        marks: completions[date.dayKey]?.plus(_nowMinutes()) ?? [_nowMinutes()],
       );
     }
     return completions;
@@ -197,7 +196,8 @@ class CompletionOps {
       if (count <= (previous?.count ?? 0)) continue;
       final today = date.isSameDay(AppClock.today());
       completions ??= {...habit.completions};
-      completions[date.dayKey] = previous?.copyWith(count: count) ??
+      completions[date.dayKey] =
+          previous?.copyWith(count: count) ??
           Completion(
             date: date.dayKey,
             count: count,

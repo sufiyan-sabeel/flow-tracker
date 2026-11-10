@@ -42,46 +42,44 @@ class HabitNote {
     int? minutes,
     List<String>? photos,
     bool clearMinutes = false,
-  }) =>
-      HabitNote(
-        id: id,
-        habitId: habitId ?? this.habitId,
-        date: date,
-        type: type ?? this.type,
-        text: text ?? this.text,
-        minutes: clearMinutes ? null : (minutes ?? this.minutes),
-        photos: photos ?? this.photos,
-        createdAt: createdAt,
-      );
+  }) => HabitNote(
+    id: id,
+    habitId: habitId ?? this.habitId,
+    date: date,
+    type: type ?? this.type,
+    text: text ?? this.text,
+    minutes: clearMinutes ? null : (minutes ?? this.minutes),
+    photos: photos ?? this.photos,
+    createdAt: createdAt,
+  );
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'habitId': habitId,
-        'date': date,
-        'type': type.index,
-        'text': text,
-        'minutes': minutes,
-        'photos': photos,
-        'createdAt': createdAt.toIso8601String(),
-      };
+    'id': id,
+    'habitId': habitId,
+    'date': date,
+    'type': type.index,
+    'text': text,
+    'minutes': minutes,
+    'photos': photos,
+    'createdAt': createdAt.toIso8601String(),
+  };
 
   factory HabitNote.fromMap(Map<String, dynamic> map) => HabitNote(
-        id: map['id'] as String,
-        habitId: (map['habitId'] ?? '') as String,
-        date: (map['date'] ?? '') as String,
-        type: NoteType.values[((map['type'] ?? 0) as num).toInt().clamp(0, 2)],
-        text: (map['text'] ?? '') as String,
-        minutes: (map['minutes'] as num?)?.toInt(),
-        photos: (map['photos'] as List?)?.map((p) => p as String).toList() ??
-            const [],
-        createdAt:
-            DateTime.tryParse((map['createdAt'] ?? '') as String) ??
-                DateTime.now(),
-      );
+    id: map['id'] as String,
+    habitId: (map['habitId'] ?? '') as String,
+    date: (map['date'] ?? '') as String,
+    type: NoteType.values[((map['type'] ?? 0) as num).toInt().clamp(0, 2)],
+    text: (map['text'] ?? '') as String,
+    minutes: (map['minutes'] as num?)?.toInt(),
+    photos:
+        (map['photos'] as List?)?.map((p) => p as String).toList() ?? const [],
+    createdAt:
+        DateTime.tryParse((map['createdAt'] ?? '') as String) ?? DateTime.now(),
+  );
 }
 
 Color noteTypeColor(BuildContext context, NoteType type) => switch (type) {
-      NoteType.note => context.tokens.info,
-      NoteType.planned => context.tokens.warning,
-      NoteType.completed => context.tokens.success,
-    };
+  NoteType.note => context.tokens.info,
+  NoteType.planned => context.tokens.warning,
+  NoteType.completed => context.tokens.success,
+};

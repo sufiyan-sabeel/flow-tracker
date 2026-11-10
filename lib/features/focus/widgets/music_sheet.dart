@@ -36,21 +36,21 @@ class _SceneArt extends StatelessWidget {
 }
 
 List<FocusTrack> focusTracksOf(BuildContext context, SettingsController s) => [
-      for (final entry in builtInTracks.entries)
-        if (!s.isTrackHidden(entry.key))
-          FocusTrack(
-            id: entry.key,
-            name: switch (entry.key) {
-              'brown_noise.mp3' => context.l10n.focus_track_brown,
-              'fire.mp3' => context.l10n.focus_track_fire,
-              'ticking.wav' => context.l10n.focus_track_ticking,
-              _ => entry.value,
-            },
-            asset: true,
-          ),
-      for (final raw in s.focusTracks)
-        if (FocusTrack.decode(raw) != null) FocusTrack.decode(raw)!,
-    ];
+  for (final entry in builtInTracks.entries)
+    if (!s.isTrackHidden(entry.key))
+      FocusTrack(
+        id: entry.key,
+        name: switch (entry.key) {
+          'brown_noise.mp3' => context.l10n.focus_track_brown,
+          'fire.mp3' => context.l10n.focus_track_fire,
+          'ticking.wav' => context.l10n.focus_track_ticking,
+          _ => entry.value,
+        },
+        asset: true,
+      ),
+  for (final raw in s.focusTracks)
+    if (FocusTrack.decode(raw) != null) FocusTrack.decode(raw)!,
+];
 
 Future<void> showMusicSheet(BuildContext context) async {
   await context.read<SettingsController>().pruneFocusTracks();
@@ -126,8 +126,8 @@ class _MusicSheet extends StatelessWidget {
                   mode: settings.focusShuffle
                       ? 2
                       : settings.focusRepeatOne
-                          ? 1
-                          : 0,
+                      ? 1
+                      : 0,
                   onChanged: (mode) async {
                     await settings.setFocusMode(
                       shuffle: mode == 2,
@@ -146,22 +146,22 @@ class _MusicSheet extends StatelessWidget {
             _VolumeRow(onDone: settings.setFocusVolume),
             const SizedBox(height: 10),
             _TrackList(
-                count: tracks.length,
-                children: [
-                  for (final track in tracks)
-                    _TrackRow(
-                      track: track,
-                      tracks: tracks,
-                      shuffle: settings.focusShuffle,
-                      repeatOne: settings.focusRepeatOne,
-                      onDelete: track.asset
-                          ? () => settings.hideTrack(track.id)
-                          : () => settings.removeFocusTrack(
-                                '${track.id}|${track.name}',
-                              ),
-                    ),
-                ],
-              ),
+              count: tracks.length,
+              children: [
+                for (final track in tracks)
+                  _TrackRow(
+                    track: track,
+                    tracks: tracks,
+                    shuffle: settings.focusShuffle,
+                    repeatOne: settings.focusRepeatOne,
+                    onDelete: track.asset
+                        ? () => settings.hideTrack(track.id)
+                        : () => settings.removeFocusTrack(
+                            '${track.id}|${track.name}',
+                          ),
+                  ),
+              ],
+            ),
             if (settings.hiddenTracks.isNotEmpty)
               Align(
                 alignment: Alignment.centerLeft,
@@ -187,8 +187,9 @@ class _MusicSheet extends StatelessWidget {
                     horizontal: 18,
                     vertical: 12,
                   ),
-                  backgroundColor:
-                      context.colors.primary.withValues(alpha: 0.12),
+                  backgroundColor: context.colors.primary.withValues(
+                    alpha: 0.12,
+                  ),
                   shape: const StadiumBorder(),
                 ),
               ),
@@ -197,8 +198,9 @@ class _MusicSheet extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
               decoration: BoxDecoration(
-                color: context.colors.surfaceContainerHighest
-                    .withValues(alpha: 0.5),
+                color: context.colors.surfaceContainerHighest.withValues(
+                  alpha: 0.5,
+                ),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: _AlertRow(settings: settings),
@@ -231,8 +233,8 @@ class _VolumeRow extends StatelessWidget {
               volume == 0
                   ? LucideIcons.volumeX
                   : volume < 0.5
-                      ? LucideIcons.volume1
-                      : LucideIcons.volume2,
+                  ? LucideIcons.volume1
+                  : LucideIcons.volume2,
               size: 19,
               color: context.colors.onSurface,
             ),
@@ -289,9 +291,9 @@ class _TrackList extends StatelessWidget {
         child: ScrollConfiguration(
           behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
           child: ListView(
-          padding: const EdgeInsets.only(bottom: _row / 2),
-          children: children,
-        ),
+            padding: const EdgeInsets.only(bottom: _row / 2),
+            children: children,
+          ),
         ),
       ),
     );
@@ -323,8 +325,8 @@ class _AlertRow extends StatelessWidget {
       index: alert.isEmpty
           ? 0
           : alert == FocusAudio.silentAlert
-              ? 2
-              : 1,
+          ? 2
+          : 1,
       onSelected: (index) async {
         if (index == 0) return settings.setFocusAlert('');
         if (index == 2) return settings.setFocusAlert(FocusAudio.silentAlert);
@@ -349,7 +351,10 @@ class _AlertRow extends StatelessWidget {
         ListTile(
           contentPadding: EdgeInsets.zero,
           leading: Icon(LucideIcons.bellRing, color: context.colors.onSurface),
-          title: Text(context.l10n.focus_alert, style: sheetOptionStyle(context)),
+          title: Text(
+            context.l10n.focus_alert,
+            style: sheetOptionStyle(context),
+          ),
           subtitle: Text(
             _label(context),
             style: TextStyle(fontSize: 12.5, color: context.tokens.muted),
@@ -360,7 +365,10 @@ class _AlertRow extends StatelessWidget {
           contentPadding: EdgeInsets.zero,
           value: settings.focusHold,
           onChanged: settings.setFocusHold,
-          title: Text(context.l10n.focus_hold, style: sheetOptionStyle(context)),
+          title: Text(
+            context.l10n.focus_hold,
+            style: sheetOptionStyle(context),
+          ),
           subtitle: Text(
             context.l10n.focus_hold_sub,
             style: TextStyle(fontSize: 12.5, color: context.tokens.muted),
@@ -454,82 +462,82 @@ class _TrackRow extends StatelessWidget {
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: InkWell(
-                borderRadius: BorderRadius.circular(18),
-                onLongPress: onDelete == null
-                    ? null
-                    : () async {
-                        if (await showDeleteSheet(context)) onDelete!();
-                      },
-                onTap: () async {
-                  final settings = context.read<SettingsController>();
-                  if (isPlaying) {
-                    await FocusAudio.pause();
-                    await settings.setFocusTrack('');
-                  } else if (active) {
-                    await FocusAudio.resume();
-                    await settings.setFocusTrack(track.id);
-                  } else {
-                    await FocusAudio.playQueue(
-                      tracks,
-                      shuffle: shuffle,
-                      repeatOne: repeatOne,
-                      from: track,
-                    );
-                    await settings.setFocusTrack(track.id);
-                  }
-                },
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 9, 8, 9),
-                  child: Row(
-                    children: [
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 260),
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: active
-                              ? context.colors.primary.withValues(alpha: 0.16)
-                              : context.colors.surfaceContainerHighest,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          !active
-                              ? LucideIcons.music
-                              : isPlaying
-                                  ? LucideIcons.pause
-                                  : LucideIcons.play,
-                          size: 17,
-                          color: active
-                              ? context.colors.primary
-                              : context.tokens.muted,
-                        ),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Text(
-                          track.name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: sheetOptionStyle(
-                            context,
-                            size: 15,
-                            selected: active,
-                            color: active ? context.colors.primary : null,
+                  borderRadius: BorderRadius.circular(18),
+                  onLongPress: onDelete == null
+                      ? null
+                      : () async {
+                          if (await showDeleteSheet(context)) onDelete!();
+                        },
+                  onTap: () async {
+                    final settings = context.read<SettingsController>();
+                    if (isPlaying) {
+                      await FocusAudio.pause();
+                      await settings.setFocusTrack('');
+                    } else if (active) {
+                      await FocusAudio.resume();
+                      await settings.setFocusTrack(track.id);
+                    } else {
+                      await FocusAudio.playQueue(
+                        tracks,
+                        shuffle: shuffle,
+                        repeatOne: repeatOne,
+                        from: track,
+                      );
+                      await settings.setFocusTrack(track.id);
+                    }
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 9, 8, 9),
+                    child: Row(
+                      children: [
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 260),
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: active
+                                ? context.colors.primary.withValues(alpha: 0.16)
+                                : context.colors.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            !active
+                                ? LucideIcons.music
+                                : isPlaying
+                                ? LucideIcons.pause
+                                : LucideIcons.play,
+                            size: 17,
+                            color: active
+                                ? context.colors.primary
+                                : context.tokens.muted,
                           ),
                         ),
-                      ),
-                      if (track.asset)
-                        Padding(
-                          padding: const EdgeInsets.only(right: 8),
+                        const SizedBox(width: 14),
+                        Expanded(
                           child: Text(
-                            context.l10n.focus_built_in,
-                            style: sheetLabelStyle(context, size: 11),
+                            track.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: sheetOptionStyle(
+                              context,
+                              size: 15,
+                              selected: active,
+                              color: active ? context.colors.primary : null,
+                            ),
                           ),
                         ),
-                    ],
+                        if (track.asset)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: Text(
+                              context.l10n.focus_built_in,
+                              style: sheetLabelStyle(context, size: 11),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
               ),
             );
           },
@@ -759,8 +767,8 @@ class _ScrubberState extends State<_Scrubber> {
         valueListenable: FocusAudio.position,
         builder: (context, position, _) {
           final total = length.inMilliseconds;
-          final shown = _dragging ??
-              (total <= 0 ? 0.0 : position.inMilliseconds / total);
+          final shown =
+              _dragging ?? (total <= 0 ? 0.0 : position.inMilliseconds / total);
           return Column(
             children: [
               SliderTheme(
@@ -770,7 +778,9 @@ class _ScrubberState extends State<_Scrubber> {
                   inactiveTrackColor: Colors.white.withValues(alpha: 0.25),
                   thumbColor: Colors.white,
                   overlayShape: SliderComponentShape.noOverlay,
-                  thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
+                  thumbShape: const RoundSliderThumbShape(
+                    enabledThumbRadius: 7,
+                  ),
                 ),
                 child: Slider(
                   value: shown.clamp(0.0, 1.0),
@@ -798,4 +808,3 @@ class _ScrubberState extends State<_Scrubber> {
     );
   }
 }
-

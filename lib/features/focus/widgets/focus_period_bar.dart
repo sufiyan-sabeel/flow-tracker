@@ -53,7 +53,7 @@ class FocusPeriodBar extends StatelessWidget {
     final summary = stats.rangeCount == 0
         ? context.l10n.focus_period_sessions(0)
         : '${formatHoursShort(stats.rangeSeconds)}  ·  '
-            '${context.l10n.focus_period_sessions(stats.rangeCount)}';
+              '${context.l10n.focus_period_sessions(stats.rangeCount)}';
 
     return Row(
       children: [
@@ -94,7 +94,11 @@ class FocusPeriodBar extends StatelessWidget {
 }
 
 class _Arrow extends StatelessWidget {
-  const _Arrow({required this.icon, required this.tooltip, required this.onTap});
+  const _Arrow({
+    required this.icon,
+    required this.tooltip,
+    required this.onTap,
+  });
 
   final IconData icon;
   final String tooltip;

@@ -13,16 +13,16 @@ class BookRead {
   int get days => (end ?? AppClock.today()).epochDay - start.epochDay + 1;
 
   Map<String, dynamic> toMap() => {
-        'start': start.dayKey,
-        if (end != null) 'end': end!.dayKey,
-        'pages': pages,
-      };
+    'start': start.dayKey,
+    if (end != null) 'end': end!.dayKey,
+    'pages': pages,
+  };
 
   factory BookRead.fromMap(Map<String, dynamic> map) => BookRead(
-        start: parseDayKey(map['start'] as String),
-        end: map['end'] is String ? parseDayKey(map['end'] as String) : null,
-        pages: (map['pages'] as num).toDouble(),
-      );
+    start: parseDayKey(map['start'] as String),
+    end: map['end'] is String ? parseDayKey(map['end'] as String) : null,
+    pages: (map['pages'] as num).toDouble(),
+  );
 }
 
 class BookProgress {

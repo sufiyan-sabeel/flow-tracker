@@ -62,7 +62,8 @@ class FocusBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasImage = scene == kCustomScene &&
+    final hasImage =
+        scene == kCustomScene &&
         imagePath.isNotEmpty &&
         File(imagePath).existsSync();
 
@@ -161,59 +162,59 @@ class FocusScenePreview extends StatelessWidget {
           duration: const Duration(milliseconds: 320),
           curve: Curves.easeOutBack,
           child: AspectRatio(
-          aspectRatio: 0.78,
-          child: Container(
-            padding: EdgeInsets.all(selected ? 2.5 : 0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              border: selected
-                  ? Border.all(color: Colors.white, width: 2.5)
-                  : scene == 0
-                  ? Border.all(color: Colors.white.withValues(alpha: 0.18))
-                  : null,
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(selected ? 12 : 14),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  if (video >= 0) ...[
-                    FocusVideoPoster(name: focusVideoScenes[video]),
-                    ColoredBox(color: Colors.black.withValues(alpha: 0.32)),
-                  ] else
-                    FocusBackground(
-                      scene: scene,
-                      imagePath: imagePath,
-                      thumbnail: true,
-                      child: const SizedBox.expand(),
-                    ),
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: AnimatedScale(
-                      scale: selected ? 1 : 0,
-                      duration: const Duration(milliseconds: 280),
-                      curve: Curves.easeOutBack,
-                      child: Container(
-                        width: 22,
-                        height: 22,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          LucideIcons.check,
-                          size: 14,
-                          color: Colors.black,
+            aspectRatio: 0.78,
+            child: Container(
+              padding: EdgeInsets.all(selected ? 2.5 : 0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                border: selected
+                    ? Border.all(color: Colors.white, width: 2.5)
+                    : scene == 0
+                    ? Border.all(color: Colors.white.withValues(alpha: 0.18))
+                    : null,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(selected ? 12 : 14),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (video >= 0) ...[
+                      FocusVideoPoster(name: focusVideoScenes[video]),
+                      ColoredBox(color: Colors.black.withValues(alpha: 0.32)),
+                    ] else
+                      FocusBackground(
+                        scene: scene,
+                        imagePath: imagePath,
+                        thumbnail: true,
+                        child: const SizedBox.expand(),
+                      ),
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: AnimatedScale(
+                        scale: selected ? 1 : 0,
+                        duration: const Duration(milliseconds: 280),
+                        curve: Curves.easeOutBack,
+                        child: Container(
+                          width: 22,
+                          height: 22,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            LucideIcons.check,
+                            size: 14,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
-        ),
         ),
       ),
     );

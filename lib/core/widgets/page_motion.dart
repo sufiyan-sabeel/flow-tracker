@@ -51,13 +51,14 @@ class SlideThrough extends StatelessWidget {
           reverseCurve: const Interval(0.3, 1, curve: Curves.easeIn),
         ),
         child: SlideTransition(
-          position: Tween(begin: Offset(0.1 * rtl, 0), end: Offset.zero).animate(
-            CurvedAnimation(
-              parent: animation,
-              curve: Curves.easeOutCubic,
-              reverseCurve: Curves.easeInCubic,
-            ),
-          ),
+          position: Tween(begin: Offset(0.1 * rtl, 0), end: Offset.zero)
+              .animate(
+                CurvedAnimation(
+                  parent: animation,
+                  curve: Curves.easeOutCubic,
+                  reverseCurve: Curves.easeInCubic,
+                ),
+              ),
           child: RepaintBoundary(child: child),
         ),
       ),

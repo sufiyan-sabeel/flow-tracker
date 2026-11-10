@@ -58,60 +58,63 @@ class FocusSession {
     return pieces;
   }
 
-  FocusSession _pieceOf(int index, DateTime start, int span,
-          {bool last = false}) =>
-      FocusSession(
-        id: index == 1 ? id : '$id-$index',
-        habitId: habitId,
-        targetMinutes: targetMinutes,
-        seconds: span,
-        completed: completed && last,
-        startedAt: start,
-        counted: counted,
-        label: label,
-        span: index == 1 ? span : 0,
-        pauses: index == 1 ? pauses : 0,
-      );
+  FocusSession _pieceOf(
+    int index,
+    DateTime start,
+    int span, {
+    bool last = false,
+  }) => FocusSession(
+    id: index == 1 ? id : '$id-$index',
+    habitId: habitId,
+    targetMinutes: targetMinutes,
+    seconds: span,
+    completed: completed && last,
+    startedAt: start,
+    counted: counted,
+    label: label,
+    span: index == 1 ? span : 0,
+    pauses: index == 1 ? pauses : 0,
+  );
 
   FocusSession get asCounted => FocusSession(
-        id: id,
-        habitId: habitId,
-        targetMinutes: targetMinutes,
-        seconds: seconds,
-        completed: completed,
-        startedAt: startedAt,
-        counted: true,
-        label: label,
-        span: span,
-        pauses: pauses,
-      );
+    id: id,
+    habitId: habitId,
+    targetMinutes: targetMinutes,
+    seconds: seconds,
+    completed: completed,
+    startedAt: startedAt,
+    counted: true,
+    label: label,
+    span: span,
+    pauses: pauses,
+  );
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'habitId': habitId,
-        'targetMinutes': targetMinutes,
-        'seconds': seconds,
-        'completed': completed,
-        'startedAt': startedAt.toIso8601String(),
-        if (counted) 'counted': true,
-        if (label.isNotEmpty) 'label': label,
-        if (span > 0) 'span': span,
-        if (pauses > 0) 'pauses': pauses,
-      };
+    'id': id,
+    'habitId': habitId,
+    'targetMinutes': targetMinutes,
+    'seconds': seconds,
+    'completed': completed,
+    'startedAt': startedAt.toIso8601String(),
+    if (counted) 'counted': true,
+    if (label.isNotEmpty) 'label': label,
+    if (span > 0) 'span': span,
+    if (pauses > 0) 'pauses': pauses,
+  };
 
   factory FocusSession.fromMap(Map<String, dynamic> map) => FocusSession(
-        id: map['id'] as String,
-        habitId: (map['habitId'] ?? '') as String,
-        targetMinutes: ((map['targetMinutes'] ?? 0) as num).toInt(),
-        seconds: ((map['seconds'] ?? 0) as num).toInt(),
-        completed: (map['completed'] ?? false) as bool,
-        startedAt: DateTime.tryParse((map['startedAt'] ?? '') as String) ??
-            DateTime.now(),
-        counted: map['counted'] == true,
-        label: map['label'] is String ? map['label'] as String : '',
-        span: ((map['span'] ?? 0) as num).toInt(),
-        pauses: ((map['pauses'] ?? 0) as num).toInt(),
-      );
+    id: map['id'] as String,
+    habitId: (map['habitId'] ?? '') as String,
+    targetMinutes: ((map['targetMinutes'] ?? 0) as num).toInt(),
+    seconds: ((map['seconds'] ?? 0) as num).toInt(),
+    completed: (map['completed'] ?? false) as bool,
+    startedAt:
+        DateTime.tryParse((map['startedAt'] ?? '') as String) ?? DateTime.now(),
+    counted: map['counted'] == true,
+    label: map['label'] is String ? map['label'] as String : '',
+    span: ((map['span'] ?? 0) as num).toInt(),
+    pauses: ((map['pauses'] ?? 0) as num).toInt(),
+  );
 }
 
 DateTime dayBorderAfter(DateTime moment) {

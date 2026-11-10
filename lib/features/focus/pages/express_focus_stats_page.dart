@@ -47,7 +47,9 @@ class _ExpressFocusStatsPageState extends State<ExpressFocusStatsPage> {
       for (final entry in stats.perHabit.entries)
         (
           name: habits.byId(entry.key)?.name ?? context.l10n.focus_free_session,
-          color: habits.byId(entry.key)?.color.shownIn(context) ?? context.tokens.muted,
+          color:
+              habits.byId(entry.key)?.color.shownIn(context) ??
+              context.tokens.muted,
           count: entry.value,
         ),
     ]..sort((a, b) => b.count.compareTo(a.count));

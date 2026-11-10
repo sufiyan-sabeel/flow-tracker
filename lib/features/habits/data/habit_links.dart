@@ -41,7 +41,8 @@ class HabitLinks {
         if (habit.kind != HabitKind.quantitative || habit.needsFocusSession) {
           return null;
         }
-        final amount = double.tryParse(uri.queryParameters['amount'] ?? '') ??
+        final amount =
+            double.tryParse(uri.queryParameters['amount'] ?? '') ??
             habit.incrementAmount;
         if (amount == 0) return null;
         return CompletionOps.addProgress(habit, date, amount);

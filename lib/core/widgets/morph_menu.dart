@@ -17,13 +17,13 @@ class MorphMenuStyle {
   });
 
   factory MorphMenuStyle.glass() => MorphMenuStyle(
-        closed: const Color(0xFF2A2A2F).withValues(alpha: 0.5),
-        open: const Color(0xFF2A2A2F).withValues(alpha: 0.9),
-        edge: Colors.white.withValues(alpha: 0.12),
-        ink: Colors.white,
-        tile: Colors.white.withValues(alpha: 0.1),
-        barrier: Colors.black.withValues(alpha: 0.25),
-      );
+    closed: const Color(0xFF2A2A2F).withValues(alpha: 0.5),
+    open: const Color(0xFF2A2A2F).withValues(alpha: 0.9),
+    edge: Colors.white.withValues(alpha: 0.12),
+    ink: Colors.white,
+    tile: Colors.white.withValues(alpha: 0.1),
+    barrier: Colors.black.withValues(alpha: 0.25),
+  );
 
   factory MorphMenuStyle.paper(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
@@ -181,8 +181,14 @@ class _MorphMenuState extends State<MorphMenu>
                           child: Column(
                             children: [
                               for (final (index, item) in widget.items.indexed)
-                                _item(item, _span(t, 0.4 + index * 0.06,
-                                    math.min(0.7 + index * 0.06, 1))),
+                                _item(
+                                  item,
+                                  _span(
+                                    t,
+                                    0.4 + index * 0.06,
+                                    math.min(0.7 + index * 0.06, 1),
+                                  ),
+                                ),
                             ],
                           ),
                         ),
@@ -354,7 +360,9 @@ class MorphMenuButton extends StatelessWidget {
                   child: Icon(
                     icon,
                     size: 19,
-                    color: active ? Theme.of(context).colorScheme.surface : style.ink,
+                    color: active
+                        ? Theme.of(context).colorScheme.surface
+                        : style.ink,
                   ),
                 ),
               ),

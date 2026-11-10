@@ -48,34 +48,36 @@ class _FireworksOverlayState extends State<FireworksOverlay>
   void _spawn(Brightness brightness) {
     _shells
       ..clear()
-      ..addAll(List.generate(_count, (index) {
-        final color = celebrationColor(_random, brightness);
-        final band = 0.52 / _count;
-        return _Shell(
-          core: brightness == Brightness.dark
-              ? Colors.white
-              : Color.lerp(color, Colors.black, 0.4)!,
-          hot: Color.lerp(
-            color,
-            brightness == Brightness.dark ? Colors.white : Colors.black,
-            0.42,
-          )!,
-          x: 0.24 + band * (index + _random.nextDouble()),
-          peak: 0.16 + _random.nextDouble() * 0.26,
-          start: index * 0.085 + _random.nextDouble() * 0.05,
-          color: color,
-          sparks: List.generate(62 + _random.nextInt(18), (_) {
-            final angle = _random.nextDouble() * 2 * math.pi;
-            return _Spark(
-              direction: Offset(math.cos(angle), math.sin(angle)),
-              speed: 0.30 * (0.6 + _random.nextDouble() * 0.4),
-              size: 1.6 + _random.nextDouble() * 2.0,
-              twinkle: _random.nextDouble() * 2 * math.pi,
-              hot: _random.nextDouble() < 0.25,
-            );
-          }),
-        );
-      }));
+      ..addAll(
+        List.generate(_count, (index) {
+          final color = celebrationColor(_random, brightness);
+          final band = 0.52 / _count;
+          return _Shell(
+            core: brightness == Brightness.dark
+                ? Colors.white
+                : Color.lerp(color, Colors.black, 0.4)!,
+            hot: Color.lerp(
+              color,
+              brightness == Brightness.dark ? Colors.white : Colors.black,
+              0.42,
+            )!,
+            x: 0.24 + band * (index + _random.nextDouble()),
+            peak: 0.16 + _random.nextDouble() * 0.26,
+            start: index * 0.085 + _random.nextDouble() * 0.05,
+            color: color,
+            sparks: List.generate(62 + _random.nextInt(18), (_) {
+              final angle = _random.nextDouble() * 2 * math.pi;
+              return _Spark(
+                direction: Offset(math.cos(angle), math.sin(angle)),
+                speed: 0.30 * (0.6 + _random.nextDouble() * 0.4),
+                size: 1.6 + _random.nextDouble() * 2.0,
+                twinkle: _random.nextDouble() * 2 * math.pi,
+                hot: _random.nextDouble() < 0.25,
+              );
+            }),
+          );
+        }),
+      );
   }
 
   @override
@@ -206,7 +208,8 @@ class _FireworksPainter extends CustomPainter {
 
       final reach = spark.speed * unit;
       final head = origin + spark.direction * (reach * spread) + drop;
-      if (head.dy > size.height + unit || head.dx < -unit ||
+      if (head.dy > size.height + unit ||
+          head.dx < -unit ||
           head.dx > size.width + unit) {
         continue;
       }

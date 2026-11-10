@@ -17,8 +17,7 @@ class FocusTrack {
   final String name;
   final bool asset;
 
-  Source get source =>
-      asset ? AssetSource('sounds/$id') : DeviceFileSource(id);
+  Source get source => asset ? AssetSource('sounds/$id') : DeviceFileSource(id);
 
   bool get loops => asset && loopingTracks.contains(id);
 
@@ -42,8 +41,11 @@ class FocusTrack {
     final dir = Directory('${(await appDataDir()).path}/$folder');
     if (!dir.existsSync()) dir.createSync(recursive: true);
     final found = source.split('.').last.toLowerCase();
-    final extension = FocusAudio.trackExtensions.contains(found) ? found : 'mp3';
-    final dest = '${dir.path}/${DateTime.now().millisecondsSinceEpoch}.$extension';
+    final extension = FocusAudio.trackExtensions.contains(found)
+        ? found
+        : 'mp3';
+    final dest =
+        '${dir.path}/${DateTime.now().millisecondsSinceEpoch}.$extension';
     await File(source).copy(dest);
     return dest;
   }
@@ -123,9 +125,7 @@ class FocusAudio {
       await _start(_queue[index < 0 ? 0 : index]);
       return;
     }
-    final next = _shuffle
-        ? _pickRandom(index)
-        : (index + 1) % _queue.length;
+    final next = _shuffle ? _pickRandom(index) : (index + 1) % _queue.length;
     await _start(_queue[next]);
   }
 
@@ -171,7 +171,8 @@ class FocusAudio {
     _queue = tracks;
     _shuffle = shuffle;
     _repeatOne = repeatOne;
-    final start = from ??
+    final start =
+        from ??
         (shuffle ? tracks[_random.nextInt(tracks.length)] : tracks.first);
     await _start(start);
   }
@@ -251,7 +252,9 @@ class FocusAudio {
     if (Platform.isAndroid) {
       await _effects.setAudioContext(
         AudioContext(
-          android: const AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+          android: const AudioContextAndroid(
+            audioFocus: AndroidAudioFocus.none,
+          ),
         ),
       );
     }

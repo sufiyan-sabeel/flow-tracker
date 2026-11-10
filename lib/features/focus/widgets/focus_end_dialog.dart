@@ -71,14 +71,13 @@ class FocusEndDialog extends StatelessWidget {
             ],
             _FocusDialogButton(
               icon: reached ? LucideIcons.square : LucideIcons.x,
-              label:
-                  reached ? context.l10n.focus_end : context.l10n.focus_end_anyway,
+              label: reached
+                  ? context.l10n.focus_end
+                  : context.l10n.focus_end_anyway,
               background: reached
                   ? color
                   : context.colors.surfaceContainerHighest,
-              foreground: reached
-                  ? color.ink
-                  : context.colors.onSurface,
+              foreground: reached ? color.ink : context.colors.onSurface,
               onTap: () => Navigator.of(context).pop('end'),
             ),
             const SizedBox(height: 6),

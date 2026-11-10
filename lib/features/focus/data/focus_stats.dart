@@ -117,8 +117,7 @@ class FocusStats {
         ? sessions
         : sessions.where((s) => s.habitId == habitId).toList();
 
-    final today =
-        now.subtract(Duration(hours: AppClock.cutoffHour)).atMidnight;
+    final today = now.subtract(Duration(hours: AppClock.cutoffHour)).atMidnight;
     final weekFrom = today.startOfWeek(weekStart);
     final buckets = _bucketsFor(range, today, weekStart, offset);
     final previous = _bucketsFor(range, today, weekStart, offset - 1);

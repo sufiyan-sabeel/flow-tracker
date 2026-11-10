@@ -30,8 +30,9 @@ class _FocusDefaults extends StatefulWidget {
 class _FocusDefaultsState extends State<_FocusDefaults> {
   late int _minutes = widget.habit.focusMinutes;
   late bool _pomodoro = widget.habit.focusBreakMinutes > 0;
-  late int _breakMinutes =
-      _pomodoro ? widget.habit.focusBreakMinutes : focusBreakPresets.first;
+  late int _breakMinutes = _pomodoro
+      ? widget.habit.focusBreakMinutes
+      : focusBreakPresets.first;
 
   Future<void> _save() async {
     final habits = context.read<HabitsController>();
@@ -76,8 +77,7 @@ class _FocusDefaultsState extends State<_FocusDefaults> {
               enabled: _pomodoro,
               breakMinutes: _breakMinutes,
               onToggle: (value) => setState(() => _pomodoro = value),
-              onBreakChanged: (value) =>
-                  setState(() => _breakMinutes = value),
+              onBreakChanged: (value) => setState(() => _breakMinutes = value),
             ),
             const SizedBox(height: 18),
             SizedBox(
