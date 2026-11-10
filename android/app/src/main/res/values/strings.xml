@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Flow-tracker</string>
+    <string name="widget_description">Track your habits and build lasting streaks</string>
+    <string name="widget_heatmap_label">Flow-tracker heatmap</string>
+    <string name="widget_habit_label">Flow-tracker habits</string>
+    <string name="widget_today_label">Flow-tracker today</string>
+    <string name="widget_stats_label">Flow-tracker summary</string>
+    <string name="widget_focus_label">Flow-tracker focus</string>
+    <string name="widget_focus_board_label">Flow-tracker focus board</string>
+    <string name="widget_todos_label">Flow-tracker to-do</string>
+    <string name="widget_todos_description">See what is left to do today</string>
+</resources>
