@@ -72,6 +72,8 @@ the same app rather than a stranger wearing its clothes.
 - Full colour themes and a custom per-surface palette for people who want more
 - A floating liquid-glass navigation dock with a sliding capsule, drawn from
   the theme accent and backed by a single blur node
+- **Offline PDF reports**: eight report types, six document themes, custom
+  date ranges and section toggles, saved or shared from the device
 - 28 languages, adjustable text size, and animation controls
 
 **Your data**

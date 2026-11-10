@@ -20,6 +20,7 @@ import 'package:flow_tracker/features/settings/pages/express_settings_page.dart'
 import 'package:flow_tracker/features/settings/pages/minimal_settings_page.dart';
 import 'package:flow_tracker/features/settings/pages/quotes_page.dart';
 import 'package:flow_tracker/features/settings/settings_actions.dart';
+import 'package:flow_tracker/features/settings/pages/pdf_export_page.dart';
 import 'package:flow_tracker/features/settings/state/settings_controller.dart';
 import 'package:flow_tracker/features/settings/widgets/settings_rows.dart';
 import 'package:flow_tracker/features/settings/widgets/import_apps_card.dart';
@@ -81,6 +82,18 @@ class ClassicSettingsPage extends StatelessWidget {
           const SizedBox(height: 24),
           Entrance(
             index: 2,
+            child: Card(
+              child: NavRow(
+                icon: LucideIcons.fileText,
+                title: context.l10n.pdf_export,
+                subtitle: context.l10n.pdf_export_sub,
+                onTap: () => AppNavigator.push(const PdfExportPage()),
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          Entrance(
+            index: 3,
             child: Card(
               child: Column(
                 children: [

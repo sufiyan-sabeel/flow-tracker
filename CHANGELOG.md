@@ -3,6 +3,39 @@
 All notable changes to Flow-tracker are recorded here. Versions follow
 [Semantic Versioning](https://semver.org/), and each release is tagged `vX.Y.Z`.
 
+## 1.6.0 — offline PDF reports
+
+### Added
+
+- **PDF export, generated entirely on the device.** Settings → PDF Export &
+  Reports opens a dashboard where you choose the report, the date range, which
+  sections to include and the document design, then preview, share or save.
+- **Eight report types**: complete productivity report, habit progress, habit
+  history, statistics, to-do report, focus sessions, monthly summary and yearly
+  summary. Each one is built from the local database — no server, no account, no
+  connection.
+- **Six document themes** that change the real PDF: Executive (white, charcoal,
+  muted orange), Midnight (graphite pages, white type, amber), Minimal (plain
+  white, grey rules), Aurora (blue and violet), Botanical (soft greens) and
+  Custom brand (follows your app accent).
+- **A4 report design system**: cover with report identity and creator credit,
+  executive summary with calculated statistics, section headings, statistics
+  cards, tables, progress bars, a vector activity chart, a 16-week heatmap, and
+  a footer with the period and page numbers on every page.
+- **Eight date ranges** including a custom range that is validated, swapped when
+  entered backwards, and clamped to today.
+- **Ten toggleable sections**, so a report contains only what was asked for.
+- **Save** through Android's Storage Access Framework, **share** to any app
+  through the system share sheet, and **preview** the real PDF with paging and
+  zoom.
+- Meaningful file names such as `FlowTracker_Monthly_Summary_2026-11.pdf`.
+
+### Notes
+
+- Charts and the heatmap are drawn as vector containers, so they stay sharp when
+  printed and add no image weight.
+- Fonts are the app's own Figtree, embedded in the document.
+
 ## 1.5.0 — creator identity and settings polish
 
 ### Changed

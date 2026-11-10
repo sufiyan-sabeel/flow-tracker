@@ -2201,5 +2201,7 @@
   "apply": "Apply",
   "preview": "Preview",
   "sample_button": "Sample",
-  "sample_habit": "Sample habit"
+  "sample_habit": "Sample habit",
+  "pdf_export": "PDF Export & Reports",
+  "pdf_export_sub": "Create professional PDF reports from your productivity data"
 }
