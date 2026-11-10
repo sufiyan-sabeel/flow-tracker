@@ -31,11 +31,11 @@ void main() {
     documents = Directory('${root.path}/documents')..createSync();
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
-      const MethodChannel('plugins.flutter.io/path_provider'),
-      (call) async => call.method == 'getApplicationDocumentsDirectory'
-          ? documents.path
-          : support.path,
-    );
+          const MethodChannel('plugins.flutter.io/path_provider'),
+          (call) async => call.method == 'getApplicationDocumentsDirectory'
+              ? documents.path
+              : support.path,
+        );
   });
 
   tearDown(() => root.deleteSync(recursive: true));

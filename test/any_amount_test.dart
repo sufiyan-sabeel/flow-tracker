@@ -53,7 +53,8 @@ void main() {
     expect(Habit.fromMap(map..remove('anyAmount')).anyAmount, isFalse);
   });
 
-  Habit calories(double logged) => testHabit(
+  Habit calories(double logged) =>
+      testHabit(
         id: 'kcal',
         name: 'Calories',
         kind: HabitKind.quantitative,
@@ -80,7 +81,8 @@ void main() {
     expect(Habit.fromMap(_sleep(anyAmount: false).toMap()).atMost, isFalse);
   });
 
-  Habit workout({required bool anySteps}) => testHabit(
+  Habit workout({required bool anySteps}) =>
+      testHabit(
         id: 'gym',
         name: 'Workout',
         substeps: const [
@@ -90,7 +92,11 @@ void main() {
       ).copyWith(
         anySteps: anySteps,
         completions: {
-          today.dayKey: Completion(date: today.dayKey, count: 1, steps: {'legs'}),
+          today.dayKey: Completion(
+            date: today.dayKey,
+            count: 1,
+            steps: {'legs'},
+          ),
         },
       );
 

@@ -30,14 +30,14 @@ class InAppNotifications {
   void cancelAll() => _queue.clear();
 
   List<PendingNotificationRequest> get pending => [
-        for (final entry in _queue.entries)
-          PendingNotificationRequest(
-            entry.key,
-            entry.value.title,
-            entry.value.body,
-            entry.value.payload,
-          ),
-      ];
+    for (final entry in _queue.entries)
+      PendingNotificationRequest(
+        entry.key,
+        entry.value.title,
+        entry.value.body,
+        entry.value.payload,
+      ),
+  ];
 
   Future<void> _showDue() async {
     final now = tz.TZDateTime.now(tz.local);

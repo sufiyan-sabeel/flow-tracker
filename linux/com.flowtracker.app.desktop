@@ -1,8 +1,8 @@
 [Desktop Entry]
 Type=Application
-Name=Streak
-Comment=A minimal habit tracker that helps you build lasting streaks
-Exec=Streak
+Name=Flow-tracker
+Comment=Private, offline habit tracking with reports
+Exec=flow-tracker
 Icon=com.flowtracker.app
 Terminal=false
 Categories=Utility;

@@ -37,11 +37,13 @@ class _Registry {
 
   static const _currentUser = -0x7FFFFFFF;
 
-  static final _deleteTree = DynamicLibrary.open('advapi32.dll').lookupFunction<
-      Int32 Function(IntPtr, Pointer<Utf16>),
-      int Function(int, Pointer<Utf16>)>('RegDeleteTreeW');
+  static final _deleteTree = DynamicLibrary.open('advapi32.dll')
+      .lookupFunction<
+        Int32 Function(IntPtr, Pointer<Utf16>),
+        int Function(int, Pointer<Utf16>)
+      >('RegDeleteTreeW');
 
   static void delete(String path) => using((arena) {
-        _deleteTree(_currentUser, path.toNativeUtf16(allocator: arena));
-      });
+    _deleteTree(_currentUser, path.toNativeUtf16(allocator: arena));
+  });
 }

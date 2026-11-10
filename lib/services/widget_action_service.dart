@@ -115,7 +115,9 @@ class WidgetActionService {
   static Future<void> _clear(int applied) async {
     try {
       final current = await _read();
-      final rest = current.length > applied ? current.sublist(applied) : const <String>[];
+      final rest = current.length > applied
+          ? current.sublist(applied)
+          : const <String>[];
       await HomeWidget.saveWidgetData<String>(
         _queueKey,
         rest.isEmpty ? '' : json.encode(rest),
@@ -157,16 +159,18 @@ class WidgetActionService {
 
     final target = _dayOf(uri);
     if (target == null) return null;
-    final delta = double.tryParse(uri.queryParameters['delta'] ?? '') ??
+    final delta =
+        double.tryParse(uri.queryParameters['delta'] ?? '') ??
         habit.incrementAmount;
 
     final action = uri.queryParameters['action'] ?? 'toggle';
     if (action == 'toggle' && habit.needsFocusSession) return null;
 
     final completions = switch (action) {
-      'relapse' => habit.completions.containsKey(target.dayKey)
-          ? CompletionOps.clearRelapse(habit, target)
-          : CompletionOps.logRelapse(habit, target),
+      'relapse' =>
+        habit.completions.containsKey(target.dayKey)
+            ? CompletionOps.clearRelapse(habit, target)
+            : CompletionOps.logRelapse(habit, target),
       'progress' => CompletionOps.addProgress(habit, target, delta),
       _ => CompletionOps.toggle(habit, target),
     };

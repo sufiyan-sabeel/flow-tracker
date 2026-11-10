@@ -81,7 +81,13 @@ class ReminderSchedule {
       final day = DateTime(from.year, from.month, from.day + offset);
       if (!due(day)) continue;
       for (final slot in slots) {
-        final at = DateTime(day.year, day.month, day.day, slot ~/ 60, slot % 60);
+        final at = DateTime(
+          day.year,
+          day.month,
+          day.day,
+          slot ~/ 60,
+          slot % 60,
+        );
         if (at.isBefore(from)) continue;
         moments.add(at);
         if (moments.length >= limit) return moments;

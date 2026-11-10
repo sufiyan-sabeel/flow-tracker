@@ -204,8 +204,8 @@ the markdown here does not change anything in the app.
         final days = reminder.days.isEmpty
             ? 'every day'
             : (reminder.days.toList()..sort())
-                .map((d) => _weekdays[d - 1])
-                .join(', ');
+                  .map((d) => _weekdays[d - 1])
+                  .join(', ');
         out.writeln('- $at on $days');
       }
     }
@@ -237,8 +237,8 @@ the markdown here does not change anything in the app.
     final column = negative
         ? 'Relapse'
         : habit.kind == HabitKind.quantitative
-            ? 'Amount'
-            : 'Done';
+        ? 'Amount'
+        : 'Done';
 
     final out = StringBuffer()
       ..writeln('| Date | Day | $column |')
@@ -249,8 +249,8 @@ the markdown here does not change anything in the app.
       final value = negative
           ? 'yes'
           : habit.kind == HabitKind.quantitative
-              ? _amount(habit, entry.count)
-              : 'yes';
+          ? _amount(habit, entry.count)
+          : 'yes';
       out.writeln(
         '| ${_day(date)} | ${_weekdays[date.weekday - 1]} | $value |',
       );
@@ -343,23 +343,24 @@ the markdown here does not change anything in the app.
   }
 
   static String _type(Habit habit) => switch (habit.kind) {
-        HabitKind.positive => habit.substeps.isEmpty ? 'habit' : 'checklist',
-        HabitKind.negative => 'avoid',
-        HabitKind.quantitative => 'amount',
-      };
+    HabitKind.positive => habit.substeps.isEmpty ? 'habit' : 'checklist',
+    HabitKind.negative => 'avoid',
+    HabitKind.quantitative => 'amount',
+  };
 
   static String _schedule(Habit habit) => switch (habit.interval) {
-        HabitInterval.daily => 'every day',
-        HabitInterval.weekly => '${habit.targetFrequency} times per week',
-        HabitInterval.monthly => '${habit.targetFrequency} times per month',
-        HabitInterval.weekdays => habit.scheduleWeekdays.isEmpty
-            ? 'every day'
-            : (habit.scheduleWeekdays.toList()..sort())
+    HabitInterval.daily => 'every day',
+    HabitInterval.weekly => '${habit.targetFrequency} times per week',
+    HabitInterval.monthly => '${habit.targetFrequency} times per month',
+    HabitInterval.weekdays =>
+      habit.scheduleWeekdays.isEmpty
+          ? 'every day'
+          : (habit.scheduleWeekdays.toList()..sort())
                 .map((d) => _weekdays[d - 1])
                 .join(', '),
-        HabitInterval.everyXDays =>
-          'every ${habit.scheduleEvery} ${habit.scheduleUnit.name}',
-      };
+    HabitInterval.everyXDays =>
+      'every ${habit.scheduleEvery} ${habit.scheduleUnit.name}',
+  };
 
   static String _slug(String name) {
     var clean = name;

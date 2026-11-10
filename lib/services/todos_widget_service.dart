@@ -44,20 +44,20 @@ class TodosWidgetService {
 
   static String _encode(List<Todo> todos) {
     final today = AppClock.today();
-    final listed = [
-      for (final section in groupPending(
-        todos,
-        today,
-        lowFirst: LocalStore.setting('todoLowFirst', false),
-        sort: todoSortOf(LocalStore.setting('todoSortBy', 0)),
-      ))
-        ...section.todos,
-    ].take(_maxTodos).toList()
-      ..addAll(
-        sortCompleted(todos)
-            .where((todo) => todo.doneAt?.atMidnight == today)
-            .take(_maxDone),
-      );
+    final listed =
+        [
+          for (final section in groupPending(
+            todos,
+            today,
+            lowFirst: LocalStore.setting('todoLowFirst', false),
+            sort: todoSortOf(LocalStore.setting('todoSortBy', 0)),
+          ))
+            ...section.todos,
+        ].take(_maxTodos).toList()..addAll(
+          sortCompleted(
+            todos,
+          ).where((todo) => todo.doneAt?.atMidnight == today).take(_maxDone),
+        );
 
     return json.encode({
       'epochDay': today.epochDay,

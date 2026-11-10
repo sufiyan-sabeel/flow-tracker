@@ -5,10 +5,10 @@ void main() {
   final left = DateTime(2026, 8, 9, 10);
 
   bool ask(int grace, Duration away) => appLockNeedsAuth(
-        leftAt: left,
-        graceSeconds: grace,
-        now: left.add(away),
-      );
+    leftAt: left,
+    graceSeconds: grace,
+    now: left.add(away),
+  );
 
   group('the grace period', () {
     test('with no delay it always asks again', () {

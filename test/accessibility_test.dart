@@ -10,17 +10,17 @@ import 'package:flow_tracker/features/settings/pages/settings_page.dart';
 import 'support/app_harness.dart';
 
 Future<void> _seed(WidgetTester tester) => seedHabits(tester, [
-      testHabit(id: 'a', name: 'Read', order: 0, done: lastDays(3)),
-      testHabit(
-        id: 'b',
-        name: 'Water',
-        order: 1,
-        kind: HabitKind.quantitative,
-        perDayTarget: 8,
-        unitLabel: 'glasses',
-      ),
-      testHabit(id: 'c', name: 'No sugar', order: 2, kind: HabitKind.negative),
-    ]);
+  testHabit(id: 'a', name: 'Read', order: 0, done: lastDays(3)),
+  testHabit(
+    id: 'b',
+    name: 'Water',
+    order: 1,
+    kind: HabitKind.quantitative,
+    perDayTarget: 8,
+    unitLabel: 'glasses',
+  ),
+  testHabit(id: 'c', name: 'No sugar', order: 2, kind: HabitKind.negative),
+]);
 
 void main() {
   useEmptyStore();
@@ -90,10 +90,18 @@ void main() {
       ),
     );
     final list = find.byType(Scrollable).first;
-    await tester.scrollUntilVisible(find.bySemanticsLabel('Add step'), 300, scrollable: list);
+    await tester.scrollUntilVisible(
+      find.bySemanticsLabel('Add step'),
+      300,
+      scrollable: list,
+    );
     expect(find.bySemanticsLabel('Add step'), findsOneWidget);
 
-    await tester.scrollUntilVisible(find.bySemanticsLabel('sparkles'), 300, scrollable: list);
+    await tester.scrollUntilVisible(
+      find.bySemanticsLabel('sparkles'),
+      300,
+      scrollable: list,
+    );
     expect(find.bySemanticsLabel('sparkles'), findsOneWidget);
     handle.dispose();
   });

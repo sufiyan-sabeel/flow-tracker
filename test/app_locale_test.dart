@@ -4,11 +4,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flow_tracker/core/i18n/app_locale.dart';
 
 void main() {
-  test('a language the app does not ship falls back to English, not German', () {
-    expect(pickLocale(const [Locale('fi', 'FI')]), const Locale('en'));
-    expect(pickLocale(const [Locale('und')]), const Locale('en'));
-    expect(pickLocale(null), const Locale('en'));
-  });
+  test(
+    'a language the app does not ship falls back to English, not German',
+    () {
+      expect(pickLocale(const [Locale('fi', 'FI')]), const Locale('en'));
+      expect(pickLocale(const [Locale('und')]), const Locale('en'));
+      expect(pickLocale(null), const Locale('en'));
+    },
+  );
 
   test('the first shipped language in the system list wins', () {
     expect(

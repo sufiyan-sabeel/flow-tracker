@@ -143,9 +143,10 @@ class ImportService {
     }
 
     final delimiter = _detectDelimiter(text);
-    final rows = _parseCsv(text, delimiter)
-        .where((r) => r.any((c) => c.trim().isNotEmpty))
-        .toList();
+    final rows = _parseCsv(
+      text,
+      delimiter,
+    ).where((r) => r.any((c) => c.trim().isNotEmpty)).toList();
     if (rows.length < 2) {
       throw const ImportException(
         'That file has no rows to import. Expected a CSV, JSON or zip export.',
@@ -167,7 +168,13 @@ class ImportService {
       return _build(_parseHabitify(lower, rows.skip(1)), 'Habitify');
     }
     final habitCol = _indexOfAny(lower, const ['habit', 'name', 'habitname']);
-    final dateCol = _indexOfAny(lower, const ['date', 'fecha', 'day', 'día', 'timestamp']);
+    final dateCol = _indexOfAny(lower, const [
+      'date',
+      'fecha',
+      'day',
+      'día',
+      'timestamp',
+    ]);
     if (habitCol != null && dateCol != null && habitCol != dateCol) {
       return _build(_parseLong(lower, rows.skip(1)), 'CSV');
     }
@@ -218,14 +225,16 @@ class ImportService {
               : AppPalette.habitColors[i % AppPalette.habitColors.length],
           order: i,
           kind: r.kind,
-          perDayTarget: measurable ? (r.target <= 0 ? 1 : r.target).toDouble() : 1,
+          perDayTarget: measurable
+              ? (r.target <= 0 ? 1 : r.target).toDouble()
+              : 1,
           unitLabel: measurable ? r.unit : '',
           completions: completions,
           createdAt: createdAt,
           archivedAt: r.archived
               ? (r.days.isEmpty
-                  ? DateTime.now()
-                  : r.days.keys.reduce((a, b) => a.isAfter(b) ? a : b))
+                    ? DateTime.now()
+                    : r.days.keys.reduce((a, b) => a.isAfter(b) ? a : b))
               : null,
         ),
       );
@@ -246,8 +255,8 @@ class ImportService {
     final list = decoded is List
         ? decoded
         : (decoded is Map && decoded['habits'] is List
-            ? decoded['habits'] as List
-            : const []);
+              ? decoded['habits'] as List
+              : const []);
     final habits = <Habit>[];
     for (final e in list) {
       if (e is! Map) continue;
@@ -260,8 +269,7 @@ class ImportService {
     if (habits.isEmpty) {
       throw const ImportException('No habits found in that backup.');
     }
-    final entries =
-        habits.fold<int>(0, (a, h) => a + h.completions.length);
+    final entries = habits.fold<int>(0, (a, h) => a + h.completions.length);
     return ImportOutcome(
       habits: habits,
       source: 'Flow-tracker',
@@ -307,13 +315,15 @@ class ImportService {
         final archivedIdx = lower.indexOf('archived?');
         final questionIdx = lower.indexOf('question');
         final descriptionIdx = lower.indexOf('description');
-        final numeratorIdx = _indexOfAny(
+        final numeratorIdx =
+            _indexOfAny(
               lower,
               const ['frequencynumerator', 'numrepetitions'],
             ) ??
             -1;
         final denominatorIdx =
-            _indexOfAny(lower, const ['frequencydenominator', 'interval']) ?? -1;
+            _indexOfAny(lower, const ['frequencydenominator', 'interval']) ??
+            -1;
         String cell(List<String> row, int idx) =>
             idx >= 0 && row.length > idx ? row[idx].trim() : '';
         for (final row in rows.skip(1)) {
@@ -322,7 +332,8 @@ class ImportService {
           if (name.isEmpty) continue;
           final numerical = cell(row, typeIdx).toUpperCase() == 'NUMERICAL';
           final target = numerical
-              ? (double.tryParse(cell(row, targetIdx).replaceAll(',', '.')) ?? 1)
+              ? (double.tryParse(cell(row, targetIdx).replaceAll(',', '.')) ??
+                    1)
               : 1;
           final (interval, frequency, every) = _loopSchedule(
             int.tryParse(cell(row, numeratorIdx)) ?? 1,
@@ -335,9 +346,10 @@ class ImportService {
             target: target <= 0 ? 1 : target,
             unit: cell(row, unitIdx),
             archived: cell(row, archivedIdx).toLowerCase() == 'true',
-            description: [cell(row, questionIdx), cell(row, descriptionIdx)]
-                .where((text) => text.isNotEmpty)
-                .join('\n'),
+            description: [
+              cell(row, questionIdx),
+              cell(row, descriptionIdx),
+            ].where((text) => text.isNotEmpty).join('\n'),
             interval: interval,
             frequency: frequency,
             every: every,
@@ -403,7 +415,10 @@ class ImportService {
     return ordered;
   }
 
-  static (HabitInterval, int, int) _loopSchedule(int numerator, int denominator) {
+  static (HabitInterval, int, int) _loopSchedule(
+    int numerator,
+    int denominator,
+  ) {
     if (numerator < 1 || denominator < 1 || numerator >= denominator) {
       return (HabitInterval.daily, 1, 2);
     }
@@ -433,7 +448,9 @@ class ImportService {
     final metadata = _entry(files, 'metadata.txt');
     final habitsCsv = _entry(files, 'habits.csv');
     final actionsCsv = _entry(files, 'actions.csv');
-    if (metadata == null || habitsCsv == null || actionsCsv == null) return null;
+    if (metadata == null || habitsCsv == null || actionsCsv == null) {
+      return null;
+    }
     if (!_decode(metadata).contains('backup_version')) return null;
 
     final habitRows = _rows(_decode(habitsCsv));
@@ -465,7 +482,9 @@ class ImportService {
 
     final actionRows = _rows(_decode(actionsCsv));
     if (actionRows.isNotEmpty) {
-      final aHead = actionRows.first.map((c) => c.trim().toLowerCase()).toList();
+      final aHead = actionRows.first
+          .map((c) => c.trim().toLowerCase())
+          .toList();
       final habitIdx = aHead.indexOf('habit_id');
       final timeIdx = aHead.indexOf('timestamp');
       for (final row in actionRows.skip(1)) {
@@ -480,8 +499,8 @@ class ImportService {
 
     final ordered = byId.entries.toList()
       ..sort((a, b) {
-        final archived = (a.value.habit.archived ? 1 : 0) -
-            (b.value.habit.archived ? 1 : 0);
+        final archived =
+            (a.value.habit.archived ? 1 : 0) - (b.value.habit.archived ? 1 : 0);
         if (archived != 0) return archived;
         if (a.value.habit.archived) {
           return (int.tryParse(a.key) ?? 0).compareTo(int.tryParse(b.key) ?? 0);
@@ -491,8 +510,11 @@ class ImportService {
     return [for (final e in ordered) e.value.habit];
   }
 
-  static List<int>? _entry(Map<String, List<int>> files, String basename,
-      {bool topLevelOnly = false}) {
+  static List<int>? _entry(
+    Map<String, List<int>> files,
+    String basename, {
+    bool topLevelOnly = false,
+  }) {
     for (final e in files.entries) {
       final name = e.key.toLowerCase();
       if (topLevelOnly && name != basename) continue;
@@ -503,9 +525,10 @@ class ImportService {
 
   static List<List<String>> _rows(String text) {
     final delimiter = _detectDelimiter(text);
-    return _parseCsv(text, delimiter)
-        .where((r) => r.any((c) => c.trim().isNotEmpty))
-        .toList();
+    return _parseCsv(
+      text,
+      delimiter,
+    ).where((r) => r.any((c) => c.trim().isNotEmpty)).toList();
   }
 
   static int? _parseHexColor(String raw) {
@@ -527,7 +550,9 @@ class ImportService {
   }
 
   static List<_RawHabit> _parseHabitBull(
-      List<String> header, Iterable<List<String>> rows) {
+    List<String> header,
+    Iterable<List<String>> rows,
+  ) {
     final lower = header.map((c) => c.toLowerCase()).toList();
     final nameIdx = lower.indexOf('habitname');
     final dateIdx = lower.indexOf('date');
@@ -554,8 +579,9 @@ class ImportService {
       (decoded['completions'] is List ||
           decoded['intervals'] is List ||
           (decoded['habits'] as List).any(
-            (h) => h is Map && (h.containsKey('iconName') ||
-                h.containsKey('orderIndex')),
+            (h) =>
+                h is Map &&
+                (h.containsKey('iconName') || h.containsKey('orderIndex')),
           ));
 
   static List<_RawHabit> _parseHabitKit(dynamic decoded) {
@@ -611,8 +637,7 @@ class ImportService {
         if (c is! Map) continue;
         final raw = byId[c['habitId']?.toString()];
         if (raw == null) continue;
-        final date =
-            _habitKitDate(c['date'], c['timezoneOffsetInMinutes']);
+        final date = _habitKitDate(c['date'], c['timezoneOffsetInMinutes']);
         if (date == null) continue;
         final amount = c['amountOfCompletions'];
         final n = amount is num ? amount.toInt() : 1;
@@ -637,13 +662,27 @@ class ImportService {
     final hex = _parseHexColor(name);
     if (hex != null) return hex;
     const m = {
-      'red': 0xFFF44336, 'pink': 0xFFE91E63, 'purple': 0xFF9C27B0,
-      'deeppurple': 0xFF673AB7, 'indigo': 0xFF3F51B5, 'blue': 0xFF2196F3,
-      'lightblue': 0xFF03A9F4, 'cyan': 0xFF00BCD4, 'teal': 0xFF009688,
-      'green': 0xFF4CAF50, 'lightgreen': 0xFF8BC34A, 'lime': 0xFFCDDC39,
-      'yellow': 0xFFFDD835, 'amber': 0xFFFFC107, 'orange': 0xFFFF9800,
-      'deeporange': 0xFFFF5722, 'brown': 0xFF795548, 'gray': 0xFF9E9E9E,
-      'grey': 0xFF9E9E9E, 'bluegray': 0xFF607D8B, 'bluegrey': 0xFF607D8B,
+      'red': 0xFFF44336,
+      'pink': 0xFFE91E63,
+      'purple': 0xFF9C27B0,
+      'deeppurple': 0xFF673AB7,
+      'indigo': 0xFF3F51B5,
+      'blue': 0xFF2196F3,
+      'lightblue': 0xFF03A9F4,
+      'cyan': 0xFF00BCD4,
+      'teal': 0xFF009688,
+      'green': 0xFF4CAF50,
+      'lightgreen': 0xFF8BC34A,
+      'lime': 0xFFCDDC39,
+      'yellow': 0xFFFDD835,
+      'amber': 0xFFFFC107,
+      'orange': 0xFFFF9800,
+      'deeporange': 0xFFFF5722,
+      'brown': 0xFF795548,
+      'gray': 0xFF9E9E9E,
+      'grey': 0xFF9E9E9E,
+      'bluegray': 0xFF607D8B,
+      'bluegrey': 0xFF607D8B,
     };
     return m[name.toLowerCase().replaceAll(' ', '').replaceAll('_', '')];
   }
@@ -700,12 +739,14 @@ class ImportService {
   }
 
   static List<_RawHabit> _parseMatrix(
-      List<String> header, Iterable<List<String>> rows) {
+    List<String> header,
+    Iterable<List<String>> rows,
+  ) {
     final habits = <_RawHabit?>[];
     for (var i = 0; i < header.length; i++) {
-      habits.add(i == 0 || header[i].trim().isEmpty
-          ? null
-          : _RawHabit(header[i].trim()));
+      habits.add(
+        i == 0 || header[i].trim().isEmpty ? null : _RawHabit(header[i].trim()),
+      );
     }
     for (final row in rows) {
       if (row.isEmpty) continue;
@@ -720,12 +761,28 @@ class ImportService {
   }
 
   static List<_RawHabit> _parseLong(
-      List<String> lowerHeader, Iterable<List<String>> rows) {
-    final habitCol = _indexOfAny(lowerHeader, const ['habit', 'name', 'habitname'])!;
-    final dateCol =
-        _indexOfAny(lowerHeader, const ['date', 'fecha', 'day', 'día', 'timestamp'])!;
-    final valueCol =
-        _indexOfAny(lowerHeader, const ['value', 'count', 'amount', 'done', 'completed']);
+    List<String> lowerHeader,
+    Iterable<List<String>> rows,
+  ) {
+    final habitCol = _indexOfAny(lowerHeader, const [
+      'habit',
+      'name',
+      'habitname',
+    ])!;
+    final dateCol = _indexOfAny(lowerHeader, const [
+      'date',
+      'fecha',
+      'day',
+      'día',
+      'timestamp',
+    ])!;
+    final valueCol = _indexOfAny(lowerHeader, const [
+      'value',
+      'count',
+      'amount',
+      'done',
+      'completed',
+    ]);
     final byName = <String, _RawHabit>{};
     for (final row in rows) {
       if (row.length <= habitCol || row.length <= dateCol) continue;
@@ -743,7 +800,9 @@ class ImportService {
   }
 
   static List<_RawHabit> _parseHabitify(
-      List<String> lower, Iterable<List<String>> rows) {
+    List<String> lower,
+    Iterable<List<String>> rows,
+  ) {
     final habitCol = lower.indexOf('habit');
     final dateCol = lower.indexOf('date');
     final statusCol = lower.indexOf('status');
@@ -762,8 +821,8 @@ class ImportService {
       names.putIfAbsent(key, () => name);
       final log = num.tryParse(cell(row, logCol).replaceAll(',', '.')) ?? 0;
       logs.putIfAbsent(key, () => []).add(
-            (date, cell(row, statusCol).toLowerCase(), log),
-          );
+        (date, cell(row, statusCol).toLowerCase(), log),
+      );
     }
     return [
       for (final entry in logs.entries)
@@ -772,9 +831,12 @@ class ImportService {
   }
 
   static _RawHabit _habitifyHabit(
-      String name, List<(DateTime, String, num)> days) {
+    String name,
+    List<(DateTime, String, num)> days,
+  ) {
     final statuses = {for (final (_, status, _) in days) status};
-    final avoid = statuses.contains('succeeded') ||
+    final avoid =
+        statuses.contains('succeeded') ||
         (statuses.contains('failed') && !statuses.contains('completed'));
     final habit = _RawHabit(
       name,
@@ -782,7 +844,9 @@ class ImportService {
     );
     for (final (date, status, log) in days) {
       habit.seen(date);
-      if (avoid && status == 'failed') habit.mark(date, log < 1 ? 1 : log.round());
+      if (avoid && status == 'failed') {
+        habit.mark(date, log < 1 ? 1 : log.round());
+      }
       if (!avoid && status == 'completed') habit.mark(date, 1);
     }
     return habit;
@@ -822,8 +886,21 @@ class ImportService {
     final n = num.tryParse(s.replaceAll(',', '.'));
     if (n != null) return n > 0 ? n.round() : 0;
     const truthy = {
-      'yes', 'y', 'true', 't', 'x', '✓', '✔', 'v', 'done', 'complete',
-      'completed', 'si', 'sí', 'ok', 'yes_manual',
+      'yes',
+      'y',
+      'true',
+      't',
+      'x',
+      '✓',
+      '✔',
+      'v',
+      'done',
+      'complete',
+      'completed',
+      'si',
+      'sí',
+      'ok',
+      'yes_manual',
     };
     return truthy.contains(s) ? 1 : 0;
   }
@@ -833,7 +910,8 @@ class ImportService {
       final n = raw.toInt();
 
       return DateTime.fromMillisecondsSinceEpoch(
-          n >= 100000000000 ? n : n * 1000);
+        n >= 100000000000 ? n : n * 1000,
+      );
     }
     if (raw is String) {
       final ms = int.tryParse(raw);
@@ -854,10 +932,10 @@ class ImportService {
     final sep = datePart.contains('/')
         ? '/'
         : datePart.contains('-')
-            ? '-'
-            : datePart.contains('.')
-                ? '.'
-                : '';
+        ? '-'
+        : datePart.contains('.')
+        ? '.'
+        : '';
     if (sep.isEmpty) return null;
     final parts = datePart.split(sep);
     if (parts.length != 3) return null;
@@ -922,7 +1000,9 @@ class ImportService {
   }
 
   static String _detectDelimiter(String text) {
-    final firstLine = text.split('\n').firstWhere(
+    final firstLine = text
+        .split('\n')
+        .firstWhere(
           (l) => l.trim().isNotEmpty,
           orElse: () => '',
         );
