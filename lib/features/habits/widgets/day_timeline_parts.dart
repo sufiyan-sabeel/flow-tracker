@@ -120,78 +120,84 @@ class TimelineBlock extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                Row(
-                  children: [
-                    Container(
-                      width: _tile,
-                      height: _tileHeight,
-                      decoration: BoxDecoration(
-                        color: habit.color.shownIn(context).withValues(alpha: done ? 0.5 : 0.18),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: HabitGlyph(
-                        glyph: habit.icon,
-                        color: done ? scheme.surface : habit.color.shownIn(context),
-                        size: 22,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            habit.name,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 15.5,
-                              fontWeight: FontWeight.w700,
-                              color:
-                                  done ? context.tokens.muted : scheme.onSurface,
-                              decoration:
-                                  done ? TextDecoration.lineThrough : null,
-                              decorationColor: context.tokens.muted,
-                            ),
+                    Row(
+                      children: [
+                        Container(
+                          width: _tile,
+                          height: _tileHeight,
+                          decoration: BoxDecoration(
+                            color: habit.color
+                                .shownIn(context)
+                                .withValues(alpha: done ? 0.5 : 0.18),
+                            borderRadius: BorderRadius.circular(14),
                           ),
-                          const SizedBox(height: 3),
-                          Text(
-                            _subtitle(context),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 12.5,
-                              fontWeight: FontWeight.w600,
-                              color: context.tokens.muted,
-                            ),
+                          child: HabitGlyph(
+                            glyph: habit.icon,
+                            color: done
+                                ? scheme.surface
+                                : habit.color.shownIn(context),
+                            size: 22,
                           ),
-                          if (progress != null) ...[
-                            const SizedBox(height: 2),
-                            Text(
-                              progress,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.w700,
-                                color: habit.color.shownIn(context),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                habit.name,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 15.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: done
+                                      ? context.tokens.muted
+                                      : scheme.onSurface,
+                                  decoration: done
+                                      ? TextDecoration.lineThrough
+                                      : null,
+                                  decorationColor: context.tokens.muted,
+                                ),
                               ),
-                            ),
-                          ],
-                        ],
-                      ),
+                              const SizedBox(height: 3),
+                              Text(
+                                _subtitle(context),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: context.tokens.muted,
+                                ),
+                              ),
+                              if (progress != null) ...[
+                                const SizedBox(height: 2),
+                                Text(
+                                  progress,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: habit.color.shownIn(context),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        TimelineCheck(
+                          habit: habit,
+                          date: date,
+                          done: done,
+                          onTap: onCheck,
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 10),
-                    TimelineCheck(
-                      habit: habit,
-                      date: date,
-                      done: done,
-                      onTap: onCheck,
-                    ),
-                  ],
-                ),
-                TimelineNotes(habit: habit, date: date),
+                    TimelineNotes(habit: habit, date: date),
                   ],
                 ),
               ),
@@ -205,8 +211,8 @@ class TimelineBlock extends StatelessWidget {
 
 Color timelineTodoColor(BuildContext context, Todo todo) =>
     todo.priority == TodoPriority.none
-        ? context.colors.primary
-        : todoPriorityColor(context, todo.priority);
+    ? context.colors.primary
+    : todoPriorityColor(context, todo.priority);
 
 class TimelineTodo extends StatelessWidget {
   const TimelineTodo({
@@ -305,10 +311,12 @@ class TimelineTodo extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 15.5,
                               fontWeight: FontWeight.w700,
-                              color:
-                                  done ? context.tokens.muted : scheme.onSurface,
-                              decoration:
-                                  done ? TextDecoration.lineThrough : null,
+                              color: done
+                                  ? context.tokens.muted
+                                  : scheme.onSurface,
+                              decoration: done
+                                  ? TextDecoration.lineThrough
+                                  : null,
                               decorationColor: context.tokens.muted,
                             ),
                           ),
@@ -497,7 +505,9 @@ class TimelineCheck extends StatelessWidget {
   Widget build(BuildContext context) {
     final count = habit.completions[date.dayKey]?.count ?? 0;
     final progress = habit.progressFor(count, goal: habit.pastGoalOn(date));
-    final color = _quant ? progress.activeColor(habit.color.shownIn(context)) : habit.color.shownIn(context);
+    final color = _quant
+        ? progress.activeColor(habit.color.shownIn(context))
+        : habit.color.shownIn(context);
     final circle = context.watch<SettingsController>().isCircleCheck;
 
     return Semantics(
@@ -505,8 +515,8 @@ class TimelineCheck extends StatelessWidget {
       label: _quant
           ? context.l10n.a11y_add_amount(habit.name)
           : done
-              ? context.l10n.a11y_mark_not_done(habit.name)
-              : context.l10n.a11y_mark_done(habit.name),
+          ? context.l10n.a11y_mark_not_done(habit.name)
+          : context.l10n.a11y_mark_done(habit.name),
       child: GestureDetector(
         onTap: onTap,
         child: SizedBox(
@@ -551,16 +561,16 @@ class TimelineCheck extends StatelessWidget {
                   done
                       ? LucideIcons.check
                       : habit.needsFocusSession
-                          ? LucideIcons.timer
-                          : _quant
-                              ? LucideIcons.plus
-                              : LucideIcons.check,
+                      ? LucideIcons.timer
+                      : _quant
+                      ? LucideIcons.plus
+                      : LucideIcons.check,
                   size: _quant ? 15 : 18,
                   color: done
                       ? context.colors.surface
                       : _quant || habit.needsFocusSession
-                          ? color
-                          : color.withValues(alpha: 0.3),
+                      ? color
+                      : color.withValues(alpha: 0.3),
                 ),
               ),
             ],

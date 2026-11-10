@@ -21,8 +21,10 @@ class _HabitEntranceState extends State<HabitEntrance>
     vsync: this,
     duration: const Duration(milliseconds: 420),
   );
-  late final Animation<double> _fade =
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut);
+  late final Animation<double> _fade = CurvedAnimation(
+    parent: _controller,
+    curve: Curves.easeOut,
+  );
   late final Animation<Offset> _slide = Tween(
     begin: const Offset(0, 0.12),
     end: Offset.zero,
@@ -50,10 +52,10 @@ class _HabitEntranceState extends State<HabitEntrance>
   Widget build(BuildContext context) => MediaQuery.disableAnimationsOf(context)
       ? RepaintBoundary(child: widget.child)
       : FadeTransition(
-        opacity: _fade,
-        child: SlideTransition(
-          position: _slide,
-          child: RepaintBoundary(child: widget.child),
-        ),
-      );
+          opacity: _fade,
+          child: SlideTransition(
+            position: _slide,
+            child: RepaintBoundary(child: widget.child),
+          ),
+        );
 }

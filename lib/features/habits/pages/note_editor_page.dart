@@ -45,14 +45,15 @@ class NoteEditorPage extends StatefulWidget {
 class _NoteEditorPageState extends State<NoteEditorPage> with ShortcutHost {
   @override
   Map<AppShortcut, VoidCallback> get shortcuts => {
-        AppShortcut.save: _save,
-        AppShortcut.create: () {},
-        AppShortcut.createFolder: () {},
-        AppShortcut.find: () {},
-      };
+    AppShortcut.save: _save,
+    AppShortcut.create: () {},
+    AppShortcut.createFolder: () {},
+    AppShortcut.find: () {},
+  };
 
-  late final TextEditingController _text =
-      TextEditingController(text: widget.note?.text ?? '');
+  late final TextEditingController _text = TextEditingController(
+    text: widget.note?.text ?? '',
+  );
   late NoteType _type = widget.note?.type ?? NoteType.note;
   late TimeOfDay? _time = widget.note?.time;
   late final List<String> _photos = [...?widget.note?.photos];
@@ -134,10 +135,12 @@ class _NoteEditorPageState extends State<NoteEditorPage> with ShortcutHost {
           leading: express
               ? Padding(
                   padding: const EdgeInsets.only(left: 16),
-                  child: Center(child: ExpressIconButton(
-                    icon: LucideIcons.arrowLeft,
-                    onPressed: () => AppNavigator.pop(),
-                  )),
+                  child: Center(
+                    child: ExpressIconButton(
+                      icon: LucideIcons.arrowLeft,
+                      onPressed: () => AppNavigator.pop(),
+                    ),
+                  ),
                 )
               : IconButton(
                   icon: const Icon(LucideIcons.arrowLeft),
@@ -204,11 +207,13 @@ class _NoteEditorPageState extends State<NoteEditorPage> with ShortcutHost {
                     maxLength: _kMaxLength,
                     textCapitalization: TextCapitalization.sentences,
                     onChanged: (_) => setState(() {}),
-                    buildCounter: (_,
-                            {required currentLength,
-                            required isFocused,
-                            maxLength}) =>
-                        null,
+                    buildCounter:
+                        (
+                          _, {
+                          required currentLength,
+                          required isFocused,
+                          maxLength,
+                        }) => null,
                     style: TextStyle(
                       fontSize: 15.5,
                       height: 1.4,
@@ -279,32 +284,33 @@ class _NoteEditorPageState extends State<NoteEditorPage> with ShortcutHost {
             ),
             const SizedBox(height: 28),
             if (!express)
-            SizedBox(
-              height: 52,
-              child: FilledButton(
-                onPressed: _canSave ? _save : null,
-                style: FilledButton.styleFrom(
-                  backgroundColor: widget.accent,
-                  disabledBackgroundColor:
-                      widget.accent.withValues(alpha: 0.14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+              SizedBox(
+                height: 52,
+                child: FilledButton(
+                  onPressed: _canSave ? _save : null,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: widget.accent,
+                    disabledBackgroundColor: widget.accent.withValues(
+                      alpha: 0.14,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
-                ),
-                child: Text(
-                  context.l10n.save_note,
-                  style: sheetActionStyle(
-                    context,
-                    size: 16,
-                    color: !_canSave
-                        ? widget.accent.withValues(alpha: 0.6)
-                        : widget.accent.computeLuminance() > 0.6
-                        ? Colors.black
-                        : Colors.white,
+                  child: Text(
+                    context.l10n.save_note,
+                    style: sheetActionStyle(
+                      context,
+                      size: 16,
+                      color: !_canSave
+                          ? widget.accent.withValues(alpha: 0.6)
+                          : widget.accent.computeLuminance() > 0.6
+                          ? Colors.black
+                          : Colors.white,
+                    ),
                   ),
                 ),
               ),
-            ),
           ],
         ),
       ),
@@ -445,16 +451,16 @@ class _Label extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(left: 2, bottom: 10),
-        child: Text(
-          text,
-          style: context.watch<SettingsController>().isExpressStyle
-              ? ExpressType.headline.at(
-                  15,
-                  weight: 800,
-                  color: context.colors.primary,
-                )
-              : sheetLabelStyle(context),
-        ),
-      );
+    padding: const EdgeInsets.only(left: 2, bottom: 10),
+    child: Text(
+      text,
+      style: context.watch<SettingsController>().isExpressStyle
+          ? ExpressType.headline.at(
+              15,
+              weight: 800,
+              color: context.colors.primary,
+            )
+          : sheetLabelStyle(context),
+    ),
+  );
 }

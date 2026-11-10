@@ -56,130 +56,130 @@ class _QuantStatsPageState extends State<QuantStatsPage> {
     final totals = stats.totals;
 
     final body = totals.loggedDays == 0
-          ? AppEmptyState(
-              icon: LucideIcons.chartColumn,
-              title: context.l10n.no_data_yet,
-              message: context.l10n.quant_stats_empty,
-            )
-          : ListView(
-              padding: context.pagePadding(16, 8, 16, 28),
-              children: [
-                if (habit.tracksBook) ...[
-                  StatReveal(child: BookCard(habit: habit)),
-                  const SizedBox(height: 12),
-                ],
-                if (habit.hasTotalGoal) ...[
-                  StatReveal(child: TotalGoalCard(habit: habit)),
-                  const SizedBox(height: 12),
-                ],
-                StatReveal(
-                  child: StatPair(
-                    left: MiniStat(
-                      icon: LucideIcons.sun,
-                      color: habit.color.shownIn(context),
-                      value: habit.amountText(stats.today),
-                      unit: unit,
-                      label: context.l10n.today,
-                    ),
-                    right: MiniStat(
-                      icon: LucideIcons.calendarDays,
-                      color: context.tokens.info,
-                      value: habit.amountText(stats.week),
-                      unit: unit,
-                      label: context.l10n.week,
-                    ),
-                  ),
-                ),
+        ? AppEmptyState(
+            icon: LucideIcons.chartColumn,
+            title: context.l10n.no_data_yet,
+            message: context.l10n.quant_stats_empty,
+          )
+        : ListView(
+            padding: context.pagePadding(16, 8, 16, 28),
+            children: [
+              if (habit.tracksBook) ...[
+                StatReveal(child: BookCard(habit: habit)),
                 const SizedBox(height: 12),
-                StatReveal(
-                  child: StatPair(
-                    left: MiniStat(
-                      icon: LucideIcons.calendarRange,
-                      color: context.tokens.warning,
-                      value: habit.amountText(stats.month),
-                      unit: unit,
-                      label: context.l10n.month,
-                    ),
-                    right: MiniStat(
-                      icon: LucideIcons.sigma,
-                      color: context.tokens.success,
-                      value: habit.amountText(totals.total),
-                      unit: unit,
-                      label: context.l10n.total,
-                    ),
-                  ),
-                ),
+              ],
+              if (habit.hasTotalGoal) ...[
+                StatReveal(child: TotalGoalCard(habit: habit)),
                 const SizedBox(height: 12),
-                StatReveal(
-                  child: StatPair(
-                    left: MiniStat(
-                      icon: LucideIcons.calendarCheck,
-                      color: habit.color.shownIn(context),
-                      value: '${totals.loggedDays}',
-                      label: context.l10n.quant_logged_days,
-                    ),
-                    right: MiniStat(
-                      icon: LucideIcons.activity,
-                      color: context.tokens.info,
-                      value: habit.amountText(totals.average),
-                      unit: unit,
-                      label: context.l10n.quant_average,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                StatReveal(
-                  child: StatPair(
-                    left: MiniStat(
-                      icon: LucideIcons.trophy,
-                      color: context.tokens.warning,
-                      value: habit.amountText(totals.best),
-                      unit: unit,
-                      label: context.l10n.quant_best_day,
-                    ),
-                    right: MiniStat(
-                      icon: LucideIcons.circleCheck,
-                      color: context.tokens.success,
-                      value: '${totals.goalDays}',
-                      label: context.l10n.quant_goal_days,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                StatReveal(
-                  child: StatCard(
-                    title: context.l10n.quant_per_day,
-                    icon: LucideIcons.chartColumn,
+              ],
+              StatReveal(
+                child: StatPair(
+                  left: MiniStat(
+                    icon: LucideIcons.sun,
                     color: habit.color.shownIn(context),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Segmented(
-                            options: [
-                              context.l10n.week,
-                              context.l10n.month,
-                              context.l10n.year,
-                            ],
-                            index: QuantRange.values.indexOf(_range),
-                            onChanged: (index) => setState(
-                              () => _range = QuantRange.values[index],
-                            ),
+                    value: habit.amountText(stats.today),
+                    unit: unit,
+                    label: context.l10n.today,
+                  ),
+                  right: MiniStat(
+                    icon: LucideIcons.calendarDays,
+                    color: context.tokens.info,
+                    value: habit.amountText(stats.week),
+                    unit: unit,
+                    label: context.l10n.week,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              StatReveal(
+                child: StatPair(
+                  left: MiniStat(
+                    icon: LucideIcons.calendarRange,
+                    color: context.tokens.warning,
+                    value: habit.amountText(stats.month),
+                    unit: unit,
+                    label: context.l10n.month,
+                  ),
+                  right: MiniStat(
+                    icon: LucideIcons.sigma,
+                    color: context.tokens.success,
+                    value: habit.amountText(totals.total),
+                    unit: unit,
+                    label: context.l10n.total,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              StatReveal(
+                child: StatPair(
+                  left: MiniStat(
+                    icon: LucideIcons.calendarCheck,
+                    color: habit.color.shownIn(context),
+                    value: '${totals.loggedDays}',
+                    label: context.l10n.quant_logged_days,
+                  ),
+                  right: MiniStat(
+                    icon: LucideIcons.activity,
+                    color: context.tokens.info,
+                    value: habit.amountText(totals.average),
+                    unit: unit,
+                    label: context.l10n.quant_average,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              StatReveal(
+                child: StatPair(
+                  left: MiniStat(
+                    icon: LucideIcons.trophy,
+                    color: context.tokens.warning,
+                    value: habit.amountText(totals.best),
+                    unit: unit,
+                    label: context.l10n.quant_best_day,
+                  ),
+                  right: MiniStat(
+                    icon: LucideIcons.circleCheck,
+                    color: context.tokens.success,
+                    value: '${totals.goalDays}',
+                    label: context.l10n.quant_goal_days,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              StatReveal(
+                child: StatCard(
+                  title: context.l10n.quant_per_day,
+                  icon: LucideIcons.chartColumn,
+                  color: habit.color.shownIn(context),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Segmented(
+                          options: [
+                            context.l10n.week,
+                            context.l10n.month,
+                            context.l10n.year,
+                          ],
+                          index: QuantRange.values.indexOf(_range),
+                          onChanged: (index) => setState(
+                            () => _range = QuantRange.values[index],
                           ),
                         ),
-                        const SizedBox(height: 18),
-                        QuantRangeBars(
-                          habit: habit,
-                          stats: stats,
-                          range: _range,
-                        ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 18),
+                      QuantRangeBars(
+                        habit: habit,
+                        stats: stats,
+                        range: _range,
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            );
+              ),
+            ],
+          );
 
     return Scaffold(
       appBar: AppBar(

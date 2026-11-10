@@ -41,12 +41,12 @@ class IntervalSelector extends StatelessWidget {
   int get _max => interval == HabitInterval.weekly ? 6 : 25;
 
   String _label(BuildContext context, HabitInterval option) => switch (option) {
-        HabitInterval.daily => context.l10n.daily,
-        HabitInterval.weekly => context.l10n.weekly,
-        HabitInterval.monthly => context.l10n.monthly,
-        HabitInterval.weekdays => context.l10n.sched_days,
-        HabitInterval.everyXDays => context.l10n.sched_interval,
-      };
+    HabitInterval.daily => context.l10n.daily,
+    HabitInterval.weekly => context.l10n.weekly,
+    HabitInterval.monthly => context.l10n.monthly,
+    HabitInterval.weekdays => context.l10n.sched_days,
+    HabitInterval.everyXDays => context.l10n.sched_interval,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -66,8 +66,10 @@ class IntervalSelector extends StatelessWidget {
                   onTap: () => onIntervalChanged(option),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 180),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
                       color: option == interval
                           ? scheme.primary
@@ -199,7 +201,7 @@ class IntervalSelector extends StatelessWidget {
           ),
           HoldRepeatButton(
             icon: LucideIcons.minus,
-label: context.l10n.a11y_decrease,
+            label: context.l10n.a11y_decrease,
             onTap: value > min ? () => onChanged(value - 1) : null,
           ),
           SizedBox(
@@ -216,7 +218,7 @@ label: context.l10n.a11y_decrease,
           ),
           HoldRepeatButton(
             icon: LucideIcons.plus,
-label: context.l10n.a11y_increase,
+            label: context.l10n.a11y_increase,
             onTap: value < max ? () => onChanged(value + 1) : null,
           ),
         ],
@@ -288,14 +290,13 @@ class ScheduleStartRow extends StatelessWidget {
   }
 }
 
-int scheduleEveryMin(ScheduleUnit unit) =>
-    unit == ScheduleUnit.days ? 2 : 1;
+int scheduleEveryMin(ScheduleUnit unit) => unit == ScheduleUnit.days ? 2 : 1;
 
 int scheduleEveryMax(ScheduleUnit unit) => switch (unit) {
-      ScheduleUnit.days => 90,
-      ScheduleUnit.weeks => 26,
-      ScheduleUnit.months => 24,
-    };
+  ScheduleUnit.days => 90,
+  ScheduleUnit.weeks => 26,
+  ScheduleUnit.months => 24,
+};
 
 String scheduleEveryLabel(BuildContext context, int every, ScheduleUnit unit) =>
     switch (unit) {
@@ -380,8 +381,7 @@ class ScheduleUnitRow extends StatelessWidget {
 }
 
 class AddReminderButton extends StatelessWidget {
-  const AddReminderButton({
-    super.key,required this.onTap});
+  const AddReminderButton({super.key, required this.onTap});
 
   final VoidCallback onTap;
 

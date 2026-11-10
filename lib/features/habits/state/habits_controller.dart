@@ -48,8 +48,8 @@ class HabitsController extends ChangeNotifier {
     super.notifyListeners();
   }
 
-  List<Habit> get habits => _active ??=
-      _habits.values.where((h) => !h.isArchived).toList()
+  List<Habit> get habits =>
+      _active ??= _habits.values.where((h) => !h.isArchived).toList()
         ..sort((a, b) => a.order.compareTo(b.order));
 
   List<Habit> get withArchived => _every ??= _habits.values.toList();
@@ -63,9 +63,9 @@ class HabitsController extends ChangeNotifier {
   bool get isEmpty => habits.isEmpty;
 
   Map<String, Habit> get asMap => {
-        for (final entry in _habits.entries)
-          if (!entry.value.isArchived) entry.key: entry.value,
-      };
+    for (final entry in _habits.entries)
+      if (!entry.value.isArchived) entry.key: entry.value,
+  };
 
   Habit? byId(String id) => _habits[id];
 
@@ -97,9 +97,11 @@ class HabitsController extends ChangeNotifier {
   }
 
   Future<void> _rescheduleChanged(Map<String, Habit> before) async {
-    String plan(Habit habit) => jsonEncode(habit.toMap()
-      ..remove('completions')
-      ..remove('missReasons'));
+    String plan(Habit habit) => jsonEncode(
+      habit.toMap()
+        ..remove('completions')
+        ..remove('missReasons'),
+    );
     try {
       for (final id in before.keys) {
         if (!_habits.containsKey(id)) await _notifications.cancelFor(id);
@@ -117,7 +119,9 @@ class HabitsController extends ChangeNotifier {
   }
 
   void recount() {
-    _habits = {for (final entry in _habits.entries) entry.key: entry.value.copyWith()};
+    _habits = {
+      for (final entry in _habits.entries) entry.key: entry.value.copyWith(),
+    };
     _countedOn = AppClock.today().epochDay;
     notifyListeners();
   }
@@ -263,7 +267,11 @@ class HabitsController extends ChangeNotifier {
     HomeWidgetService.syncSoon(() => asMap);
   }
 
-  Future<void> toggle(String id, DateTime date, {bool fromFocus = false}) async {
+  Future<void> toggle(
+    String id,
+    DateTime date, {
+    bool fromFocus = false,
+  }) async {
     final habit = _habits[id];
     if (habit == null) return;
     if (habit.blocksManualCheck(date, fromFocus: fromFocus)) return;
@@ -333,7 +341,11 @@ class HabitsController extends ChangeNotifier {
   }) async {
     final habit = _habits[id];
     if (habit == null) return;
-    await _apply(habit, CompletionOps.addProgress(habit, date, delta), chime: chime);
+    await _apply(
+      habit,
+      CompletionOps.addProgress(habit, date, delta),
+      chime: chime,
+    );
   }
 
   Future<void> setProgress(String id, DateTime date, double value) async {
@@ -430,7 +442,10 @@ class HabitsController extends ChangeNotifier {
     if (!habit.isPausedOn(day)) {
       await update(
         habit.copyWith(
-          vacations: [...habit.vacations, VacationPeriod(start: day, end: day)],
+          vacations: [
+            ...habit.vacations,
+            VacationPeriod(start: day, end: day),
+          ],
         ),
       );
       return;
@@ -446,7 +461,9 @@ class HabitsController extends ChangeNotifier {
         periods.add(VacationPeriod(start: period.start, end: previous));
       }
       if (period.end == null) {
-        if (!next.isAfter(AppClock.today())) periods.add(VacationPeriod(start: next));
+        if (!next.isAfter(AppClock.today())) {
+          periods.add(VacationPeriod(start: next));
+        }
       } else if (period.end!.isAfter(day)) {
         periods.add(VacationPeriod(start: next, end: period.end));
       }
@@ -545,8 +562,7 @@ class HabitsController extends ChangeNotifier {
   Future<void> restore(String id) async {
     final habit = _habits[id];
     if (habit == null) return;
-    final restored =
-        habit.copyWith(clearArchived: true, order: habits.length);
+    final restored = habit.copyWith(clearArchived: true, order: habits.length);
     _habits[id] = restored;
     await LocalStore.writeHabit(restored);
     notifyListeners();
@@ -670,8 +686,10 @@ class HabitsController extends ChangeNotifier {
       final habit = ours == null
           ? theirs
           : ours.copyWith(
-              completions:
-                  FolderSync.mergeCompletions(ours.completions, theirs.completions),
+              completions: FolderSync.mergeCompletions(
+                ours.completions,
+                theirs.completions,
+              ),
               missReasons: {...theirs.missReasons, ...ours.missReasons},
             );
       _habits[habit.id] = habit;
@@ -694,7 +712,9 @@ class HabitsController extends ChangeNotifier {
       if (!notes.contains(note.id)) await LocalStore.writeNote(note);
     }
     for (final session in data.focus) {
-      if (!focus.contains(session.id)) await LocalStore.writeFocusSession(session);
+      if (!focus.contains(session.id)) {
+        await LocalStore.writeFocusSession(session);
+      }
     }
     for (final todo in data.todos) {
       if (!todos.contains(todo.id)) await LocalStore.writeTodo(todo);

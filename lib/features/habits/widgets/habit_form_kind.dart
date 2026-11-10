@@ -36,7 +36,11 @@ class KindSelector extends StatelessWidget {
     final options = [
       (HabitKind.positive, context.l10n.kind_positive, LucideIcons.circleCheck),
       (HabitKind.negative, context.l10n.kind_negative, LucideIcons.ban),
-      (HabitKind.quantitative, context.l10n.kind_quantitative, LucideIcons.gauge),
+      (
+        HabitKind.quantitative,
+        context.l10n.kind_quantitative,
+        LucideIcons.gauge,
+      ),
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,8 +116,11 @@ class _KindOption extends StatelessWidget {
             ),
             child: Column(
               children: [
-                Icon(icon,
-                    size: 20, color: active ? scheme.onPrimary : context.tokens.muted),
+                Icon(
+                  icon,
+                  size: 20,
+                  color: active ? scheme.onPrimary : context.tokens.muted,
+                ),
                 const SizedBox(height: 6),
                 Text(
                   label,
@@ -134,8 +141,7 @@ class _KindOption extends StatelessWidget {
 }
 
 class NegativeHint extends StatelessWidget {
-  const NegativeHint({
-    super.key,required this.color});
+  const NegativeHint({super.key, required this.color});
 
   final Color color;
 
@@ -198,8 +204,9 @@ class CostField extends StatelessWidget {
                 child: AppTextField(
                   hint: '0',
                   controller: controller,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                 ),
               ),
               const SizedBox(width: 10),
@@ -267,47 +274,47 @@ class AvoidExtras extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-        HabitFlagToggle(
-          icon: LucideIcons.flag,
-          title: context.l10n.clean_goal,
-          hint: cleanGoal > 0
-              ? context.l10n.count_days(cleanGoal)
-              : context.l10n.clean_goal_sub,
-          value: cleanGoal > 0,
-          color: color,
-          onChanged: (on) => onCleanGoal(on ? 30 : 0),
-          compact: compact,
-        ),
-        if (cleanGoal > 0)
-          FlagDetail(
-            child: Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final days in cleanGoalPresets)
-                ChoiceChip(
-                  label: Text(context.l10n.count_days(days)),
-                  selected: days == cleanGoal,
-                  showCheckmark: false,
-                  selectedColor: color.withValues(alpha: 0.22),
-                  onSelected: (_) => onCleanGoal(days),
+            HabitFlagToggle(
+              icon: LucideIcons.flag,
+              title: context.l10n.clean_goal,
+              hint: cleanGoal > 0
+                  ? context.l10n.count_days(cleanGoal)
+                  : context.l10n.clean_goal_sub,
+              value: cleanGoal > 0,
+              color: color,
+              onChanged: (on) => onCleanGoal(on ? 30 : 0),
+              compact: compact,
+            ),
+            if (cleanGoal > 0)
+              FlagDetail(
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final days in cleanGoalPresets)
+                      ChoiceChip(
+                        label: Text(context.l10n.count_days(days)),
+                        selected: days == cleanGoal,
+                        showCheckmark: false,
+                        selectedColor: color.withValues(alpha: 0.22),
+                        onSelected: (_) => onCleanGoal(days),
+                      ),
+                    if (!cleanGoalPresets.contains(cleanGoal))
+                      ChoiceChip(
+                        label: Text(context.l10n.count_days(cleanGoal)),
+                        selected: true,
+                        showCheckmark: false,
+                        selectedColor: color.withValues(alpha: 0.22),
+                        onSelected: (_) => _pickGoal(context),
+                      ),
+                    ActionChip(
+                      avatar: Icon(LucideIcons.pencil, size: 15, color: color),
+                      label: Text(context.l10n.custom),
+                      onPressed: () => _pickGoal(context),
+                    ),
+                  ],
                 ),
-              if (!cleanGoalPresets.contains(cleanGoal))
-                ChoiceChip(
-                  label: Text(context.l10n.count_days(cleanGoal)),
-                  selected: true,
-                  showCheckmark: false,
-                  selectedColor: color.withValues(alpha: 0.22),
-                  onSelected: (_) => _pickGoal(context),
-                ),
-              ActionChip(
-                avatar: Icon(LucideIcons.pencil, size: 15, color: color),
-                label: Text(context.l10n.custom),
-                onPressed: () => _pickGoal(context),
               ),
-            ],
-          ),
-          ),
           ],
         ),
       ],
@@ -352,26 +359,26 @@ class TotalGoalField extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-        HabitFlagToggle(
-          icon: LucideIcons.target,
-          title: context.l10n.total_goal,
-          hint: context.l10n.total_goal_sub,
-          value: goal > 0,
-          color: color,
-          onChanged: (on) => on ? _pick(context) : onChanged(0),
-          compact: compact,
-        ),
-        if (goal > 0)
-          FlagDetail(
-            child: Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: ActionChip(
-              avatar: Icon(LucideIcons.pencil, size: 15, color: color),
-              label: Text(label(goal)),
-              onPressed: () => _pick(context),
+            HabitFlagToggle(
+              icon: LucideIcons.target,
+              title: context.l10n.total_goal,
+              hint: context.l10n.total_goal_sub,
+              value: goal > 0,
+              color: color,
+              onChanged: (on) => on ? _pick(context) : onChanged(0),
+              compact: compact,
             ),
-          ),
-          ),
+            if (goal > 0)
+              FlagDetail(
+                child: Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: ActionChip(
+                    avatar: Icon(LucideIcons.pencil, size: 15, color: color),
+                    label: Text(label(goal)),
+                    onPressed: () => _pick(context),
+                  ),
+                ),
+              ),
           ],
         ),
       ],
@@ -396,7 +403,12 @@ class BookPagesField extends StatelessWidget {
   final bool compact;
 
   Future<void> _pick(BuildContext context) async {
-    final value = await pickBookPages(context, pages: pages, unit: unit, color: color);
+    final value = await pickBookPages(
+      context,
+      pages: pages,
+      unit: unit,
+      color: color,
+    );
     if (value != null) onChanged(value);
   }
 
@@ -407,26 +419,26 @@ class BookPagesField extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-        HabitFlagToggle(
-          icon: LucideIcons.bookOpen,
-          title: context.l10n.book_pages,
-          hint: context.l10n.book_pages_sub,
-          value: pages > 0,
-          color: color,
-          onChanged: (on) => on ? _pick(context) : onChanged(0),
-          compact: compact,
-        ),
-        if (pages > 0)
-          FlagDetail(
-            child: Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: ActionChip(
-              avatar: Icon(LucideIcons.pencil, size: 15, color: color),
-              label: Text('${formatAmount(pages)} $unit'.trim()),
-              onPressed: () => _pick(context),
+            HabitFlagToggle(
+              icon: LucideIcons.bookOpen,
+              title: context.l10n.book_pages,
+              hint: context.l10n.book_pages_sub,
+              value: pages > 0,
+              color: color,
+              onChanged: (on) => on ? _pick(context) : onChanged(0),
+              compact: compact,
             ),
-          ),
-          ),
+            if (pages > 0)
+              FlagDetail(
+                child: Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: ActionChip(
+                    avatar: Icon(LucideIcons.pencil, size: 15, color: color),
+                    label: Text('${formatAmount(pages)} $unit'.trim()),
+                    onPressed: () => _pick(context),
+                  ),
+                ),
+              ),
           ],
         ),
       ],
@@ -440,15 +452,14 @@ Future<double?> pickBookPages(
   required String unit,
   required Color color,
   String? title,
-}) =>
-    showNumberKeypadDialog(
-      context,
-      title: title ?? context.l10n.book_pages,
-      value: pages > 0 ? pages : 300,
-      unit: unit,
-      min: 1,
-      accent: color,
-    );
+}) => showNumberKeypadDialog(
+  context,
+  title: title ?? context.l10n.book_pages,
+  value: pages > 0 ? pages : 300,
+  unit: unit,
+  min: 1,
+  accent: color,
+);
 
 class FocusOnlyToggle extends StatelessWidget {
   const FocusOnlyToggle({
@@ -466,14 +477,14 @@ class FocusOnlyToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => HabitFlagToggle(
-        icon: LucideIcons.timer,
-        title: context.l10n.focus_only,
-        hint: context.l10n.focus_only_hint,
-        value: value,
-        color: color,
-        onChanged: onChanged,
-        compact: compact,
-      );
+    icon: LucideIcons.timer,
+    title: context.l10n.focus_only,
+    hint: context.l10n.focus_only_hint,
+    value: value,
+    color: color,
+    onChanged: onChanged,
+    compact: compact,
+  );
 }
 
 class TrackingToggle extends StatelessWidget {
@@ -492,14 +503,14 @@ class TrackingToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => HabitFlagToggle(
-        icon: LucideIcons.activity,
-        title: context.l10n.just_tracking,
-        hint: context.l10n.just_tracking_sub,
-        value: value,
-        color: color,
-        onChanged: onChanged,
-        compact: compact,
-      );
+    icon: LucideIcons.activity,
+    title: context.l10n.just_tracking,
+    hint: context.l10n.just_tracking_sub,
+    value: value,
+    color: color,
+    onChanged: onChanged,
+    compact: compact,
+  );
 }
 
 class NoGoalToggle extends StatelessWidget {
@@ -518,14 +529,14 @@ class NoGoalToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => HabitFlagToggle(
-        icon: LucideIcons.chartLine,
-        title: context.l10n.no_goal,
-        hint: context.l10n.no_goal_sub,
-        value: value,
-        color: color,
-        onChanged: onChanged,
-        compact: compact,
-      );
+    icon: LucideIcons.chartLine,
+    title: context.l10n.no_goal,
+    hint: context.l10n.no_goal_sub,
+    value: value,
+    color: color,
+    onChanged: onChanged,
+    compact: compact,
+  );
 }
 
 class AtMostToggle extends StatelessWidget {
@@ -544,14 +555,14 @@ class AtMostToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => HabitFlagToggle(
-        icon: LucideIcons.gauge,
-        title: context.l10n.at_most,
-        hint: context.l10n.at_most_sub,
-        value: value,
-        color: color,
-        onChanged: onChanged,
-        compact: compact,
-      );
+    icon: LucideIcons.gauge,
+    title: context.l10n.at_most,
+    hint: context.l10n.at_most_sub,
+    value: value,
+    color: color,
+    onChanged: onChanged,
+    compact: compact,
+  );
 }
 
 class AnyAmountToggle extends StatelessWidget {
@@ -570,14 +581,14 @@ class AnyAmountToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => HabitFlagToggle(
-        icon: LucideIcons.circleCheck,
-        title: context.l10n.any_amount,
-        hint: context.l10n.any_amount_sub,
-        value: value,
-        color: color,
-        onChanged: onChanged,
-        compact: compact,
-      );
+    icon: LucideIcons.circleCheck,
+    title: context.l10n.any_amount,
+    hint: context.l10n.any_amount_sub,
+    value: value,
+    color: color,
+    onChanged: onChanged,
+    compact: compact,
+  );
 }
 
 class AnyStepsToggle extends StatelessWidget {
@@ -608,34 +619,34 @@ class AnyStepsToggle extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-        HabitFlagToggle(
-          icon: LucideIcons.listChecks,
-          title: context.l10n.any_step,
-          hint: value && total > 1
-              ? context.l10n.steps_needed_sub(shown, total)
-              : context.l10n.any_step_sub,
-          value: value,
-          color: color,
-          onChanged: onChanged,
-          compact: compact,
-        ),
-        if (value && total > 2)
-          FlagDetail(
-            child: Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (var n = 1; n < total; n++)
-                ChoiceChip(
-                  label: Text('$n'),
-                  selected: n == shown,
-                  showCheckmark: false,
-                  selectedColor: color.withValues(alpha: 0.22),
-                  onSelected: (_) => onNeeded(n),
+            HabitFlagToggle(
+              icon: LucideIcons.listChecks,
+              title: context.l10n.any_step,
+              hint: value && total > 1
+                  ? context.l10n.steps_needed_sub(shown, total)
+                  : context.l10n.any_step_sub,
+              value: value,
+              color: color,
+              onChanged: onChanged,
+              compact: compact,
+            ),
+            if (value && total > 2)
+              FlagDetail(
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (var n = 1; n < total; n++)
+                      ChoiceChip(
+                        label: Text('$n'),
+                        selected: n == shown,
+                        showCheckmark: false,
+                        selectedColor: color.withValues(alpha: 0.22),
+                        onSelected: (_) => onNeeded(n),
+                      ),
+                  ],
                 ),
-            ],
-          ),
-          ),
+              ),
           ],
         ),
       ],
@@ -659,14 +670,14 @@ class FromLastDoneToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => HabitFlagToggle(
-        icon: LucideIcons.history,
-        title: context.l10n.from_last_done,
-        hint: context.l10n.from_last_done_sub,
-        value: value,
-        color: color,
-        onChanged: onChanged,
-        compact: compact,
-      );
+    icon: LucideIcons.history,
+    title: context.l10n.from_last_done,
+    hint: context.l10n.from_last_done_sub,
+    value: value,
+    color: color,
+    onChanged: onChanged,
+    compact: compact,
+  );
 }
 
 class MonthWeekdayToggle extends StatelessWidget {
@@ -687,14 +698,14 @@ class MonthWeekdayToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => HabitFlagToggle(
-        icon: LucideIcons.calendarDays,
-        title: context.l10n.month_weekday,
-        hint: context.l10n.month_weekday_sub(monthWeekdayLabel(context, start)),
-        value: value,
-        color: color,
-        onChanged: onChanged,
-        compact: compact,
-      );
+    icon: LucideIcons.calendarDays,
+    title: context.l10n.month_weekday,
+    hint: context.l10n.month_weekday_sub(monthWeekdayLabel(context, start)),
+    value: value,
+    color: color,
+    onChanged: onChanged,
+    compact: compact,
+  );
 }
 
 class DifficultyPicker extends StatelessWidget {
@@ -726,47 +737,47 @@ class DifficultyPicker extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-        HabitFlagToggle(
-          icon: LucideIcons.mountain,
-          title: context.l10n.difficulty,
-          hint: context.l10n.difficulty_hint,
-          value: value > 0,
-          color: color,
-          compact: compact,
-          onChanged: (on) => onChanged(on ? 2 : 0),
-        ),
-        if (value > 0)
-          FlagDetail(
-            child: settings.isMinimalStyle
-                ? MinimalSegmented(
-              expand: true,
-              index: value - 1,
-              options: labels,
-              onChanged: (i) => onChanged(i + 1),
-            )
-          : settings.isExpressStyle
-            ? ExpressTabs(
-              labels: labels,
-              index: value - 1,
-              onChanged: (i) => onChanged(i + 1),
-            )
-          : Row(
-              children: [
-                for (var i = 0; i < options.length; i++) ...[
-                  if (i > 0) const SizedBox(width: 8),
-                  Expanded(
-                    child: _KindOption(
-                      active: value == i + 1,
-                      dimmed: false,
-                      label: options[i].$1,
-                      icon: options[i].$2,
-                      onTap: () => onChanged(i + 1),
-                    ),
-                  ),
-                ],
-              ],
+            HabitFlagToggle(
+              icon: LucideIcons.mountain,
+              title: context.l10n.difficulty,
+              hint: context.l10n.difficulty_hint,
+              value: value > 0,
+              color: color,
+              compact: compact,
+              onChanged: (on) => onChanged(on ? 2 : 0),
             ),
-          ),
+            if (value > 0)
+              FlagDetail(
+                child: settings.isMinimalStyle
+                    ? MinimalSegmented(
+                        expand: true,
+                        index: value - 1,
+                        options: labels,
+                        onChanged: (i) => onChanged(i + 1),
+                      )
+                    : settings.isExpressStyle
+                    ? ExpressTabs(
+                        labels: labels,
+                        index: value - 1,
+                        onChanged: (i) => onChanged(i + 1),
+                      )
+                    : Row(
+                        children: [
+                          for (var i = 0; i < options.length; i++) ...[
+                            if (i > 0) const SizedBox(width: 8),
+                            Expanded(
+                              child: _KindOption(
+                                active: value == i + 1,
+                                dimmed: false,
+                                label: options[i].$1,
+                                icon: options[i].$2,
+                                onTap: () => onChanged(i + 1),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+              ),
           ],
         ),
       ],
@@ -810,10 +821,10 @@ class _SubstepsEditorState extends State<SubstepsEditor> {
   }
 
   void _emit() => widget.onChanged(
-        _steps
-            .map((s) => Substep(id: s.id, title: s.controller.text.trim()))
-            .toList(),
-      );
+    _steps
+        .map((s) => Substep(id: s.id, title: s.controller.text.trim()))
+        .toList(),
+  );
 
   void _add() {
     setState(() {
@@ -831,13 +842,16 @@ class _SubstepsEditorState extends State<SubstepsEditor> {
     final removed = _steps[index];
     setState(() => _steps.removeAt(index));
 
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => removed.controller.dispose());
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => removed.controller.dispose(),
+    );
     _emit();
   }
 
   void _move(int from, int to) {
-    setState(() => _steps.insert(to > from ? to - 1 : to, _steps.removeAt(from)));
+    setState(
+      () => _steps.insert(to > from ? to - 1 : to, _steps.removeAt(from)),
+    );
     _emit();
   }
 
@@ -876,38 +890,41 @@ class _SubstepsEditorState extends State<SubstepsEditor> {
               proxyDecorator: (child, _, __) =>
                   Material(type: MaterialType.transparency, child: child),
               children: [
-            for (var i = 0; i < _steps.length; i++)
-              Padding(
-                key: ValueKey(_steps[i].id),
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Row(
-                  children: [
-                    ReorderableDragStartListener(
-                      index: i,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 10, 8, 10),
-                        child: Icon(LucideIcons.gripVertical,
-                            size: 17, color: context.tokens.muted),
-                      ),
+                for (var i = 0; i < _steps.length; i++)
+                  Padding(
+                    key: ValueKey(_steps[i].id),
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      children: [
+                        ReorderableDragStartListener(
+                          index: i,
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 10, 8, 10),
+                            child: Icon(
+                              LucideIcons.gripVertical,
+                              size: 17,
+                              color: context.tokens.muted,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: AppTextField(
+                            hint: context.l10n.step_hint,
+                            controller: _steps[i].controller,
+                            onChanged: (_) => _emit(),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => _remove(i),
+                          icon: Icon(
+                            LucideIcons.x,
+                            size: 20,
+                            color: context.tokens.muted,
+                          ),
+                        ),
+                      ],
                     ),
-                    Expanded(
-                      child: AppTextField(
-                        hint: context.l10n.step_hint,
-                        controller: _steps[i].controller,
-                        onChanged: (_) => _emit(),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () => _remove(i),
-                      icon: Icon(
-                        LucideIcons.x,
-                        size: 20,
-                        color: context.tokens.muted,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+                  ),
               ],
             ),
             const SizedBox(height: 4),
@@ -982,16 +999,17 @@ class QuantitativeFields extends StatelessWidget {
   final double? step;
 
   double get _step => switch (quantKind) {
-        QuantKind.water => 50,
-        QuantKind.time => 5,
-        QuantKind.reading || QuantKind.generic => 1,
-      };
+    QuantKind.water => 50,
+    QuantKind.time => 5,
+    QuantKind.reading || QuantKind.generic => 1,
+  };
 
   @override
   Widget build(BuildContext context) {
     final time = quantKind == QuantKind.time;
-    final unit =
-        time ? context.l10n.unit_min_short : unitController.text.trim();
+    final unit = time
+        ? context.l10n.unit_min_short
+        : unitController.text.trim();
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -1015,15 +1033,16 @@ class QuantitativeFields extends StatelessWidget {
               ),
             ],
             if (showGoal) const SizedBox(height: 12),
-            if (showGoal) _QuantityStepperRow(
-              label: context.l10n.quant_daily_goal,
-              value: target,
-              unit: unit,
-              step: step ?? _step,
-              min: 0.01,
-              clock: time,
-              onChanged: onTargetChanged,
-            ),
+            if (showGoal)
+              _QuantityStepperRow(
+                label: context.l10n.quant_daily_goal,
+                value: target,
+                unit: unit,
+                step: step ?? _step,
+                min: 0.01,
+                clock: time,
+                onChanged: onTargetChanged,
+              ),
             const SizedBox(height: 8),
             _QuantityStepperRow(
               label: context.l10n.quant_tap_amount,
@@ -1089,12 +1108,15 @@ class _QuantityStepperRow extends StatelessWidget {
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                color: scheme.onSurface,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
           HoldRepeatButton(
             icon: LucideIcons.minus,
-label: context.l10n.a11y_decrease,
+            label: context.l10n.a11y_decrease,
             onTap: value - step >= min ? () => onChanged(value - step) : null,
           ),
           Semantics(
@@ -1110,8 +1132,8 @@ label: context.l10n.a11y_decrease,
                   clock
                       ? formatMinutes(value)
                       : unit.isEmpty
-                          ? formatAmount(value)
-                          : '${formatAmount(value)} $unit',
+                      ? formatAmount(value)
+                      : '${formatAmount(value)} $unit',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: scheme.onSurface,
@@ -1127,7 +1149,7 @@ label: context.l10n.a11y_decrease,
           ),
           HoldRepeatButton(
             icon: LucideIcons.plus,
-label: context.l10n.a11y_increase,
+            label: context.l10n.a11y_increase,
             onTap: () => onChanged(value + step),
           ),
         ],

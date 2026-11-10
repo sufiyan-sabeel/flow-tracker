@@ -38,31 +38,30 @@ class Reminder {
   bool get isHourly => everyMinutes >= 1;
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'hour': hour,
-        'minute': minute,
-        'selectedDays': days,
-        'message': message,
-        'everyDays': everyDays,
-        'everyMinutes': everyMinutes,
-        'everyHours': everyMinutes ~/ 60,
-        'untilMinute': untilMinute,
-        'anchorEpochDay': anchorEpochDay,
-        'snoozeMinutes': snoozeMinutes,
-      };
+    'id': id,
+    'hour': hour,
+    'minute': minute,
+    'selectedDays': days,
+    'message': message,
+    'everyDays': everyDays,
+    'everyMinutes': everyMinutes,
+    'everyHours': everyMinutes ~/ 60,
+    'untilMinute': untilMinute,
+    'anchorEpochDay': anchorEpochDay,
+    'snoozeMinutes': snoozeMinutes,
+  };
 
   factory Reminder.fromMap(Map<String, dynamic> map) => Reminder(
-        id: map['id'] as String,
-        hour: map['hour'] as int,
-        minute: map['minute'] as int,
-        days: List<int>.from((map['selectedDays'] ?? map['days']) as List),
-        message: (map['message'] ?? '') as String,
-        everyDays: (map['everyDays'] ?? 1) as int,
-        everyMinutes: (map['everyMinutes'] ??
-            ((map['everyHours'] ?? 0) as int) * 60) as int,
-        untilMinute: map['untilMinute'] as int?,
-        anchorEpochDay: map['anchorEpochDay'] as int?,
-        snoozeMinutes:
-            (map['snoozeMinutes'] ?? defaultSnoozeMinutes) as int,
-      );
+    id: map['id'] as String,
+    hour: map['hour'] as int,
+    minute: map['minute'] as int,
+    days: List<int>.from((map['selectedDays'] ?? map['days']) as List),
+    message: (map['message'] ?? '') as String,
+    everyDays: (map['everyDays'] ?? 1) as int,
+    everyMinutes:
+        (map['everyMinutes'] ?? ((map['everyHours'] ?? 0) as int) * 60) as int,
+    untilMinute: map['untilMinute'] as int?,
+    anchorEpochDay: map['anchorEpochDay'] as int?,
+    snoozeMinutes: (map['snoozeMinutes'] ?? defaultSnoozeMinutes) as int,
+  );
 }

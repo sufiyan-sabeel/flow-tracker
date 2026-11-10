@@ -50,7 +50,9 @@ class ExpressFormHero extends StatelessWidget {
       child: Stack(
         children: [
           if (hasCover) ...[
-            Positioned.fill(child: CoverImage(path: cover, clarity: clarity)),
+            Positioned.fill(
+              child: CoverImage(path: cover, clarity: clarity),
+            ),
             Positioned.fill(
               child: DecoratedBox(
                 decoration: BoxDecoration(

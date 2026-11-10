@@ -25,8 +25,9 @@ class _CustomEmojiFieldState extends State<CustomEmojiField> {
 
   static String _own(String glyph) {
     if (!HabitEmojis.isEmoji(glyph)) return '';
-    final listed =
-        HabitEmojis.categories.values.any((list) => list.contains(glyph));
+    final listed = HabitEmojis.categories.values.any(
+      (list) => list.contains(glyph),
+    );
     return listed ? '' : glyph;
   }
 
@@ -102,9 +103,9 @@ class _CustomEmojiFieldState extends State<CustomEmojiField> {
   }
 
   InputBorder _border(Color? color) => OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: color == null
-            ? BorderSide.none
-            : BorderSide(color: color, width: 1.6),
-      );
+    borderRadius: BorderRadius.circular(12),
+    borderSide: color == null
+        ? BorderSide.none
+        : BorderSide(color: color, width: 1.6),
+  );
 }

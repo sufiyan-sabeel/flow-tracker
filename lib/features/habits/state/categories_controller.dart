@@ -111,7 +111,10 @@ class CategoriesController extends ChangeNotifier {
       name: name,
       color: color,
       icon: icon,
-      order: _categories.fold(0, (top, c) => c.order >= top ? c.order + 1 : top),
+      order: _categories.fold(
+        0,
+        (top, c) => c.order >= top ? c.order + 1 : top,
+      ),
     );
     _categories.add(category);
     await LocalStore.writeCategory(category);

@@ -93,61 +93,61 @@ class ExpressTodayHero extends StatelessWidget {
               ),
             ),
             if (showProgress) ...[
-            const SizedBox(width: 12),
-            _CountLine(done: done, total: total),
+              const SizedBox(width: 12),
+              _CountLine(done: done, total: total),
             ],
           ],
         ),
         if (showProgress) ...[
-        const SizedBox(height: 12),
-        ExpressCard(
-          radius: 26,
-          padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _PulseLabel(
-                text: total == 0
-                    ? context.l10n.no_habits_yet
-                    : allDone
-                    ? context.l10n.all_done_today
-                    : context.l10n.x_of_y_completed('$done', '$total'),
-              ),
-              const SizedBox(height: 11),
-              ExpressWaveBar(
-                value: ratio,
-                color: allDone ? context.tokens.success : scheme.primary,
-                track: scheme.surfaceContainerHighest,
-                stroke: 9,
-                wavelength: 34,
-                amplitude: 3.2,
-              ),
-              const SizedBox(height: 14),
-              ExpressMiniRow(
-                children: [
-                  ExpressMiniStat(
-                    icon: LucideIcons.flame,
-                    value: '$streak',
-                    label: context.l10n.current_streak,
-                    tint: scheme.primary,
-                  ),
-                  ExpressMiniStat(
-                    icon: LucideIcons.trophy,
-                    value: '$best',
-                    label: context.l10n.best_streak,
-                    tint: context.tokens.warning,
-                  ),
-                  ExpressMiniStat(
-                    icon: LucideIcons.target,
-                    value: '$consistency%',
-                    label: context.l10n.completion_rate_short,
-                    tint: context.tokens.success,
-                  ),
-                ],
-              ),
-            ],
+          const SizedBox(height: 12),
+          ExpressCard(
+            radius: 26,
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _PulseLabel(
+                  text: total == 0
+                      ? context.l10n.no_habits_yet
+                      : allDone
+                      ? context.l10n.all_done_today
+                      : context.l10n.x_of_y_completed('$done', '$total'),
+                ),
+                const SizedBox(height: 11),
+                ExpressWaveBar(
+                  value: ratio,
+                  color: allDone ? context.tokens.success : scheme.primary,
+                  track: scheme.surfaceContainerHighest,
+                  stroke: 9,
+                  wavelength: 34,
+                  amplitude: 3.2,
+                ),
+                const SizedBox(height: 14),
+                ExpressMiniRow(
+                  children: [
+                    ExpressMiniStat(
+                      icon: LucideIcons.flame,
+                      value: '$streak',
+                      label: context.l10n.current_streak,
+                      tint: scheme.primary,
+                    ),
+                    ExpressMiniStat(
+                      icon: LucideIcons.trophy,
+                      value: '$best',
+                      label: context.l10n.best_streak,
+                      tint: context.tokens.warning,
+                    ),
+                    ExpressMiniStat(
+                      icon: LucideIcons.target,
+                      value: '$consistency%',
+                      label: context.l10n.completion_rate_short,
+                      tint: context.tokens.success,
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
         ],
         const SizedBox(height: 10),
         const DailyQuote(),
@@ -364,24 +364,26 @@ class ExpressTodayHeader extends StatelessWidget {
         const SizedBox(height: 12),
         Row(
           children: [
-            Expanded(child: ExpressChipBar(
-            children: [
-              if (categories.isNotEmpty)
-              ExpressChip(
-                label: context.l10n.all,
-                active: category == null,
-                onTap: () => onCategory(null),
-                onLongPress: () => showCategoryOrderSheet(context),
+            Expanded(
+              child: ExpressChipBar(
+                children: [
+                  if (categories.isNotEmpty)
+                    ExpressChip(
+                      label: context.l10n.all,
+                      active: category == null,
+                      onTap: () => onCategory(null),
+                      onLongPress: () => showCategoryOrderSheet(context),
+                    ),
+                  for (final name in categories)
+                    ExpressChip(
+                      label: context.categoryLabel(name),
+                      active: category == name,
+                      onTap: () => onCategory(name),
+                      onLongPress: () => showCategoryOrderSheet(context),
+                    ),
+                ],
               ),
-              for (final name in categories)
-                ExpressChip(
-                  label: context.categoryLabel(name),
-                  active: category == name,
-                  onTap: () => onCategory(name),
-                  onLongPress: () => showCategoryOrderSheet(context),
-                ),
-            ],
-          )),
+            ),
             const SizedBox(width: 8),
             Semantics(
               label: context.l10n.today_filter,

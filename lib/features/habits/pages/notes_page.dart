@@ -36,12 +36,12 @@ class NotesPage extends StatelessWidget {
   final Color accent;
 
   void _add(BuildContext context) => AppNavigator.push(
-        NoteEditorPage(
-          habitId: habitId,
-          dayKey: date.dayKey,
-          accent: accent,
-        ),
-      );
+    NoteEditorPage(
+      habitId: habitId,
+      dayKey: date.dayKey,
+      accent: accent,
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -63,10 +63,12 @@ class NotesPage extends StatelessWidget {
         leading: express
             ? Padding(
                 padding: const EdgeInsets.only(left: 16),
-                child: Center(child: ExpressIconButton(
-                  icon: LucideIcons.arrowLeft,
-                  onPressed: () => AppNavigator.pop(),
-                )),
+                child: Center(
+                  child: ExpressIconButton(
+                    icon: LucideIcons.arrowLeft,
+                    onPressed: () => AppNavigator.pop(),
+                  ),
+                ),
               )
             : IconButton(
                 icon: const Icon(LucideIcons.arrowLeft),
@@ -91,12 +93,14 @@ class NotesPage extends StatelessWidget {
           if (express)
             Padding(
               padding: const EdgeInsets.only(right: 16),
-              child: Center(child: ExpressIconButton(
-                icon: LucideIcons.plus,
-                tint: accent,
-                background: accent.withValues(alpha: 0.16),
-                onPressed: () => _add(context),
-              )),
+              child: Center(
+                child: ExpressIconButton(
+                  icon: LucideIcons.plus,
+                  tint: accent,
+                  background: accent.withValues(alpha: 0.16),
+                  onPressed: () => _add(context),
+                ),
+              ),
             )
           else ...[
             IconButton(
@@ -236,7 +240,10 @@ class NoteCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: Icon(LucideIcons.pencil, color: context.colors.onSurface),
+              leading: Icon(
+                LucideIcons.pencil,
+                color: context.colors.onSurface,
+              ),
               title: Text(context.l10n.edit, style: sheetOptionStyle(sheet)),
               onTap: () => Navigator.of(sheet).pop('edit'),
             ),

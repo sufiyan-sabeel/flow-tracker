@@ -18,8 +18,8 @@ Future<void> addCustomAmount(BuildContext context, Habit habit) async {
   if (!context.mounted) return;
 
   final replacing = ValueNotifier(false);
-  final focus = habit.isTimeAmount &&
-      context.read<SettingsController>().focusEnabled;
+  final focus =
+      habit.isTimeAmount && context.read<SettingsController>().focusEnabled;
   final amount = await showNumberKeypadDialog(
     context,
     title: context.l10n.quant_add_title,

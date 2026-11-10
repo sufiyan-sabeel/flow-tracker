@@ -46,8 +46,11 @@ class CompactActivityStrip extends StatelessWidget {
           final ratio = (done / span).clamp(0.0, 1.0);
           return ratio <= 0
               ? base
-              : Color.lerp(habit.color.shownIn(context).withValues(alpha: 0.3), habit.color.shownIn(context),
-                  ratio)!;
+              : Color.lerp(
+                  habit.color.shownIn(context).withValues(alpha: 0.3),
+                  habit.color.shownIn(context),
+                  ratio,
+                )!;
         }(),
     ];
   }
@@ -57,14 +60,19 @@ class CompactActivityStrip extends StatelessWidget {
     final days = DateTime(today.year, today.month + 1, 0).day;
     return [
       for (var day = 1; day <= days; day++)
-        heatmapCellColor(context, habit, DateTime(today.year, today.month, day)),
+        heatmapCellColor(
+          context,
+          habit,
+          DateTime(today.year, today.month, day),
+        ),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
-    final cells =
-        mode == HeatmapMode.year ? _monthCells(context) : _dayCells(context);
+    final cells = mode == HeatmapMode.year
+        ? _monthCells(context)
+        : _dayCells(context);
 
     return Row(
       children: [

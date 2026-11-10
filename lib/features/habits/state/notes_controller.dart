@@ -17,8 +17,8 @@ class NotesController extends ChangeNotifier {
   List<HabitNote> get all => List.unmodifiable(_notes);
 
   Map<String, List<HabitNote>> get _byDay => _days ??= _group(
-        (note) => '${note.habitId}|${note.date}',
-      );
+    (note) => '${note.habitId}|${note.date}',
+  );
 
   Map<String, List<HabitNote>> get _byHabit =>
       _habits ??= _group((note) => note.habitId);
@@ -55,25 +55,25 @@ class NotesController extends ChangeNotifier {
     final list = habitId == null ? _notes : _byHabit[habitId] ?? const [];
     final days = {for (final note in list) note.date: parseDayKey(note.date)};
     return [...list]..sort((a, b) {
-        final byDay = days[b.date]!.compareTo(days[a.date]!);
-        return byDay != 0 ? byDay : _byTime(a, b);
-      });
+      final byDay = days[b.date]!.compareTo(days[a.date]!);
+      return byDay != 0 ? byDay : _byTime(a, b);
+    });
   }
 
   int countFor(String habitId, String dayKey) =>
       _byDay['$habitId|$dayKey']?.length ?? 0;
 
   Set<NoteType> typesFor(String habitId, String dayKey) => {
-        for (final note in _byDay['$habitId|$dayKey'] ?? const <HabitNote>[])
-          note.type,
-      };
+    for (final note in _byDay['$habitId|$dayKey'] ?? const <HabitNote>[])
+      note.type,
+  };
 
   bool hasAny(String habitId) => _byHabit.containsKey(habitId);
 
   List<HabitNote> photoNotes(String habitId) => [
-        for (final note in _byHabit[habitId] ?? const <HabitNote>[])
-          if (note.photos.isNotEmpty) note,
-      ]..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    for (final note in _byHabit[habitId] ?? const <HabitNote>[])
+      if (note.photos.isNotEmpty) note,
+  ]..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
   int photoCount(String habitId) => (_byHabit[habitId] ?? const <HabitNote>[])
       .fold(0, (sum, n) => sum + n.photos.length);
@@ -105,8 +105,9 @@ class NotesController extends ChangeNotifier {
   Future<void> update(HabitNote note) async {
     final index = _notes.indexWhere((n) => n.id == note.id);
     if (index == -1) return;
-    final dropped =
-        _notes[index].photos.where((p) => !note.photos.contains(p)).toList();
+    final dropped = _notes[index].photos
+        .where((p) => !note.photos.contains(p))
+        .toList();
     _notes[index] = note;
     await LocalStore.writeNote(note);
     _changed();

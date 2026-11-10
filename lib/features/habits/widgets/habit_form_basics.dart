@@ -19,7 +19,11 @@ import 'package:flow_tracker/features/habits/widgets/custom_emoji_field.dart';
 
 class HabitPreview extends StatelessWidget {
   const HabitPreview({
-    super.key,required this.icon, required this.color, required this.name});
+    super.key,
+    required this.icon,
+    required this.color,
+    required this.name,
+  });
 
   final String icon;
   final Color color;
@@ -157,8 +161,11 @@ class CoverPicker extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(LucideIcons.imagePlus,
-                    size: 30, color: context.colors.primary),
+                Icon(
+                  LucideIcons.imagePlus,
+                  size: 30,
+                  color: context.colors.primary,
+                ),
                 const SizedBox(height: 8),
                 Text(
                   context.l10n.add_image,
@@ -199,13 +206,17 @@ class CoverPicker extends StatelessWidget {
             right: 8,
             child: Row(
               children: [
-                CoverActionButton(icon: LucideIcons.pencil,
+                CoverActionButton(
+                  icon: LucideIcons.pencil,
                   label: context.l10n.edit,
-                  onTap: onPick),
+                  onTap: onPick,
+                ),
                 const SizedBox(width: 8),
-                CoverActionButton(icon: LucideIcons.trash2,
+                CoverActionButton(
+                  icon: LucideIcons.trash2,
                   label: context.l10n.delete,
-                  onTap: onRemove),
+                  onTap: onRemove,
+                ),
               ],
             ),
           ),
@@ -236,7 +247,8 @@ void revealCategory(ScrollController controller, GlobalKey chip) {
   if (box == null || !controller.hasClients) return;
   final target = RenderAbstractViewport.of(box).getOffsetToReveal(box, 0.5);
   controller.jumpTo(
-      target.offset.clamp(0.0, controller.position.maxScrollExtent));
+    target.offset.clamp(0.0, controller.position.maxScrollExtent),
+  );
 }
 
 class _IconPickerState extends State<IconPicker> {
@@ -252,8 +264,9 @@ class _IconPickerState extends State<IconPicker> {
     _category = _emoji
         ? HabitEmojis.categoryOf(widget.selected)
         : HabitIcons.categoryOf(widget.selected);
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => revealCategory(_cats, _activeCat));
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => revealCategory(_cats, _activeCat),
+    );
   }
 
   @override
@@ -382,31 +395,31 @@ class _Segment2 extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = context.colors;
     Widget seg(String label, bool active, VoidCallback onTap) => Expanded(
-          child: Semantics(
-            button: true,
-            selected: active,
-            child: GestureDetector(
-              onTap: onTap,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 160),
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: active ? scheme.primary : Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: active ? scheme.onPrimary : context.tokens.muted,
-                  ),
-                ),
+      child: Semantics(
+        button: true,
+        selected: active,
+        child: GestureDetector(
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 160),
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: active ? scheme.primary : Colors.transparent,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: active ? scheme.onPrimary : context.tokens.muted,
               ),
             ),
           ),
-        );
+        ),
+      ),
+    );
     return Container(
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
@@ -456,8 +469,8 @@ class _GlyphTile extends StatelessWidget {
             color: selected
                 ? color.withValues(alpha: 0.16)
                 : (isDark
-                    ? const Color(0xFF222222)
-                    : context.colors.surfaceContainerHighest),
+                      ? const Color(0xFF222222)
+                      : context.colors.surfaceContainerHighest),
             borderRadius: BorderRadius.circular(12),
             border: selected ? Border.all(color: color, width: 1.6) : null,
           ),
@@ -503,7 +516,10 @@ class CategoryPicker extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: Icon(LucideIcons.pencil, color: context.colors.onSurface),
+              leading: Icon(
+                LucideIcons.pencil,
+                color: context.colors.onSurface,
+              ),
               title: Text(
                 context.l10n.edit,
                 style: sheetOptionStyle(sheetContext),
@@ -511,8 +527,10 @@ class CategoryPicker extends StatelessWidget {
               onTap: () => Navigator.of(sheetContext).pop('edit'),
             ),
             ListTile(
-              leading: Icon(LucideIcons.arrowUpDown,
-                  color: context.colors.onSurface),
+              leading: Icon(
+                LucideIcons.arrowUpDown,
+                color: context.colors.onSurface,
+              ),
               title: Text(
                 context.l10n.reorder,
                 style: sheetOptionStyle(sheetContext),
@@ -571,7 +589,10 @@ class CategoryPicker extends StatelessWidget {
               onLongPress: () => _editOrDelete(context, category),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 140),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: selected == category.name
                       ? category.color
@@ -621,7 +642,11 @@ class CategoryPicker extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(LucideIcons.plus, size: 14, color: context.colors.primary),
+                  Icon(
+                    LucideIcons.plus,
+                    size: 14,
+                    color: context.colors.primary,
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     context.l10n.add_category,

@@ -23,8 +23,7 @@ class CategoryEditorSheet extends StatefulWidget {
 }
 
 class _CategoryEditorSheetState extends State<CategoryEditorSheet> {
-  late final TextEditingController _name =
-      TextEditingController(text: _label);
+  late final TextEditingController _name = TextEditingController(text: _label);
   late Color _color = widget.initial?.color ?? AppPalette.brand;
   late String _icon = widget.initial?.icon ?? CategoryIcons.names.first;
   bool _showAllIcons = false;
@@ -42,7 +41,9 @@ class _CategoryEditorSheetState extends State<CategoryEditorSheet> {
     final all = CategoryIcons.names;
     if (_showAllIcons || all.length <= _iconPreviewCount) return all;
     final preview = all.take(_iconPreviewCount).toList();
-    if (!preview.contains(_icon) && all.contains(_icon)) preview[preview.length - 1] = _icon;
+    if (!preview.contains(_icon) && all.contains(_icon)) {
+      preview[preview.length - 1] = _icon;
+    }
     return preview;
   }
 
@@ -55,7 +56,8 @@ class _CategoryEditorSheetState extends State<CategoryEditorSheet> {
   void _save() {
     final initial = widget.initial;
     final name = _name.text.trim();
-    final adopted = initial != null &&
+    final adopted =
+        initial != null &&
         CategoriesController.isSeed(initial) &&
         name != _label;
     final result = Category(
@@ -96,8 +98,7 @@ class _CategoryEditorSheetState extends State<CategoryEditorSheet> {
                 onChanged: (_) => setState(() {}),
               ),
               const SizedBox(height: 18),
-              Text(context.l10n.icon,
-                  style: sheetBodyStyle(context, size: 13)),
+              Text(context.l10n.icon, style: sheetBodyStyle(context, size: 13)),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 10,
@@ -125,7 +126,9 @@ class _CategoryEditorSheetState extends State<CategoryEditorSheet> {
                           child: Icon(
                             CategoryIcons.resolve(name),
                             size: 20,
-                            color: _icon == name ? _color : context.tokens.muted,
+                            color: _icon == name
+                                ? _color
+                                : context.tokens.muted,
                           ),
                         ),
                       ),
@@ -157,8 +160,10 @@ class _CategoryEditorSheetState extends State<CategoryEditorSheet> {
                 ],
               ),
               const SizedBox(height: 18),
-              Text(context.l10n.color,
-                  style: sheetBodyStyle(context, size: 13)),
+              Text(
+                context.l10n.color,
+                style: sheetBodyStyle(context, size: 13),
+              ),
               const SizedBox(height: 10),
               ColorPicker(
                 selected: _color,

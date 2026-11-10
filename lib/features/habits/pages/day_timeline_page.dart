@@ -71,10 +71,10 @@ class _DayTimelinePageState extends State<DayTimelinePage> {
   }
 
   void _select(DateTime day) => setState(() {
-        _direction = day.atMidnight.compareTo(_day).sign;
-        if (_anchor(day) != _anchor(_day)) _flip++;
-        _day = day.atMidnight;
-      });
+    _direction = day.atMidnight.compareTo(_day).sign;
+    if (_anchor(day) != _anchor(_day)) _flip++;
+    _day = day.atMidnight;
+  });
 
   void _shift(int by) {
     if (!context.read<SettingsController>().planMonth) {
@@ -104,12 +104,12 @@ class _DayTimelinePageState extends State<DayTimelinePage> {
   }
 
   void _addNote(Habit habit) => AppNavigator.push(
-        NoteEditorPage(
-          habitId: habit.id,
-          dayKey: _day.dayKey,
-          accent: habit.color.shownIn(context),
-        ),
-      );
+    NoteEditorPage(
+      habitId: habit.id,
+      dayKey: _day.dayKey,
+      accent: habit.color.shownIn(context),
+    ),
+  );
 
   Future<void> _check(Habit habit) async {
     final controller = context.read<HabitsController>();
@@ -145,20 +145,24 @@ class _DayTimelinePageState extends State<DayTimelinePage> {
   List<Todo> _todosOf(BuildContext context) {
     final settings = context.watch<SettingsController>();
     if (!settings.planTodos) return const [];
-    return context.select<TodosController, List<Todo>>(
-      (todos) => todos.dueOn(_day),
-    ).toList()
-      ..sort((a, b) => a.done != b.done
-          ? (a.done ? 1 : -1)
-          : (a.minutes ?? Habit.dayMinutes).compareTo(
-              b.minutes ?? Habit.dayMinutes,
-            ));
+    return context
+        .select<TodosController, List<Todo>>(
+          (todos) => todos.dueOn(_day),
+        )
+        .toList()
+      ..sort(
+        (a, b) => a.done != b.done
+            ? (a.done ? 1 : -1)
+            : (a.minutes ?? Habit.dayMinutes).compareTo(
+                b.minutes ?? Habit.dayMinutes,
+              ),
+      );
   }
 
   Widget _todos(List<Todo> todos, int from) =>
       context.read<SettingsController>().todoPapers
-          ? _papers(todos, from)
-          : _tiles(todos, from);
+      ? _papers(todos, from)
+      : _tiles(todos, from);
 
   Widget _tiles(List<Todo> todos, int from) {
     final express = context.read<SettingsController>().isExpressStyle;
@@ -185,26 +189,26 @@ class _DayTimelinePageState extends State<DayTimelinePage> {
   }
 
   Widget _papers(List<Todo> todos, int from) => PaperLanes(
-        notes: [
-          for (final (i, todo) in todos.indexed)
-            (
+    notes: [
+      for (final (i, todo) in todos.indexed)
+        (
+          todo: todo,
+          build: () => Entrance(
+            key: ValueKey(todo.id),
+            index: from + i,
+            delay: _entrance,
+            child: TodoPaper(
               todo: todo,
-              build: () => Entrance(
-                key: ValueKey(todo.id),
-                index: from + i,
-                delay: _entrance,
-                child: TodoPaper(
-                  todo: todo,
-                  overdue: false,
-                  showProject: true,
-                  checking: _completing.contains(todo.id),
-                  onToggle: () => _toggleTodo(todo),
-                  onEdit: () => _openTodo(todo),
-                ),
-              ),
+              overdue: false,
+              showProject: true,
+              checking: _completing.contains(todo.id),
+              onToggle: () => _toggleTodo(todo),
+              onEdit: () => _openTodo(todo),
             ),
-        ],
-      );
+          ),
+        ),
+    ],
+  );
 
   List<Widget Function()> _rows(BuildContext context, DayPlan plan) {
     final rows = <Widget Function()>[];
@@ -296,9 +300,11 @@ class _DayTimelinePageState extends State<DayTimelinePage> {
     final plan = DayPlan.of(
       context.watch<SettingsController>().planHabits
           ? habits
-                .where((h) =>
-                    !(context.watch<SettingsController>().hideTracking &&
-                        h.tracking))
+                .where(
+                  (h) =>
+                      !(context.watch<SettingsController>().hideTracking &&
+                          h.tracking),
+                )
                 .toList()
           : const [],
       _day,
@@ -323,10 +329,12 @@ class _DayTimelinePageState extends State<DayTimelinePage> {
             : express
             ? Padding(
                 padding: const EdgeInsets.only(left: 16),
-                child: Center(child: ExpressIconButton(
-                  icon: LucideIcons.chevronLeft,
-                  onPressed: () => AppNavigator.pop(),
-                )),
+                child: Center(
+                  child: ExpressIconButton(
+                    icon: LucideIcons.chevronLeft,
+                    onPressed: () => AppNavigator.pop(),
+                  ),
+                ),
               )
             : IconButton(
                 icon: const Icon(LucideIcons.chevronLeft),
@@ -340,11 +348,13 @@ class _DayTimelinePageState extends State<DayTimelinePage> {
             express
                 ? Padding(
                     padding: EdgeInsets.only(right: _isToday ? 16 : 8),
-                    child: Center(child: ExpressIconButton(
-                      icon: LucideIcons.listPlus,
-                      tooltip: context.l10n.todo_new,
-                      onPressed: _newTodo,
-                    )),
+                    child: Center(
+                      child: ExpressIconButton(
+                        icon: LucideIcons.listPlus,
+                        tooltip: context.l10n.todo_new,
+                        onPressed: _newTodo,
+                      ),
+                    ),
                   )
                 : minimal
                 ? IconButton(
@@ -364,11 +374,13 @@ class _DayTimelinePageState extends State<DayTimelinePage> {
             express
                 ? Padding(
                     padding: const EdgeInsets.only(right: 16),
-                    child: Center(child: ExpressIconButton(
-                      icon: LucideIcons.calendarCheck,
-                      tooltip: context.l10n.today,
-                      onPressed: () => _select(AppClock.now()),
-                    )),
+                    child: Center(
+                      child: ExpressIconButton(
+                        icon: LucideIcons.calendarCheck,
+                        tooltip: context.l10n.today,
+                        onPressed: () => _select(AppClock.now()),
+                      ),
+                    ),
                   )
                 : minimal
                 ? IconButton(
@@ -430,49 +442,51 @@ class _DayTimelinePageState extends State<DayTimelinePage> {
                   },
                   child: Stack(
                     children: [
-                plan.isEmpty && todos.isEmpty
-                    ? AppEmptyState(
-                        icon: LucideIcons.calendarClock,
-                        title: context.l10n.day_timeline_empty,
-                        message: style.planHabits
-                            ? context.l10n.day_timeline_empty_sub
-                            : context.l10n.day_timeline_empty_todos,
-                      )
-                    : CustomScrollView(
-                        key: ValueKey(_day.epochDay),
-                        slivers: [
-                          SliverPadding(
-                            padding: context.pagePadding(
-                              16,
-                              8,
-                              16,
-                              pushed ? 28 : 148,
-                            ),
-                            sliver: SliverMainAxisGroup(
+                      plan.isEmpty && todos.isEmpty
+                          ? AppEmptyState(
+                              icon: LucideIcons.calendarClock,
+                              title: context.l10n.day_timeline_empty,
+                              message: style.planHabits
+                                  ? context.l10n.day_timeline_empty_sub
+                                  : context.l10n.day_timeline_empty_todos,
+                            )
+                          : CustomScrollView(
+                              key: ValueKey(_day.epochDay),
                               slivers: [
-                                SliverList.builder(
-                                  itemCount: rows.length,
-                                  itemBuilder: (context, i) => rows[i](),
-                                ),
-                                if (todos.isNotEmpty) ...[
-                                  SliverToBoxAdapter(
-                                    child: Padding(
-                                      padding: EdgeInsets.only(
-                                        top: plan.isEmpty ? 0 : 22,
-                                      ),
-                                      child: SectionLabel(
-                                        context.l10n.todos,
-                                        trailing: _EstimateTotal(todos: todos),
-                                      ),
-                                    ),
+                                SliverPadding(
+                                  padding: context.pagePadding(
+                                    16,
+                                    8,
+                                    16,
+                                    pushed ? 28 : 148,
                                   ),
-                                  _todos(todos, rows.length),
-                                ],
+                                  sliver: SliverMainAxisGroup(
+                                    slivers: [
+                                      SliverList.builder(
+                                        itemCount: rows.length,
+                                        itemBuilder: (context, i) => rows[i](),
+                                      ),
+                                      if (todos.isNotEmpty) ...[
+                                        SliverToBoxAdapter(
+                                          child: Padding(
+                                            padding: EdgeInsets.only(
+                                              top: plan.isEmpty ? 0 : 22,
+                                            ),
+                                            child: SectionLabel(
+                                              context.l10n.todos,
+                                              trailing: _EstimateTotal(
+                                                todos: todos,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        _todos(todos, rows.length),
+                                      ],
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
-                          ),
-                        ],
-                      ),
                       if (!express && !minimal)
                         HeaderBlur(scrolled: _scrolled, height: 30),
                     ],
@@ -533,46 +547,50 @@ class _AnytimeRow extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-          Row(
-            children: [
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: habit.color.shownIn(context).withValues(alpha: done ? 0.5 : 0.18),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: HabitGlyph(
-                  glyph: habit.icon,
-                  color: done ? scheme.surface : habit.color.shownIn(context),
-                  size: 18,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  habit.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: done ? context.tokens.muted : scheme.onSurface,
-                    decoration: done ? TextDecoration.lineThrough : null,
-                    decorationColor: context.tokens.muted,
+              Row(
+                children: [
+                  Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: habit.color
+                          .shownIn(context)
+                          .withValues(alpha: done ? 0.5 : 0.18),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: HabitGlyph(
+                      glyph: habit.icon,
+                      color: done
+                          ? scheme.surface
+                          : habit.color.shownIn(context),
+                      size: 18,
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      habit.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: done ? context.tokens.muted : scheme.onSurface,
+                        decoration: done ? TextDecoration.lineThrough : null,
+                        decorationColor: context.tokens.muted,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  TimelineCheck(
+                    habit: habit,
+                    date: date,
+                    done: done,
+                    onTap: onCheck,
+                  ),
+                ],
               ),
-              const SizedBox(width: 10),
-              TimelineCheck(
-                habit: habit,
-                date: date,
-                done: done,
-                onTap: onCheck,
-              ),
-            ],
-          ),
-          TimelineNotes(habit: habit, date: date),
+              TimelineNotes(habit: habit, date: date),
             ],
           ),
         ),

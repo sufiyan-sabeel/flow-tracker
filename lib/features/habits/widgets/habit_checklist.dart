@@ -38,7 +38,11 @@ Future<void> setHabitStep(
   await controller.setStep(habit.id, day, stepId, value);
 }
 
-List<Substep> orderedSteps(BuildContext context, Habit habit, [DateTime? date]) {
+List<Substep> orderedSteps(
+  BuildContext context,
+  Habit habit, [
+  DateTime? date,
+]) {
   final checked = checkedStepsOf(habit, date);
   if (!context.watch<SettingsController>().sortCompletedLast) {
     return habit.substeps;
@@ -142,7 +146,9 @@ class ChecklistRow extends StatelessWidget {
                   border: checked
                       ? null
                       : Border.all(
-                          color: color.withValues(alpha: 0.5), width: 1.6),
+                          color: color.withValues(alpha: 0.5),
+                          width: 1.6,
+                        ),
                 ),
                 child: checked
                     ? Icon(
@@ -164,8 +170,9 @@ class ChecklistRow extends StatelessWidget {
                     color: checked
                         ? context.tokens.muted
                         : context.colors.onSurface,
-                    decoration:
-                        checked ? TextDecoration.lineThrough : TextDecoration.none,
+                    decoration: checked
+                        ? TextDecoration.lineThrough
+                        : TextDecoration.none,
                     decorationColor: context.tokens.muted,
                   ),
                 ),
@@ -210,10 +217,17 @@ class _HabitStepsPanelState extends State<HabitStepsPanel> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(LucideIcons.listChecks, size: 13, color: habit.color.shownIn(context)),
+                  Icon(
+                    LucideIcons.listChecks,
+                    size: 13,
+                    color: habit.color.shownIn(context),
+                  ),
                   const SizedBox(width: 5),
                   Text(
-                    context.l10n.steps_done('$done', '${habit.substeps.length}'),
+                    context.l10n.steps_done(
+                      '$done',
+                      '${habit.substeps.length}',
+                    ),
                     style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w700,

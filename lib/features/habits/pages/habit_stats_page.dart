@@ -50,7 +50,12 @@ class HabitStatsPage extends StatelessWidget {
         title: minimal ? null : Text(habit.name),
       ),
       body: ListView(
-        padding: context.pagePadding(minimal ? 20 : 16, 8, minimal ? 20 : 16, 32),
+        padding: context.pagePadding(
+          minimal ? 20 : 16,
+          8,
+          minimal ? 20 : 16,
+          32,
+        ),
         children: [
           if (minimal) MinimalTitle(title: habit.name),
           ...spaced,

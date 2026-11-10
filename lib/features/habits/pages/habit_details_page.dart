@@ -107,8 +107,11 @@ class _HabitDetailsPageState extends State<HabitDetailsPage> {
         }
 
         Future<void> editAmount(DateTime date) async {
-          final allowed =
-              await confirmUnscheduledDay(context, habit: habit, date: date);
+          final allowed = await confirmUnscheduledDay(
+            context,
+            habit: habit,
+            date: date,
+          );
           if (!allowed || !context.mounted) return;
 
           final current = habit.completions[date.dayKey]?.count ?? 0;
@@ -130,10 +133,15 @@ class _HabitDetailsPageState extends State<HabitDetailsPage> {
         }
 
         Future<void> toggleDay(DateTime date) async {
-          if (!await allowManualCheck(context, habit: habit, date: date)) return;
+          if (!await allowManualCheck(context, habit: habit, date: date)) {
+            return;
+          }
           if (!context.mounted) return;
-          final allowed =
-              await confirmUnscheduledDay(context, habit: habit, date: date);
+          final allowed = await confirmUnscheduledDay(
+            context,
+            habit: habit,
+            date: date,
+          );
           if (!allowed) return;
           final wasDone = habit.isCompletedOn(date);
           await controller.toggle(habit.id, date);
@@ -174,11 +182,11 @@ class _HabitDetailsPageState extends State<HabitDetailsPage> {
         final notesOn = settings.notesEnabled;
 
         void openDay(DateTime date) => showDayActionsSheet(
-              context,
-              habit: habit,
-              date: date,
-              notesEnabled: notesOn,
-            );
+          context,
+          habit: habit,
+          date: date,
+          notesEnabled: notesOn,
+        );
 
         return Scaffold(
           appBar: AppBar(
@@ -186,14 +194,18 @@ class _HabitDetailsPageState extends State<HabitDetailsPage> {
             title: minimal || express
                 ? null
                 : Row(
-              children: [
-                HabitGlyph(glyph: habit.icon, color: habit.color.shownIn(context), size: 22),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _ClassicTitle(habit.name),
-                ),
-              ],
-            ),
+                    children: [
+                      HabitGlyph(
+                        glyph: habit.icon,
+                        color: habit.color.shownIn(context),
+                        size: 22,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _ClassicTitle(habit.name),
+                      ),
+                    ],
+                  ),
             leadingWidth: minimal || express ? null : 64,
             leading: minimal || express
                 ? IconButton(
@@ -204,8 +216,9 @@ class _HabitDetailsPageState extends State<HabitDetailsPage> {
                     child: GlassIconButton(
                       icon: LucideIcons.x,
                       size: 38,
-                      tooltip: MaterialLocalizations.of(context)
-                          .closeButtonTooltip,
+                      tooltip: MaterialLocalizations.of(
+                        context,
+                      ).closeButtonTooltip,
                       onTap: () => AppNavigator.pop(),
                     ),
                   ),
@@ -245,100 +258,121 @@ class _HabitDetailsPageState extends State<HabitDetailsPage> {
                     const SizedBox(width: 16),
                   ],
           ),
-          body: _SolidNavBar(child: _DetailBackground(
-            coverPath: habit.coverPath,
-            clarity: habit.coverClarity,
-            child: ListView(
-              padding: context.pagePadding(16, 16, 16, 16),
-              children: [
-                if (minimal) MinimalDetailHeader(habit: habit),
-                if (express) _ExpressHeader(habit: habit),
-                if (!minimal) ...[
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: FrequencyChip(habit: habit),
-                  ),
-                  const SizedBox(height: 14),
-                ],
-                if (habit.description.isNotEmpty) ...[
-                  Text(
-                    habit.description,
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: context.tokens.muted,
-                      height: 1.4,
+          body: _SolidNavBar(
+            child: _DetailBackground(
+              coverPath: habit.coverPath,
+              clarity: habit.coverClarity,
+              child: ListView(
+                padding: context.pagePadding(16, 16, 16, 16),
+                children: [
+                  if (minimal) MinimalDetailHeader(habit: habit),
+                  if (express) _ExpressHeader(habit: habit),
+                  if (!minimal) ...[
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: FrequencyChip(habit: habit),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
-                if (settings.focusEnabled && habit.needsFocusSession) ...[
-                  if (minimal)
-                    MinimalFocusRow(habit: habit)
-                  else
-                    _FocusTile(habit: habit),
-                  const SizedBox(height: 20),
-                ],
-                if (habit.kind == HabitKind.quantitative) ...[
-                  QuantitativeProgress(habit: habit),
-                  const SizedBox(height: 20),
-                  SectionLabel(
-                    context.l10n.quant_per_day,
-                    trailing: QuantStatsLink(habit: habit),
-                  ),
-                  QuantDailyBars(habit: habit),
-                  const SizedBox(height: 20),
-                ],
-                if (habit.hasSubsteps) ...[
-                  SectionLabel(context.l10n.todays_checklist),
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: HabitChecklist(habit: habit, header: true),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
-                if (settings.focusEnabled && !habit.needsFocusSession) ...[
-                  if (minimal)
-                    MinimalFocusRow(habit: habit)
-                  else
-                    _FocusTile(habit: habit),
-                  const SizedBox(height: 20),
-                ],
-                if (minimal) ...[
-                  MinimalSection(
-                    title: context.l10n.streaks,
-                    trailing: habit.kind != HabitKind.quantitative &&
-                            hasHabitStats(habit)
-                        ? QuantStatsLink(habit: habit)
-                        : null,
-                    child: MinimalStreakTiles(habit: habit, mode: _mode),
-                  ),
-                  if (habit.hasCost)
-                    MinimalSection(
-                      title: context.l10n.money_saved,
-                      child: MinimalMoneyTiles(habit: habit),
-                    ),
-                ] else ...[
-                  SectionLabel(
-                    context.l10n.streaks,
-                    trailing: habit.kind != HabitKind.quantitative &&
-                            hasHabitStats(habit)
-                        ? QuantStatsLink(habit: habit)
-                        : null,
-                  ),
-                  StreakSummary(habit: habit, mode: _mode),
-                  if (habit.hasCost) ...[
-                    const SizedBox(height: 12),
-                    SavedMoneyCard(habit: habit),
+                    const SizedBox(height: 14),
                   ],
-                  const SizedBox(height: 20),
-                ],
-                if (minimal)
-                  MinimalHeading(
-                    title: context.l10n.activity,
-                    trailing: MinimalSegmented(
-                      options: [
+                  if (habit.description.isNotEmpty) ...[
+                    Text(
+                      habit.description,
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: context.tokens.muted,
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                  if (settings.focusEnabled && habit.needsFocusSession) ...[
+                    if (minimal)
+                      MinimalFocusRow(habit: habit)
+                    else
+                      _FocusTile(habit: habit),
+                    const SizedBox(height: 20),
+                  ],
+                  if (habit.kind == HabitKind.quantitative) ...[
+                    QuantitativeProgress(habit: habit),
+                    const SizedBox(height: 20),
+                    SectionLabel(
+                      context.l10n.quant_per_day,
+                      trailing: QuantStatsLink(habit: habit),
+                    ),
+                    QuantDailyBars(habit: habit),
+                    const SizedBox(height: 20),
+                  ],
+                  if (habit.hasSubsteps) ...[
+                    SectionLabel(context.l10n.todays_checklist),
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: HabitChecklist(habit: habit, header: true),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                  if (settings.focusEnabled && !habit.needsFocusSession) ...[
+                    if (minimal)
+                      MinimalFocusRow(habit: habit)
+                    else
+                      _FocusTile(habit: habit),
+                    const SizedBox(height: 20),
+                  ],
+                  if (minimal) ...[
+                    MinimalSection(
+                      title: context.l10n.streaks,
+                      trailing:
+                          habit.kind != HabitKind.quantitative &&
+                              hasHabitStats(habit)
+                          ? QuantStatsLink(habit: habit)
+                          : null,
+                      child: MinimalStreakTiles(habit: habit, mode: _mode),
+                    ),
+                    if (habit.hasCost)
+                      MinimalSection(
+                        title: context.l10n.money_saved,
+                        child: MinimalMoneyTiles(habit: habit),
+                      ),
+                  ] else ...[
+                    SectionLabel(
+                      context.l10n.streaks,
+                      trailing:
+                          habit.kind != HabitKind.quantitative &&
+                              hasHabitStats(habit)
+                          ? QuantStatsLink(habit: habit)
+                          : null,
+                    ),
+                    StreakSummary(habit: habit, mode: _mode),
+                    if (habit.hasCost) ...[
+                      const SizedBox(height: 12),
+                      SavedMoneyCard(habit: habit),
+                    ],
+                    const SizedBox(height: 20),
+                  ],
+                  if (minimal)
+                    MinimalHeading(
+                      title: context.l10n.activity,
+                      trailing: MinimalSegmented(
+                        options: [
+                          context.l10n.week,
+                          context.l10n.month,
+                          context.l10n.year,
+                        ],
+                        index: _mode.index.clamp(0, 2),
+                        onChanged: (i) => _changeMode(HeatmapMode.values[i]),
+                      ),
+                    )
+                  else
+                    SectionLabel(
+                      context.l10n.activity,
+                      trailing: express
+                          ? null
+                          : _ModeToggle(mode: _mode, onChanged: _changeMode),
+                    ),
+                  if (express) ...[
+                    ExpressTabs(
+                      labels: [
                         context.l10n.week,
                         context.l10n.month,
                         context.l10n.year,
@@ -346,47 +380,30 @@ class _HabitDetailsPageState extends State<HabitDetailsPage> {
                       index: _mode.index.clamp(0, 2),
                       onChanged: (i) => _changeMode(HeatmapMode.values[i]),
                     ),
-                  )
-                else
-                  SectionLabel(
-                    context.l10n.activity,
-                    trailing: express
-                        ? null
-                        : _ModeToggle(mode: _mode, onChanged: _changeMode),
+                    const SizedBox(height: 12),
+                  ],
+                  _ActivityView(
+                    habit: habit,
+                    mode: _mode,
+                    onToggle: toggle,
+                    onLongPress: openDay,
+                    showNotes: notesOn,
+                    express: express,
                   ),
-                if (express) ...[
-                  ExpressTabs(
-                    labels: [
-                      context.l10n.week,
-                      context.l10n.month,
-                      context.l10n.year,
-                    ],
-                    index: _mode.index.clamp(0, 2),
-                    onChanged: (i) => _changeMode(HeatmapMode.values[i]),
-                  ),
+                  if (notesOn && _mode != HeatmapMode.year) const NoteLegend(),
+                  if (notesOn) _JourneyStrip(habit: habit),
+                  const SizedBox(height: 20),
+                  CheckHistoryTile(habit: habit),
                   const SizedBox(height: 12),
+                  MissReasonsTile(habit: habit),
+                  if (minimal)
+                    MinimalVacationRow(habit: habit)
+                  else
+                    _VacationTile(habit: habit),
                 ],
-                _ActivityView(
-                  habit: habit,
-                  mode: _mode,
-                  onToggle: toggle,
-                  onLongPress: openDay,
-                  showNotes: notesOn,
-                  express: express,
-                ),
-                if (notesOn && _mode != HeatmapMode.year) const NoteLegend(),
-                if (notesOn) _JourneyStrip(habit: habit),
-                const SizedBox(height: 20),
-                CheckHistoryTile(habit: habit),
-                const SizedBox(height: 12),
-                MissReasonsTile(habit: habit),
-                if (minimal)
-                  MinimalVacationRow(habit: habit)
-                else
-                  _VacationTile(habit: habit),
-              ],
+              ),
             ),
-          )),
+          ),
         );
       },
     );
@@ -441,7 +458,10 @@ class _JourneyStrip extends StatelessWidget {
               button: true,
               child: GestureDetector(
                 onTap: () => AppNavigator.push(
-                  JourneyPage(habitId: habit.id, accent: habit.color.shownIn(context)),
+                  JourneyPage(
+                    habitId: habit.id,
+                    accent: habit.color.shownIn(context),
+                  ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -618,7 +638,11 @@ class _ExpressHeader extends StatelessWidget {
             size: 58,
             color: habit.color.shownIn(context).withValues(alpha: 0.18),
             shape: ExpressShape.cookie,
-            child: HabitGlyph(glyph: habit.icon, color: habit.color.shownIn(context), size: 27),
+            child: HabitGlyph(
+              glyph: habit.icon,
+              color: habit.color.shownIn(context),
+              size: 27,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -810,7 +834,10 @@ class _FocusTile extends StatelessWidget {
     }
     await focus.removeSessions(ids);
     if (!context.mounted) return;
-    AppSnackbar.success(context, context.l10n.focus_sessions_deleted(ids.length));
+    AppSnackbar.success(
+      context,
+      context.l10n.focus_sessions_deleted(ids.length),
+    );
   }
 
   @override
@@ -830,116 +857,130 @@ class _FocusTile extends StatelessWidget {
       child: Column(
         children: [
           InkWell(
-        borderRadius: BorderRadius.circular(24),
-        onTap: () => AppNavigator.push(FocusStatsPage(habitId: habit.id)),
-        onLongPress: () {
-          unawaited(_openActions(context));
-        },
-        child: Padding(
-          padding: express
-              ? const EdgeInsets.fromLTRB(16, 14, 14, 14)
-              : const EdgeInsets.fromLTRB(16, 12, 10, 12),
-          child: Row(
-            children: [
-              if (express)
-                ExpressBlob(
-                  size: 44,
-                  color: habit.color.shownIn(context).withValues(alpha: 0.18),
-                  shape: ExpressShape.cookie,
-                  child: Icon(LucideIcons.timer, size: 20, color: habit.color.shownIn(context)),
-                )
-              else
-                Icon(LucideIcons.timer, size: 21, color: habit.color.shownIn(context)),
-              const SizedBox(width: 14),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 150),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      context.l10n.focus_total,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: express
-                          ? ExpressType.headline.at(
-                              16,
-                              weight: 800,
-                              color: context.colors.onSurface,
-                            )
-                          : TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                              color: context.colors.onSurface,
-                            ),
+            borderRadius: BorderRadius.circular(24),
+            onTap: () => AppNavigator.push(FocusStatsPage(habitId: habit.id)),
+            onLongPress: () {
+              unawaited(_openActions(context));
+            },
+            child: Padding(
+              padding: express
+                  ? const EdgeInsets.fromLTRB(16, 14, 14, 14)
+                  : const EdgeInsets.fromLTRB(16, 12, 10, 12),
+              child: Row(
+                children: [
+                  if (express)
+                    ExpressBlob(
+                      size: 44,
+                      color: habit.color
+                          .shownIn(context)
+                          .withValues(alpha: 0.18),
+                      shape: ExpressShape.cookie,
+                      child: Icon(
+                        LucideIcons.timer,
+                        size: 20,
+                        color: habit.color.shownIn(context),
+                      ),
+                    )
+                  else
+                    Icon(
+                      LucideIcons.timer,
+                      size: 21,
+                      color: habit.color.shownIn(context),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      _focusLine(context, seconds, week, today),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: express
-                          ? ExpressType.body.at(
-                              12.5,
-                              weight: 600,
-                              color: context.tokens.muted,
-                            )
-                          : TextStyle(
-                              fontSize: 12.5,
-                              color: context.tokens.muted,
-                            ),
+                  const SizedBox(width: 14),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 150),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          context.l10n.focus_total,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: express
+                              ? ExpressType.headline.at(
+                                  16,
+                                  weight: 800,
+                                  color: context.colors.onSurface,
+                                )
+                              : TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                  color: context.colors.onSurface,
+                                ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          _focusLine(context, seconds, week, today),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: express
+                              ? ExpressType.body.at(
+                                  12.5,
+                                  weight: 600,
+                                  color: context.tokens.muted,
+                                )
+                              : TextStyle(
+                                  fontSize: 12.5,
+                                  color: context.tokens.muted,
+                                ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: FocusQuickTimers(habit: habit),
-                ),
-              ),
-              const SizedBox(width: 6),
-              if (express)
-                ExpressIconButton(
-                  icon: LucideIcons.play,
-                  tooltip: context.l10n.focus_start,
-                  size: 46,
-                  tint: habit.color.shownIn(context).computeLuminance() > 0.55
-                      ? Colors.black
-                      : Colors.white,
-                  background: habit.color.shownIn(context),
-                  resting: ExpressShape.cookie,
-                  pressed: ExpressShape.flower,
-                  onPressed: () => AppNavigator.push(
-                    focus.isActive
-                        ? const FocusPage()
-                        : FocusPage(
-                            startHabitId: habit.id,
-                            startMinutes: habit.focusMinutes,
-                            breakMinutes: habit.focusBreakMinutes,
-                          ),
-                    fade: true,
-                    name: FocusPage.routeName,
                   ),
-                )
-              else
-                IconButton(
-                  tooltip: context.l10n.focus_start,
-                  icon: Icon(LucideIcons.circlePlay, color: habit.color.shownIn(context)),
-                  onPressed: () => AppNavigator.push(
-                    focus.isActive
-                        ? const FocusPage()
-                        : FocusPage(
-                            startHabitId: habit.id,
-                            startMinutes: habit.focusMinutes,
-                            breakMinutes: habit.focusBreakMinutes,
-                          ),
-                    fade: true,
-                    name: FocusPage.routeName,
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: FocusQuickTimers(habit: habit),
+                    ),
                   ),
-                ),
-            ],
-          ),
-        ),
+                  const SizedBox(width: 6),
+                  if (express)
+                    ExpressIconButton(
+                      icon: LucideIcons.play,
+                      tooltip: context.l10n.focus_start,
+                      size: 46,
+                      tint:
+                          habit.color.shownIn(context).computeLuminance() > 0.55
+                          ? Colors.black
+                          : Colors.white,
+                      background: habit.color.shownIn(context),
+                      resting: ExpressShape.cookie,
+                      pressed: ExpressShape.flower,
+                      onPressed: () => AppNavigator.push(
+                        focus.isActive
+                            ? const FocusPage()
+                            : FocusPage(
+                                startHabitId: habit.id,
+                                startMinutes: habit.focusMinutes,
+                                breakMinutes: habit.focusBreakMinutes,
+                              ),
+                        fade: true,
+                        name: FocusPage.routeName,
+                      ),
+                    )
+                  else
+                    IconButton(
+                      tooltip: context.l10n.focus_start,
+                      icon: Icon(
+                        LucideIcons.circlePlay,
+                        color: habit.color.shownIn(context),
+                      ),
+                      onPressed: () => AppNavigator.push(
+                        focus.isActive
+                            ? const FocusPage()
+                            : FocusPage(
+                                startHabitId: habit.id,
+                                startMinutes: habit.focusMinutes,
+                                breakMinutes: habit.focusBreakMinutes,
+                              ),
+                        fade: true,
+                        name: FocusPage.routeName,
+                      ),
+                    ),
+                ],
+              ),
+            ),
           ),
           if (seconds > 0)
             Padding(

@@ -2,8 +2,8 @@ import 'package:flow_tracker/core/extensions/date_extensions.dart';
 
 class VacationPeriod {
   VacationPeriod({required DateTime start, DateTime? end, this.bulk = false})
-      : start = start.atMidnight,
-        end = end?.atMidnight;
+    : start = start.atMidnight,
+      end = end?.atMidnight;
 
   final DateTime start;
   final DateTime? end;
@@ -22,14 +22,14 @@ class VacationPeriod {
       VacationPeriod(start: start, end: end ?? this.end, bulk: bulk);
 
   Map<String, dynamic> toMap() => {
-        'start': start.toIso8601String(),
-        if (end != null) 'end': end!.toIso8601String(),
-        if (bulk) 'bulk': true,
-      };
+    'start': start.toIso8601String(),
+    if (end != null) 'end': end!.toIso8601String(),
+    if (bulk) 'bulk': true,
+  };
 
   factory VacationPeriod.fromMap(Map<String, dynamic> map) => VacationPeriod(
-        start: DateTime.parse(map['start'] as String),
-        end: map['end'] != null ? DateTime.tryParse(map['end'] as String) : null,
-        bulk: map['bulk'] == true,
-      );
+    start: DateTime.parse(map['start'] as String),
+    end: map['end'] != null ? DateTime.tryParse(map['end'] as String) : null,
+    bulk: map['bulk'] == true,
+  );
 }

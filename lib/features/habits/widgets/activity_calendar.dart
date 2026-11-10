@@ -76,10 +76,14 @@ class _ActivityCalendarState extends State<ActivityCalendar> {
               children: [
                 Text(
                   _month.year == _today.year
-                      ? DateFormat('MMMM', Localizations.localeOf(context).toString())
-                          .format(_month)
-                      : DateFormat('MMMM yyyy', Localizations.localeOf(context).toString())
-                          .format(_month),
+                      ? DateFormat(
+                          'MMMM',
+                          Localizations.localeOf(context).toString(),
+                        ).format(_month)
+                      : DateFormat(
+                          'MMMM yyyy',
+                          Localizations.localeOf(context).toString(),
+                        ).format(_month),
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
@@ -105,20 +109,25 @@ class _ActivityCalendarState extends State<ActivityCalendar> {
             ),
             const SizedBox(height: 8),
             Row(
-              children: WeekdayLabels.shortFrom(
-                      Localizations.localeOf(context).languageCode, weekStart)
-                  .map((d) => Expanded(
-                        child: Text(
-                          d,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: context.tokens.muted,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 12,
+              children:
+                  WeekdayLabels.shortFrom(
+                        Localizations.localeOf(context).languageCode,
+                        weekStart,
+                      )
+                      .map(
+                        (d) => Expanded(
+                          child: Text(
+                            d,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: context.tokens.muted,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 12,
+                            ),
                           ),
                         ),
-                      ))
-                  .toList(),
+                      )
+                      .toList(),
             ),
             const SizedBox(height: 8),
             for (var week = 0; week < weeks; week++)
@@ -131,8 +140,7 @@ class _ActivityCalendarState extends State<ActivityCalendar> {
                         child: _CalendarCell(
                           date: days[week * 7 + day],
                           habit: habit,
-                          isCurrentMonth:
-                              _isCurrentMonth(days[week * 7 + day]),
+                          isCurrentMonth: _isCurrentMonth(days[week * 7 + day]),
                           isToday: _isToday(days[week * 7 + day]),
                           onToggle: widget.onToggle,
                           onLongPress: widget.onLongPress,
@@ -177,9 +185,12 @@ class _CalendarCell extends StatelessWidget {
     final beforeCreation = date.atMidnight.isBefore(habit.startedAt);
     final outOfScope = future || beforeCreation;
     final completed = habit.isCompletedOn(date);
-    final relapsed = !completed &&
+    final relapsed =
+        !completed &&
         !outOfScope &&
-        (negative || (habit.capsAmount && (habit.completions[date.dayKey]?.count ?? 0) > 0));
+        (negative ||
+            (habit.capsAmount &&
+                (habit.completions[date.dayKey]?.count ?? 0) > 0));
     final paused = isCurrentMonth && !outOfScope && habit.isNeutralOn(date);
     final tappable = isCurrentMonth && !future;
     final danger = context.tokens.danger;
@@ -207,7 +218,8 @@ class _CalendarCell extends StatelessWidget {
     } else {
       fillColor = null;
     }
-    final filledStrong = isCurrentMonth &&
+    final filledStrong =
+        isCurrentMonth &&
         !paused &&
         (relapsed ||
             (!negative && !ratioFill && completed) ||
@@ -215,7 +227,10 @@ class _CalendarCell extends StatelessWidget {
 
     final Color textColor;
     if (filledStrong) {
-      textColor = (relapsed ? danger : habit.color.shownIn(context)).computeLuminance() > 0.5
+      textColor =
+          (relapsed ? danger : habit.color.shownIn(context))
+                  .computeLuminance() >
+              0.5
           ? Colors.black
           : Colors.white;
     } else if (!isCurrentMonth) {
@@ -247,11 +262,18 @@ class _CalendarCell extends StatelessWidget {
             duration: const Duration(milliseconds: 280),
             height: quantity ? 44 : 38,
             decoration: BoxDecoration(
-              color: fillColor ??
-                  (isToday ? scheme.surfaceContainerHighest : Colors.transparent),
+              color:
+                  fillColor ??
+                  (isToday
+                      ? scheme.surfaceContainerHighest
+                      : Colors.transparent),
               borderRadius: BorderRadius.circular(10),
               border: isToday && !filledStrong
-                  ? Border.all(color: habit.color.shownIn(context).withValues(alpha: 0.5))
+                  ? Border.all(
+                      color: habit.color
+                          .shownIn(context)
+                          .withValues(alpha: 0.5),
+                    )
                   : null,
             ),
             child: Column(
@@ -259,7 +281,10 @@ class _CalendarCell extends StatelessWidget {
               children: [
                 Text(
                   '${date.day}',
-                  style: TextStyle(color: textColor, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    color: textColor,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 if (quantity && isCurrentMonth && count > 0)
                   Padding(

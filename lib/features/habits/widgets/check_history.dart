@@ -34,9 +34,9 @@ String _clock(BuildContext context, Completion entry) {
   final today = AppClock.today();
   final (label, from) = switch (mode) {
     HeatmapMode.week => (
-        context.l10n.period_this_week,
-        today.startOfWeek(context.read<SettingsController>().weekStart),
-      ),
+      context.l10n.period_this_week,
+      today.startOfWeek(context.read<SettingsController>().weekStart),
+    ),
     HeatmapMode.year => (context.l10n.period_this_year, DateTime(today.year)),
     _ => (context.l10n.period_this_month, DateTime(today.year, today.month)),
   };
@@ -64,8 +64,8 @@ String lastCheckLabel(
   final when = day.isAtSameMomentAs(today)
       ? context.l10n.today
       : day.isAtSameMomentAs(today.addDays(-1))
-          ? context.l10n.yesterday
-          : DateFormat.MMMd(context.l10n.localeName).format(day);
+      ? context.l10n.yesterday
+      : DateFormat.MMMd(context.l10n.localeName).format(day);
   final time = entry.stamp;
   if (time == null || !withTime) return when;
   return '$when · ${context.clockOf(time)}';
@@ -207,13 +207,19 @@ class _EntryState extends State<_Entry> {
   String _at(int minuteOfDay) {
     final day = widget.entry.day ?? AppClock.today();
     return context.clockOf(
-      DateTime(day.year, day.month, day.day, minuteOfDay ~/ 60,
-          minuteOfDay % 60),
+      DateTime(
+        day.year,
+        day.month,
+        day.day,
+        minuteOfDay ~/ 60,
+        minuteOfDay % 60,
+      ),
     );
   }
 
   Future<void> _retime(int? from) async {
-    final start = from ?? AppClock.wallNow().hour * 60 + AppClock.wallNow().minute;
+    final start =
+        from ?? AppClock.wallNow().hour * 60 + AppClock.wallNow().minute;
     final picked = await pickTime(
       context,
       TimeOfDay(hour: start ~/ 60, minute: start % 60),
@@ -221,14 +227,18 @@ class _EntryState extends State<_Entry> {
     if (picked == null || !mounted) return;
     final to = picked.hour * 60 + picked.minute;
     if (to == from) return;
-    await context
-        .read<HabitsController>()
-        .retime(widget.habit.id, widget.entry.date, from, to);
+    await context.read<HabitsController>().retime(
+      widget.habit.id,
+      widget.entry.date,
+      from,
+      to,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final entry = context
+    final entry =
+        context
             .watch<HabitsController>()
             .byId(widget.habit.id)
             ?.completions[widget.entry.date] ??
@@ -286,7 +296,9 @@ class _EntryState extends State<_Entry> {
                   const SizedBox(width: 4),
                   Icon(
                     many
-                        ? (_open ? LucideIcons.chevronUp : LucideIcons.chevronDown)
+                        ? (_open
+                              ? LucideIcons.chevronUp
+                              : LucideIcons.chevronDown)
                         : LucideIcons.pencil,
                     size: many ? 16 : 13,
                     color: context.tokens.muted,
@@ -339,19 +351,19 @@ class _EntryState extends State<_Entry> {
                     GestureDetector(
                       onTap: () => _retime(at),
                       child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 9,
-                        vertical: 4,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 9,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: context.colors.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          _at(at),
+                          style: sheetLabelStyle(context, size: 12),
+                        ),
                       ),
-                      decoration: BoxDecoration(
-                        color: context.colors.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Text(
-                        _at(at),
-                        style: sheetLabelStyle(context, size: 12),
-                      ),
-                    ),
                     ),
                 ],
               ),

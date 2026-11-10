@@ -30,12 +30,15 @@ String goalAmount(
   required String unit,
   required double value,
 }) {
-  if (kind != HabitKind.quantitative) return context.l10n.count_times(value.round());
+  if (kind != HabitKind.quantitative) {
+    return context.l10n.count_times(value.round());
+  }
   if (time) return formatMinutes(value);
   return '${formatAmount(value)} $unit'.trim();
 }
 
-String habitGoalAmount(BuildContext context, Habit habit, double value) => goalAmount(
+String habitGoalAmount(BuildContext context, Habit habit, double value) =>
+    goalAmount(
       context,
       kind: habit.kind,
       time: habit.isTimeAmount,
@@ -62,7 +65,9 @@ class CleanGoalCard extends StatelessWidget {
       headline: reached
           ? context.l10n.clean_goal_reached
           : context.l10n.clean_goal_left(goal - streak),
-      sub: reached ? context.l10n.clean_goal_again : context.l10n.count_days(goal),
+      sub: reached
+          ? context.l10n.clean_goal_again
+          : context.l10n.count_days(goal),
       color: habit.color.shownIn(context),
     );
   }
@@ -182,11 +187,16 @@ class _BookReads extends StatelessWidget {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: read.isFinished ? color : color.withValues(alpha: 0.14),
+                  color: read.isFinished
+                      ? color
+                      : color.withValues(alpha: 0.14),
                 ),
                 child: read.isFinished
                     ? Icon(LucideIcons.check, size: 16, color: color.ink)
-                    : Text('${i + 1}', style: strong.copyWith(fontSize: 13, color: color)),
+                    : Text(
+                        '${i + 1}',
+                        style: strong.copyWith(fontSize: 13, color: color),
+                      ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -195,22 +205,30 @@ class _BookReads extends StatelessWidget {
                   children: [
                     Text.rich(
                       read.isFinished
-                          ? TextSpan(children: [
-                              TextSpan(text: _day(context, read.start)),
-                              WidgetSpan(
-                                alignment: PlaceholderAlignment.middle,
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                                  child: Icon(
-                                    LucideIcons.arrowRight,
-                                    size: 14,
-                                    color: context.tokens.muted,
+                          ? TextSpan(
+                              children: [
+                                TextSpan(text: _day(context, read.start)),
+                                WidgetSpan(
+                                  alignment: PlaceholderAlignment.middle,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                    ),
+                                    child: Icon(
+                                      LucideIcons.arrowRight,
+                                      size: 14,
+                                      color: context.tokens.muted,
+                                    ),
                                   ),
                                 ),
+                                TextSpan(text: _day(context, read.end!)),
+                              ],
+                            )
+                          : TextSpan(
+                              text: context.l10n.book_since(
+                                _day(context, read.start),
                               ),
-                              TextSpan(text: _day(context, read.end!)),
-                            ])
-                          : TextSpan(text: context.l10n.book_since(_day(context, read.start))),
+                            ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: strong,
@@ -287,7 +305,11 @@ class _GoalCard extends StatelessWidget {
     final tint = reached ? context.tokens.success : color;
     final express = style.isExpressStyle;
     final titleStyle = express
-        ? ExpressType.headline.at(19, weight: 800, color: context.colors.onSurface)
+        ? ExpressType.headline.at(
+            19,
+            weight: 800,
+            color: context.colors.onSurface,
+          )
         : TextStyle(
             fontSize: 19,
             fontWeight: FontWeight.w800,
@@ -463,7 +485,9 @@ class _AvoidMonthSectionState extends State<AvoidMonthSection> {
 
     final label = DateFormat.yMMMM(locale).format(month);
     final nav = _MonthNav(
-      label: label.isEmpty ? label : label[0].toUpperCase() + label.substring(1),
+      label: label.isEmpty
+          ? label
+          : label[0].toUpperCase() + label.substring(1),
       onPrevious: month.isAfter(first) ? () => _shift(-1) : null,
       onNext: month.isBefore(_current) ? () => _shift(1) : null,
     );
@@ -473,12 +497,36 @@ class _AvoidMonthSectionState extends State<AvoidMonthSection> {
     final danger = context.tokens.danger;
     final history = _history(context, habit, month, locale, danger, style);
     final stats = [
-      (LucideIcons.shieldCheck, context.l10n.clean_days, '${data.cleanDays}', color, ExpressShape.gem),
-      (LucideIcons.triangleAlert, context.l10n.relapses, '${data.relapses}', danger, ExpressShape.cookie),
+      (
+        LucideIcons.shieldCheck,
+        context.l10n.clean_days,
+        '${data.cleanDays}',
+        color,
+        ExpressShape.gem,
+      ),
+      (
+        LucideIcons.triangleAlert,
+        context.l10n.relapses,
+        '${data.relapses}',
+        danger,
+        ExpressShape.cookie,
+      ),
       if (showSaved)
-        (LucideIcons.piggyBank, context.l10n.money_saved, money(data.saved), success, ExpressShape.clover),
+        (
+          LucideIcons.piggyBank,
+          context.l10n.money_saved,
+          money(data.saved),
+          success,
+          ExpressShape.clover,
+        ),
       if (showSpent)
-        (LucideIcons.wallet, context.l10n.money_spent, money(data.spent), danger, ExpressShape.flower),
+        (
+          LucideIcons.wallet,
+          context.l10n.money_spent,
+          money(data.spent),
+          danger,
+          ExpressShape.flower,
+        ),
       if (showSaved && showSpent)
         (
           LucideIcons.scale,
@@ -496,30 +544,33 @@ class _AvoidMonthSectionState extends State<AvoidMonthSection> {
             MinimalTile(icon: icon, label: label, value: value, tint: tint),
         ],
       );
-      return _withHistory(history, MinimalSection(
-        title: context.l10n.avoid_month,
-        trailing: nav,
-        child: expenses.isEmpty
-            ? grid
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  grid,
-                  const SizedBox(height: 12),
-                  MinimalList(
-                    children: [
-                      for (final (i, (date, amount)) in expenses.indexed)
-                        MinimalRow(
-                          label: day(date),
-                          value: money(amount),
-                          tint: danger,
-                          last: i == expenses.length - 1,
-                        ),
-                    ],
-                  ),
-                ],
-              ),
-      ));
+      return _withHistory(
+        history,
+        MinimalSection(
+          title: context.l10n.avoid_month,
+          trailing: nav,
+          child: expenses.isEmpty
+              ? grid
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    grid,
+                    const SizedBox(height: 12),
+                    MinimalList(
+                      children: [
+                        for (final (i, (date, amount)) in expenses.indexed)
+                          MinimalRow(
+                            label: day(date),
+                            value: money(amount),
+                            tint: danger,
+                            last: i == expenses.length - 1,
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+        ),
+      );
     }
 
     final Widget body;
@@ -576,13 +627,16 @@ class _AvoidMonthSectionState extends State<AvoidMonthSection> {
         ],
       );
     }
-    return _withHistory(history, Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        SectionLabel(context.l10n.avoid_month, trailing: nav),
-        body,
-      ],
-    ));
+    return _withHistory(
+      history,
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SectionLabel(context.l10n.avoid_month, trailing: nav),
+          body,
+        ],
+      ),
+    );
   }
 
   Widget _withHistory(Widget? history, Widget month) {
@@ -682,14 +736,14 @@ class _MonthNav extends StatelessWidget {
   Widget build(BuildContext context) {
     final muted = context.tokens.muted;
     Widget arrow(IconData icon, VoidCallback? onTap) => IconButton(
-          icon: Icon(icon, size: 18),
-          color: muted,
-          disabledColor: muted.withValues(alpha: 0.3),
-          visualDensity: VisualDensity.compact,
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints.tightFor(width: 32, height: 32),
-          onPressed: onTap,
-        );
+      icon: Icon(icon, size: 18),
+      color: muted,
+      disabledColor: muted.withValues(alpha: 0.3),
+      visualDensity: VisualDensity.compact,
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints.tightFor(width: 32, height: 32),
+      onPressed: onTap,
+    );
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [

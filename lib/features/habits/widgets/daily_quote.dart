@@ -12,19 +12,19 @@ class DailyQuote extends StatefulWidget {
   const DailyQuote({super.key});
 
   static List<String> appQuotes(BuildContext context) => [
-        context.l10n.quote_1,
-        context.l10n.quote_2,
-        context.l10n.quote_3,
-        context.l10n.quote_4,
-        context.l10n.quote_5,
-        context.l10n.quote_6,
-        context.l10n.quote_7,
-        context.l10n.quote_8,
-        context.l10n.quote_9,
-        context.l10n.quote_10,
-        context.l10n.quote_11,
-        context.l10n.quote_12,
-      ];
+    context.l10n.quote_1,
+    context.l10n.quote_2,
+    context.l10n.quote_3,
+    context.l10n.quote_4,
+    context.l10n.quote_5,
+    context.l10n.quote_6,
+    context.l10n.quote_7,
+    context.l10n.quote_8,
+    context.l10n.quote_9,
+    context.l10n.quote_10,
+    context.l10n.quote_11,
+    context.l10n.quote_12,
+  ];
 
   static List<String> quotesOf(BuildContext context, SettingsController s) =>
       switch (s.quoteSource) {
@@ -73,8 +73,10 @@ class _DailyQuoteState extends State<DailyQuote> {
 
   @override
   Widget build(BuildContext context) {
-    final quotes =
-        DailyQuote.quotesOf(context, context.watch<SettingsController>());
+    final quotes = DailyQuote.quotesOf(
+      context,
+      context.watch<SettingsController>(),
+    );
     if (quotes.isEmpty) return const SizedBox.shrink();
 
     if (!_picked || DailyQuote._index >= quotes.length) {
@@ -95,7 +97,11 @@ class _DailyQuoteState extends State<DailyQuote> {
           children: [
             Padding(
               padding: const EdgeInsets.only(top: 2),
-              child: Icon(LucideIcons.sparkles, size: 14, color: context.colors.primary),
+              child: Icon(
+                LucideIcons.sparkles,
+                size: 14,
+                color: context.colors.primary,
+              ),
             ),
             const SizedBox(width: 6),
             Expanded(

@@ -110,34 +110,34 @@ class ExpressHabitList extends StatelessWidget {
           child: Opacity(
             opacity: extra ? 0.6 : 1,
             child: SlotTransition(
-            leaving: leaving.contains(habit.id),
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: Express.groupGap),
-              child: PaneMark(
-                id: habit.id,
-                tint: habit.color.shownIn(context),
-                corners: radius,
-                child: SwipeCheck(
-                  done: habit.isCompletedOn(AppClock.today()),
+              leaving: leaving.contains(habit.id),
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: Express.groupGap),
+                child: PaneMark(
+                  id: habit.id,
                   tint: habit.color.shownIn(context),
                   corners: radius,
-                  onSwipe: onSwipe == null ? null : () => onSwipe!(habit),
-                  child: KeepBuilt(
-                  keys: [habit, mode, slot, group.length, AppClock.today()],
-                  build: () => ExpressHabitCard(
-                    habit: habit,
-                    mode: mode,
-                    radius: radius,
-                    onOpen: () => onOpen(habit),
-                    onToggleToday: () => onToggleToday(habit),
-                    onToggleDay: (date) => onToggleDay(habit, date),
-                    onLongPress: () => onLongPress(habit),
-                  ),
+                  child: SwipeCheck(
+                    done: habit.isCompletedOn(AppClock.today()),
+                    tint: habit.color.shownIn(context),
+                    corners: radius,
+                    onSwipe: onSwipe == null ? null : () => onSwipe!(habit),
+                    child: KeepBuilt(
+                      keys: [habit, mode, slot, group.length, AppClock.today()],
+                      build: () => ExpressHabitCard(
+                        habit: habit,
+                        mode: mode,
+                        radius: radius,
+                        onOpen: () => onOpen(habit),
+                        onToggleToday: () => onToggleToday(habit),
+                        onToggleDay: (date) => onToggleDay(habit, date),
+                        onLongPress: () => onLongPress(habit),
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
           ),
         );
       },

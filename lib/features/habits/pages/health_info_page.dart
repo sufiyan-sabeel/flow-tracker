@@ -36,7 +36,11 @@ class HealthInfoPage extends StatelessWidget {
                 color: scheme.primary.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
-              child: Icon(LucideIcons.footprints, size: 32, color: scheme.primary),
+              child: Icon(
+                LucideIcons.footprints,
+                size: 32,
+                color: scheme.primary,
+              ),
             ),
           ),
           const SizedBox(height: 18),

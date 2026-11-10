@@ -169,7 +169,11 @@ class _TotalHero extends StatelessWidget {
                 size: 52,
                 color: habit.color.shownIn(context).withValues(alpha: 0.18),
                 shape: ExpressShape.flower,
-                child: Icon(LucideIcons.sigma, size: 23, color: habit.color.shownIn(context)),
+                child: Icon(
+                  LucideIcons.sigma,
+                  size: 23,
+                  color: habit.color.shownIn(context),
+                ),
               ),
               const SizedBox(width: 16),
               Expanded(

@@ -70,17 +70,19 @@ class _CheckTile extends StatelessWidget {
     final negative = habit.kind == HabitKind.negative;
     final relapsed = negative && isRelapse(habit, AppClock.now());
     final marked = negative ? relapsed : done;
-    final tint = relapsed ? context.tokens.danger : habit.color.shownIn(context);
+    final tint = relapsed
+        ? context.tokens.danger
+        : habit.color.shownIn(context);
 
     return Semantics(
       button: true,
       label: negative
           ? (relapsed
-              ? context.l10n.a11y_clear_relapse(habit.name)
-              : context.l10n.a11y_log_relapse(habit.name))
+                ? context.l10n.a11y_clear_relapse(habit.name)
+                : context.l10n.a11y_log_relapse(habit.name))
           : (done
-              ? context.l10n.a11y_mark_not_done(habit.name)
-              : context.l10n.a11y_mark_done(habit.name)),
+                ? context.l10n.a11y_mark_not_done(habit.name)
+                : context.l10n.a11y_mark_done(habit.name)),
       child: GestureDetector(
         onTap: () {
           onTap();
@@ -124,8 +126,11 @@ class _QuantTile extends StatelessWidget {
     final controller = context.read<HabitsController>();
     if (!await allowManualCheck(context, habit: habit, date: today)) return;
     if (!context.mounted) return;
-    final allowed =
-        await confirmUnscheduledDay(context, habit: habit, date: today);
+    final allowed = await confirmUnscheduledDay(
+      context,
+      habit: habit,
+      date: today,
+    );
     if (!allowed) return;
     await controller.addProgress(habit.id, today, habit.incrementAmount);
   }
@@ -136,7 +141,9 @@ class _QuantTile extends StatelessWidget {
     final count = habit.completions[today.dayKey]?.count ?? 0;
     final progress = habit.progressFor(count);
     final reached = progress.reachedGoal;
-    final settled = reached ? progress.reachedColor(habit.color.shownIn(context)) : habit.color.shownIn(context);
+    final settled = reached
+        ? progress.reachedColor(habit.color.shownIn(context))
+        : habit.color.shownIn(context);
 
     return Semantics(
       button: true,
@@ -167,7 +174,9 @@ class _QuantTile extends StatelessWidget {
                       heightFactor: t.clamp(0.0, 1.0),
                       widthFactor: 1,
                       child: ColoredBox(
-                        color: progress.activeColor(habit.color.shownIn(context)),
+                        color: progress.activeColor(
+                          habit.color.shownIn(context),
+                        ),
                       ),
                     ),
                   ),
@@ -180,7 +189,9 @@ class _QuantTile extends StatelessWidget {
                     builder: (context, t, _) => Icon(
                       Icons.check_rounded,
                       size: size * 0.5,
-                      color: reached || t >= 0.45 ? habit.color.shownIn(context).ink : habit.color.shownIn(context),
+                      color: reached || t >= 0.45
+                          ? habit.color.shownIn(context).ink
+                          : habit.color.shownIn(context),
                     ),
                   ),
               ],
@@ -338,7 +349,9 @@ class _DayCell extends StatelessWidget {
     final relapsed = negative && isRelapse(habit, date);
     final done = relapsed || habit.isCompletedOn(date);
     final covered = !done && habit.isCoveredOn(date);
-    final tint = relapsed ? context.tokens.danger : habit.color.shownIn(context);
+    final tint = relapsed
+        ? context.tokens.danger
+        : habit.color.shownIn(context);
     final quant = habit.kind == HabitKind.quantitative;
     final today = date.atMidnight == AppClock.today();
 
@@ -394,12 +407,17 @@ class _DayCell extends StatelessWidget {
                               Align(
                                 alignment: Alignment.bottomCenter,
                                 child: FractionallySizedBox(
-                                  heightFactor: habit.progressFor(
-                                    habit.completions[date.dayKey]?.count ?? 0,
-                                    goal: habit.pastGoalOn(date),
-                                  ).fraction,
+                                  heightFactor: habit
+                                      .progressFor(
+                                        habit.completions[date.dayKey]?.count ??
+                                            0,
+                                        goal: habit.pastGoalOn(date),
+                                      )
+                                      .fraction,
                                   widthFactor: 1,
-                                  child: ColoredBox(color: habit.color.shownIn(context)),
+                                  child: ColoredBox(
+                                    color: habit.color.shownIn(context),
+                                  ),
                                 ),
                               ),
                           ],
@@ -676,8 +694,9 @@ class _GridYearStripState extends State<_GridYearStrip> {
                       height: 14,
                       child: Text(
                         months.format(start.addDays(column * 7)),
-                        textScaler: MediaQuery.textScalerOf(context)
-                            .clamp(maxScaleFactor: 1.2),
+                        textScaler: MediaQuery.textScalerOf(
+                          context,
+                        ).clamp(maxScaleFactor: 1.2),
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
@@ -749,7 +768,8 @@ class _GridMonthCalendar extends StatelessWidget {
     final first = DateTime(today.year, today.month, 1).startOfWeek(weekStart);
     final lastDay = DateTime(today.year, today.month + 1, 0);
     final weeks =
-        ((lastDay.startOfWeek(weekStart).epochDay - first.epochDay) / 7).round() +
+        ((lastDay.startOfWeek(weekStart).epochDay - first.epochDay) / 7)
+            .round() +
         1;
 
     return Column(
@@ -841,8 +861,10 @@ class _GridViewSwitcherState extends State<GridViewSwitcher> {
   void _move(Offset local) {
     final finger = _finger;
     if (finger == null) return;
-    final x = (local.dx - _inset)
-        .clamp(_centerOf(0), _centerOf(_options.length - 1));
+    final x = (local.dx - _inset).clamp(
+      _centerOf(0),
+      _centerOf(_options.length - 1),
+    );
     setState(() => _finger = x);
   }
 
@@ -855,10 +877,10 @@ class _GridViewSwitcherState extends State<GridViewSwitcher> {
   }
 
   String _label(BuildContext context, HeatmapMode value) => switch (value) {
-        HeatmapMode.week => context.l10n.week,
-        HeatmapMode.year => context.l10n.year,
-        _ => context.l10n.month,
-      };
+    HeatmapMode.week => context.l10n.week,
+    HeatmapMode.year => context.l10n.year,
+    _ => context.l10n.month,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -897,8 +919,9 @@ class _GridViewSwitcherState extends State<GridViewSwitcher> {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 240),
                 decoration: BoxDecoration(
-                  color: context.colors.primary
-                      .withValues(alpha: held ? 0.22 : 0.16),
+                  color: context.colors.primary.withValues(
+                    alpha: held ? 0.22 : 0.16,
+                  ),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(

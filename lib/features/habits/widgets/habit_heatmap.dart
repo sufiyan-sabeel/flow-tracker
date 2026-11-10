@@ -37,11 +37,15 @@ Color heatmapCellColor(
     }
     final clean = habit.color.shownIn(context).withValues(alpha: 0.4);
     if (date.isAfter(today)) return clean.withValues(alpha: 0.18);
-    if (habit.completions.containsKey(date.dayKey)) return context.tokens.danger;
+    if (habit.completions.containsKey(date.dayKey)) {
+      return context.tokens.danger;
+    }
     return clean;
   }
 
-  if (!beforeCreation && !habit.isCompletedOn(date) && habit.isCoveredOn(date)) {
+  if (!beforeCreation &&
+      !habit.isCompletedOn(date) &&
+      habit.isCoveredOn(date)) {
     return habit.color.shownIn(context).withValues(alpha: 0.22);
   }
 
@@ -52,10 +56,18 @@ Color heatmapCellColor(
     final untouched = date.isAfter(today) || habit.isOffDay(date);
     return untouched ? base.withValues(alpha: 0.4) : base;
   }
-  if (habit.capsAmount && !habit.isCompletedOn(date)) return context.tokens.danger;
+  if (habit.capsAmount && !habit.isCompletedOn(date)) {
+    return context.tokens.danger;
+  }
   final ratio = (count / habit.fillTargetOn(date)).clamp(0.25, 1.0);
-  final full = habit.progressOn(date, count).solidColor(habit.color.shownIn(context));
-  return Color.lerp(habit.color.shownIn(context).withValues(alpha: 0.4), full, ratio)!;
+  final full = habit
+      .progressOn(date, count)
+      .solidColor(habit.color.shownIn(context));
+  return Color.lerp(
+    habit.color.shownIn(context).withValues(alpha: 0.4),
+    full,
+    ratio,
+  )!;
 }
 
 String heatmapDayLabel(BuildContext context, Habit habit, DateTime date) {
@@ -101,8 +113,8 @@ class _HabitHeatmapState extends State<HabitHeatmap> {
 
   DateTime get _today => AppClock.today();
 
-  DateTime _weekOf(DateTime d) => d.atMidnight
-      .startOfWeek(context.watch<SettingsController>().weekStart);
+  DateTime _weekOf(DateTime d) =>
+      d.atMidnight.startOfWeek(context.watch<SettingsController>().weekStart);
 
   Color _cell(BuildContext context, DateTime date, {bool inScope = true}) =>
       heatmapCellColor(context, widget.habit, date, inScope: inScope);
@@ -358,14 +370,17 @@ class _HabitHeatmapState extends State<HabitHeatmap> {
     final first = monthStart.startOfWeek(weekStart);
     final lastDay = DateTime(_today.year, _today.month + 1, 0);
     final weeks =
-        ((lastDay.startOfWeek(weekStart).epochDay - first.epochDay) / 7).round() +
+        ((lastDay.startOfWeek(weekStart).epochDay - first.epochDay) / 7)
+            .round() +
         1;
     final path = heatmapPathOn(context);
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        var side = (constraints.maxWidth / 7 - (widget.compact ? 2 : 3))
-            .clamp(0.0, _monthCellMax);
+        var side = (constraints.maxWidth / 7 - (widget.compact ? 2 : 3)).clamp(
+          0.0,
+          _monthCellMax,
+        );
         var gap = (constraints.maxWidth - side * 7) / 6;
         final maxGap = path ? heatmapPathGap : _monthGapMax;
         if (gap > maxGap) {
@@ -374,82 +389,102 @@ class _HabitHeatmapState extends State<HabitHeatmap> {
         }
 
         return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (!widget.compact)
-          Padding(
-            padding: const EdgeInsets.only(left: 2, bottom: 8),
-            child: Text(
-              _monthLabel(monthStart),
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: context.tokens.muted,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (!widget.compact)
+              Padding(
+                padding: const EdgeInsets.only(left: 2, bottom: 8),
+                child: Text(
+                  _monthLabel(monthStart),
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: context.tokens.muted,
+                  ),
+                ),
+              ),
+            withHeatmapPath(
+              on: path,
+              columns: 7,
+              rows: weeks,
+              cell: side,
+              gap: gap,
+              byRows: true,
+              inkFor: (column, row) => _pathInk(
+                context,
+                first.addDays(row * 7 + column),
+                inMonth: true,
+              ),
+              child: Column(
+                children: [
+                  for (var w = 0; w < weeks; w++)
+                    Padding(
+                      padding: EdgeInsets.only(
+                        bottom: w == weeks - 1 ? 0 : gap,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: List.generate(7, (d) {
+                          final date = first.addDays(w * 7 + d);
+                          final inMonth = date.month == _today.month;
+                          final future = date.isAfter(_today);
+                          final fill = !inMonth
+                              ? Colors.transparent
+                              : future
+                              ? context.colors.surfaceContainerHighest
+                                    .withValues(
+                                      alpha: 0.4,
+                                    )
+                              : _cell(context, date);
+                          final decoration = BoxDecoration(
+                            color: fill,
+                            borderRadius: BorderRadius.circular(
+                              widget.circle ? 999 : 9,
+                            ),
+                            border: _isToday(date)
+                                ? _todayRing(
+                                    context,
+                                    fill,
+                                    widget.compact ? 1.2 : 1.5,
+                                  )
+                                : null,
+                          );
+                          final number = inMonth && side >= 20
+                              ? _dayNumber(
+                                  context,
+                                  date,
+                                  fill,
+                                  side,
+                                  future: future,
+                                )
+                              : null;
+                          return SizedBox(
+                            width: side,
+                            height: side,
+                            child: _tappable(
+                              date: date,
+                              enabled: inMonth,
+                              child: widget.compact
+                                  ? DecoratedBox(
+                                      decoration: decoration,
+                                      child: number,
+                                    )
+                                  : AnimatedContainer(
+                                      duration: const Duration(
+                                        milliseconds: 200,
+                                      ),
+                                      decoration: decoration,
+                                      child: number,
+                                    ),
+                            ),
+                          );
+                        }),
+                      ),
+                    ),
+                ],
               ),
             ),
-          ),
-        withHeatmapPath(
-          on: path,
-          columns: 7,
-          rows: weeks,
-          cell: side,
-          gap: gap,
-          byRows: true,
-          inkFor: (column, row) => _pathInk(
-            context,
-            first.addDays(row * 7 + column),
-            inMonth: true,
-          ),
-          child: Column(
-            children: [
-        for (var w = 0; w < weeks; w++)
-          Padding(
-            padding: EdgeInsets.only(bottom: w == weeks - 1 ? 0 : gap),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(7, (d) {
-                final date = first.addDays(w * 7 + d);
-                final inMonth = date.month == _today.month;
-                final future = date.isAfter(_today);
-                final fill = !inMonth
-                    ? Colors.transparent
-                    : future
-                    ? context.colors.surfaceContainerHighest.withValues(
-                        alpha: 0.4,
-                      )
-                    : _cell(context, date);
-                final decoration = BoxDecoration(
-                  color: fill,
-                  borderRadius: BorderRadius.circular(widget.circle ? 999 : 9),
-                  border: _isToday(date)
-                      ? _todayRing(context, fill, widget.compact ? 1.2 : 1.5)
-                      : null,
-                );
-                final number = inMonth && side >= 20
-                    ? _dayNumber(context, date, fill, side, future: future)
-                    : null;
-                return SizedBox(
-                  width: side,
-                  height: side,
-                  child: _tappable(
-                    date: date,
-                    enabled: inMonth,
-                    child: widget.compact
-                        ? DecoratedBox(decoration: decoration, child: number)
-                        : AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            decoration: decoration,
-                            child: number,
-                          ),
-                  ),
-                );
-              }),
-            ),
-          ),
-            ],
-          ),
-        ),
-      ],
+          ],
         );
       },
     );
@@ -467,10 +502,10 @@ class _HabitHeatmapState extends State<HabitHeatmap> {
     final color = filled
         ? fill.ink
         : future
-            ? context.tokens.muted.withValues(alpha: 0.5)
-            : today
-                ? context.colors.primary
-                : context.tokens.muted;
+        ? context.tokens.muted.withValues(alpha: 0.5)
+        : today
+        ? context.colors.primary
+        : context.tokens.muted;
     return Center(
       child: Text(
         '${date.day}',
@@ -509,7 +544,8 @@ class _HabitHeatmapState extends State<HabitHeatmap> {
   }
 
   Widget _yearGrid(BuildContext context) {
-    final history = (_today.epochDay - _weekOf(widget.habit.startedAt).epochDay) ~/ 7 + 1;
+    final history =
+        (_today.epochDay - _weekOf(widget.habit.startedAt).epochDay) ~/ 7 + 1;
     final columns = history < 53 ? 53 : (history > 520 ? 520 : history);
     final path = heatmapPathOn(context);
     final gap = path ? heatmapPathGap : 3.0;
@@ -534,52 +570,52 @@ class _HabitHeatmapState extends State<HabitHeatmap> {
         cell: cell,
         gap: gap,
         top: 14,
-        inkFor: (col, row) =>
-            _pathInk(context, start.addDays(col * 7 + row)),
+        inkFor: (col, row) => _pathInk(context, start.addDays(col * 7 + row)),
         child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: List.generate(columns, (col) {
-          final colDate = start.addDays(col * 7);
-          final prevDate = start.addDays((col - 1) * 7);
-          final isNewMonth = col == 0 || colDate.month != prevDate.month;
-          return Padding(
-            padding: EdgeInsets.only(right: gap),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: 14,
-                  width: cell,
-                  child: isNewMonth
-                      ? OverflowBox(
-                          maxWidth: 40,
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            months.format(colDate),
-                            textScaler: MediaQuery.textScalerOf(context)
-                                .clamp(maxScaleFactor: 1.2),
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              color: context.tokens.muted,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: List.generate(columns, (col) {
+            final colDate = start.addDays(col * 7);
+            final prevDate = start.addDays((col - 1) * 7);
+            final isNewMonth = col == 0 || colDate.month != prevDate.month;
+            return Padding(
+              padding: EdgeInsets.only(right: gap),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 14,
+                    width: cell,
+                    child: isNewMonth
+                        ? OverflowBox(
+                            maxWidth: 40,
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              months.format(colDate),
+                              textScaler: MediaQuery.textScalerOf(
+                                context,
+                              ).clamp(maxScaleFactor: 1.2),
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: context.tokens.muted,
+                              ),
                             ),
-                          ),
-                        )
-                      : null,
-                ),
-                for (var row = 0; row < 7; row++)
-                  Padding(
-                    padding: EdgeInsets.only(bottom: gap),
-                    child: _yearCell(
-                      context,
-                      start.addDays(col * 7 + row),
-                      cell,
-                    ),
+                          )
+                        : null,
                   ),
-              ],
-            ),
-          );
-        }),
+                  for (var row = 0; row < 7; row++)
+                    Padding(
+                      padding: EdgeInsets.only(bottom: gap),
+                      child: _yearCell(
+                        context,
+                        start.addDays(col * 7 + row),
+                        cell,
+                      ),
+                    ),
+                ],
+              ),
+            );
+          }),
         ),
       ),
     );

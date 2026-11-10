@@ -64,9 +64,9 @@ class FlagDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(62, 0, 14, 14),
-        child: child,
-      );
+    padding: const EdgeInsets.fromLTRB(62, 0, 14, 14),
+    child: child,
+  );
 }
 
 class HabitFlagToggle extends StatelessWidget {
@@ -98,7 +98,12 @@ class HabitFlagToggle extends StatelessWidget {
       child: InkWell(
         onTap: () => onChanged(!value),
         child: Padding(
-          padding: EdgeInsets.fromLTRB(14, compact ? 10 : 12, 8, compact ? 10 : 12),
+          padding: EdgeInsets.fromLTRB(
+            14,
+            compact ? 10 : 12,
+            8,
+            compact ? 10 : 12,
+          ),
           child: Row(
             children: [
               AnimatedContainer(
@@ -120,14 +125,20 @@ class HabitFlagToggle extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: sheetHeadingStyle(context, size: compact ? 13.5 : 14.5),
+                      style: sheetHeadingStyle(
+                        context,
+                        size: compact ? 13.5 : 14.5,
+                      ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       hint,
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
-                      style: sheetBodyStyle(context, size: compact ? 11.5 : 12.5),
+                      style: sheetBodyStyle(
+                        context,
+                        size: compact ? 11.5 : 12.5,
+                      ),
                     ),
                   ],
                 ),

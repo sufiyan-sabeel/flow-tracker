@@ -9,15 +9,22 @@ import 'package:flow_tracker/core/extensions/color_extensions.dart';
 String habitFrequencyLabel(BuildContext context, Habit habit) {
   return switch (habit.interval) {
     HabitInterval.daily => context.l10n.daily,
-    HabitInterval.weekly =>
-      context.l10n.freq_per_week_short('${habit.targetFrequency}'),
-    HabitInterval.monthly =>
-      context.l10n.freq_per_month_short('${habit.targetFrequency}'),
+    HabitInterval.weekly => context.l10n.freq_per_week_short(
+      '${habit.targetFrequency}',
+    ),
+    HabitInterval.monthly => context.l10n.freq_per_month_short(
+      '${habit.targetFrequency}',
+    ),
     HabitInterval.weekdays => _weekdaysLabel(context, habit),
-    HabitInterval.everyXDays => habit.monthWeekday
-        ? '${scheduleEveryLabel(context, habit.scheduleEvery, habit.scheduleUnit)}, '
-            '${monthWeekdayLabel(context, habit.scheduleStart ?? habit.createdAt)}'
-        : scheduleEveryLabel(context, habit.scheduleEvery, habit.scheduleUnit),
+    HabitInterval.everyXDays =>
+      habit.monthWeekday
+          ? '${scheduleEveryLabel(context, habit.scheduleEvery, habit.scheduleUnit)}, '
+                '${monthWeekdayLabel(context, habit.scheduleStart ?? habit.createdAt)}'
+          : scheduleEveryLabel(
+              context,
+              habit.scheduleEvery,
+              habit.scheduleUnit,
+            ),
   };
 }
 

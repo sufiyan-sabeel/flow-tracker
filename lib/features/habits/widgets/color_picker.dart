@@ -65,8 +65,7 @@ class _ColorPickerState extends State<ColorPicker> {
                     _Swatch(
                       color: color,
                       size: swatch,
-                      selected:
-                          widget.selected.toARGB32() == color.toARGB32(),
+                      selected: widget.selected.toARGB32() == color.toARGB32(),
                       onTap: () => widget.onSelected(color),
                       icon: LucideIcons.sparkles,
                     ),
@@ -74,8 +73,7 @@ class _ColorPickerState extends State<ColorPicker> {
                     _Swatch(
                       color: color,
                       size: swatch,
-                      selected:
-                          widget.selected.toARGB32() == color.toARGB32(),
+                      selected: widget.selected.toARGB32() == color.toARGB32(),
                       onTap: () => widget.onSelected(color),
                     ),
                 ],
@@ -104,31 +102,31 @@ class _Segment2 extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = context.colors;
     Widget seg(String label, bool active, VoidCallback onTap) => Expanded(
-          child: Semantics(
-            button: true,
-            selected: active,
-            child: GestureDetector(
-              onTap: onTap,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 160),
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: active ? scheme.primary : Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: active ? scheme.onPrimary : context.tokens.muted,
-                  ),
-                ),
+      child: Semantics(
+        button: true,
+        selected: active,
+        child: GestureDetector(
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 160),
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: active ? scheme.primary : Colors.transparent,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: active ? scheme.onPrimary : context.tokens.muted,
               ),
             ),
           ),
-        );
+        ),
+      ),
+    );
     return Container(
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
@@ -148,7 +146,8 @@ class _Segment2 extends StatelessWidget {
 Border? swatchOutline(BuildContext context, Color color) {
   final scheme = Theme.of(context).colorScheme;
   final blends =
-      (color.computeLuminance() - scheme.surface.computeLuminance()).abs() < 0.1;
+      (color.computeLuminance() - scheme.surface.computeLuminance()).abs() <
+      0.1;
   return blends
       ? Border.all(color: scheme.onSurface.withValues(alpha: 0.3))
       : null;
@@ -171,10 +170,12 @@ class _Swatch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final checkColor =
-        color.computeLuminance() > 0.6 ? const Color(0xFF1C1C1E) : Colors.white;
-    final borderColor =
-        color.computeLuminance() > 0.85 ? const Color(0xFF8E8E93) : Colors.white;
+    final checkColor = color.computeLuminance() > 0.6
+        ? const Color(0xFF1C1C1E)
+        : Colors.white;
+    final borderColor = color.computeLuminance() > 0.85
+        ? const Color(0xFF8E8E93)
+        : Colors.white;
     return Semantics(
       button: true,
       selected: selected,
@@ -193,14 +194,19 @@ class _Swatch extends StatelessWidget {
                 ? Border.all(color: borderColor, width: 2.5)
                 : swatchOutline(context, color),
             boxShadow: selected
-                ? [BoxShadow(color: color.withValues(alpha: 0.45), blurRadius: 10)]
+                ? [
+                    BoxShadow(
+                      color: color.withValues(alpha: 0.45),
+                      blurRadius: 10,
+                    ),
+                  ]
                 : null,
           ),
           child: selected
               ? Icon(LucideIcons.check, color: checkColor, size: 18)
               : icon == null
-                  ? null
-                  : Icon(icon, color: checkColor, size: 16),
+              ? null
+              : Icon(icon, color: checkColor, size: 16),
         ),
       ),
     );

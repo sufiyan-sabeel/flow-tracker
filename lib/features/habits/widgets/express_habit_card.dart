@@ -98,66 +98,66 @@ class ExpressHabitCard extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(14, 14, 14, compact ? 14 : 12),
               child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                _Glyph(habit: habit, done: done),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      ScrollingText(
-                        habit.name,
-                        style: ExpressType.headline.at(
-                          17.5,
-                          weight: 800,
-                          color: scheme.onSurface,
+                      _Glyph(habit: habit, done: done),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ScrollingText(
+                              habit.name,
+                              style: ExpressType.headline.at(
+                                17.5,
+                                weight: 800,
+                                color: scheme.onSurface,
+                              ),
+                            ),
+                            const SizedBox(height: 7),
+                            _MetaPills(
+                              habit: habit,
+                              planning: settings.planningEnabled,
+                              mode: mode,
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 7),
-                      _MetaPills(
+                      const SizedBox(width: 8),
+                      ExpressAction(
                         habit: habit,
-                        planning: settings.planningEnabled,
-                        mode: mode,
+                        done: done,
+                        onToggleToday: onToggleToday,
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(width: 8),
-                ExpressAction(
-                  habit: habit,
-                  done: done,
-                  onToggleToday: onToggleToday,
-                ),
-              ],
-            ),
-            if (quantitative) ...[
-              const SizedBox(height: 12),
-              _QuantWave(habit: habit),
-            ],
-            if (habit.hasSubsteps) ...[
-              const SizedBox(height: 6),
-              HabitStepsPanel(habit: habit),
-            ],
-            if (settings.cardActivity && !compact && !quantitative) ...[
-              const SizedBox(height: 12),
-              switch (mode) {
-                HeatmapMode.week => ExpressStreakRow(
-                    habit: habit,
-                    height: 48,
-                    onToggle: onToggleDay,
-                  ),
-                HeatmapMode.month => ExpressMonthStrip(habit: habit),
-                _ => HabitHeatmap(
-                    habit: habit,
-                    mode: HeatmapMode.year,
-                    compact: true,
-                  ),
-              },
-            ],
-          ],
+                  if (quantitative) ...[
+                    const SizedBox(height: 12),
+                    _QuantWave(habit: habit),
+                  ],
+                  if (habit.hasSubsteps) ...[
+                    const SizedBox(height: 6),
+                    HabitStepsPanel(habit: habit),
+                  ],
+                  if (settings.cardActivity && !compact && !quantitative) ...[
+                    const SizedBox(height: 12),
+                    switch (mode) {
+                      HeatmapMode.week => ExpressStreakRow(
+                        habit: habit,
+                        height: 48,
+                        onToggle: onToggleDay,
+                      ),
+                      HeatmapMode.month => ExpressMonthStrip(habit: habit),
+                      _ => HabitHeatmap(
+                        habit: habit,
+                        mode: HeatmapMode.year,
+                        compact: true,
+                      ),
+                    },
+                  ],
+                ],
               ),
             ),
           ],
@@ -181,14 +181,20 @@ class _Glyph extends StatelessWidget {
       width: 48,
       height: 48,
       decoration: ShapeDecoration(
-        color: habit.color.shownIn(context).withValues(alpha: done ? 0.28 : 0.16),
+        color: habit.color
+            .shownIn(context)
+            .withValues(alpha: done ? 0.28 : 0.16),
         shape: ExpressBorder(
           shape: done
               ? ExpressShape.cookie.copyWith(rotation: 0.2)
               : ExpressShape.squircle,
         ),
       ),
-      child: HabitGlyph(glyph: habit.icon, color: habit.color.shownIn(context), size: 23),
+      child: HabitGlyph(
+        glyph: habit.icon,
+        color: habit.color.shownIn(context),
+        size: 23,
+      ),
     );
   }
 }
@@ -302,7 +308,7 @@ class _QuantWave extends StatelessWidget {
         Text(
           habit.hasGoal
               ? '${habit.amountText(count)} / '
-                  '${habit.amountText(habit.perDayTarget)}$unit'
+                    '${habit.amountText(habit.perDayTarget)}$unit'
               : '${habit.amountText(count)}$unit',
           style: ExpressType.body.at(
             12.5,
@@ -369,7 +375,11 @@ class ExpressAction extends StatelessWidget {
   Widget build(BuildContext context) {
     final today = AppClock.now();
     final (icon, color, onTap) = switch (habit.kind) {
-      HabitKind.positive => (LucideIcons.check, habit.color.shownIn(context), onToggleToday),
+      HabitKind.positive => (
+        LucideIcons.check,
+        habit.color.shownIn(context),
+        onToggleToday,
+      ),
       HabitKind.negative => (
         done ? LucideIcons.shieldCheck : LucideIcons.ban,
         done ? habit.color.shownIn(context) : context.tokens.danger,

@@ -27,9 +27,9 @@ class JourneyShot {
 }
 
 List<JourneyShot> journeyShots(NotesController notes, String habitId) => [
-      for (final note in notes.photoNotes(habitId))
-        for (final path in note.photos) JourneyShot(path: path, note: note),
-    ];
+  for (final note in notes.photoNotes(habitId))
+    for (final path in note.photos) JourneyShot(path: path, note: note),
+];
 
 class JourneyPage extends StatelessWidget {
   const JourneyPage({
@@ -49,31 +49,30 @@ class JourneyPage extends StatelessWidget {
     final express = style.isExpressStyle;
     final minimal = style.isMinimalStyle;
     final body = shots.isEmpty
-          ? AppEmptyState(
-              icon: LucideIcons.images,
-              title: context.l10n.journey_empty,
-              message: context.l10n.journey_empty_sub,
-            )
-          : GridView.builder(
-              padding: context.pagePadding(14, 14, 14, 28),
-              gridDelegate:
-                  const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
-              ),
-              itemCount: shots.length,
-              itemBuilder: (_, index) => Entrance(
+        ? AppEmptyState(
+            icon: LucideIcons.images,
+            title: context.l10n.journey_empty,
+            message: context.l10n.journey_empty_sub,
+          )
+        : GridView.builder(
+            padding: context.pagePadding(14, 14, 14, 28),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+            ),
+            itemCount: shots.length,
+            itemBuilder: (_, index) => Entrance(
+              index: index,
+              delay: _entrance,
+              offset: 10,
+              child: _Thumb(
+                shot: shots[index],
                 index: index,
-                delay: _entrance,
-                offset: 10,
-                child: _Thumb(
-                  shot: shots[index],
-                  index: index,
-                  onTap: () => showJourneyViewer(context, shots, index),
-                ),
+                onTap: () => showJourneyViewer(context, shots, index),
               ),
-            );
+            ),
+          );
 
     return Scaffold(
       appBar: express
@@ -136,10 +135,8 @@ Future<void> showJourneyViewer(
   BuildContext context,
   List<JourneyShot> shots,
   int index,
-) =>
-    showPhotoViewer(
-      context,
-      [for (final shot in shots) noteShot(context, shot.note, shot.path)],
-      index,
-    );
-
+) => showPhotoViewer(
+  context,
+  [for (final shot in shots) noteShot(context, shot.note, shot.path)],
+  index,
+);

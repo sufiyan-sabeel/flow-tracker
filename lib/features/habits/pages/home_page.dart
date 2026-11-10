@@ -78,11 +78,11 @@ const _sinkDelay = Duration(milliseconds: 2500);
 class _HomePageState extends State<HomePage> with ShortcutHost {
   @override
   Map<AppShortcut, VoidCallback> get shortcuts => {
-        AppShortcut.create: () => AppNavigator.push(
-              const HabitFormPage(),
-              fullscreenDialog: true,
-            ),
-      };
+    AppShortcut.create: () => AppNavigator.push(
+      const HabitFormPage(),
+      fullscreenDialog: true,
+    ),
+  };
 
   final _confetti = ValueNotifier(0);
   final _scrolled = ValueNotifier(false);
@@ -142,7 +142,8 @@ class _HomePageState extends State<HomePage> with ShortcutHost {
   }
 
   void _openFilter(SettingsController settings) {
-    final modes = !settings.viewSwitcher &&
+    final modes =
+        !settings.viewSwitcher &&
         (settings.isMinimalStyle || settings.cardActivity);
     showTodayFilterSheet(
       context,
@@ -159,8 +160,8 @@ class _HomePageState extends State<HomePage> with ShortcutHost {
     final counted = controller.habits.where((h) => !h.tracking);
     final due = counted.where((h) => h.isScheduledOn(date));
     final perfect = due.isNotEmpty && due.every((h) => h.isCompletedOn(date));
-    _coinAmount = IslandLedger.perCheck +
-        (perfect ? IslandLedger.perPerfectDay : 0);
+    _coinAmount =
+        IslandLedger.perCheck + (perfect ? IslandLedger.perPerfectDay : 0);
     _coins.value++;
   }
 
@@ -195,31 +196,37 @@ class _HomePageState extends State<HomePage> with ShortcutHost {
           (
             LucideIcons.pencil,
             context.l10n.edit_habit,
-            () => run(() => AppNavigator.push(
-                  HabitFormPage(habit: habit),
-                  fullscreenDialog: true,
-                )),
+            () => run(
+              () => AppNavigator.push(
+                HabitFormPage(habit: habit),
+                fullscreenDialog: true,
+              ),
+            ),
             false,
           ),
           (
             LucideIcons.chartColumn,
             context.l10n.statistics,
-            () => run(() => AppNavigator.push(
-                  HabitDetailsPage(habitId: habit.id),
-                  fullscreenDialog: true,
-                )),
+            () => run(
+              () => AppNavigator.push(
+                HabitDetailsPage(habitId: habit.id),
+                fullscreenDialog: true,
+              ),
+            ),
             false,
           ),
           (
             LucideIcons.notebookPen,
             context.l10n.add_note,
-            () => run(() => AppNavigator.push(
-                  NoteEditorPage(
-                    habitId: habit.id,
-                    dayKey: AppClock.today().dayKey,
-                    accent: habit.color.shownIn(context),
-                  ),
-                )),
+            () => run(
+              () => AppNavigator.push(
+                NoteEditorPage(
+                  habitId: habit.id,
+                  dayKey: AppClock.today().dayKey,
+                  accent: habit.color.shownIn(context),
+                ),
+              ),
+            ),
             false,
           ),
           (
@@ -232,18 +239,20 @@ class _HomePageState extends State<HomePage> with ShortcutHost {
             LucideIcons.arrowUpDown,
             context.l10n.reorder,
             () => run(() {
-                  _pickCategory(null);
-                  setState(() => _reordering = true);
-                }),
+              _pickCategory(null);
+              setState(() => _reordering = true);
+            }),
             false,
           ),
           (
             LucideIcons.copy,
             context.l10n.duplicate_habit,
-            () => run(() => AppNavigator.push(
-                  HabitFormPage(template: habit),
-                  fullscreenDialog: true,
-                )),
+            () => run(
+              () => AppNavigator.push(
+                HabitFormPage(template: habit),
+                fullscreenDialog: true,
+              ),
+            ),
             false,
           ),
           (
@@ -268,8 +277,9 @@ class _HomePageState extends State<HomePage> with ShortcutHost {
         ];
 
         return SafeArea(
-          child: SingleChildScrollView(child: switch (sheetStyle(sheetContext)) {
-            1 => Padding(
+          child: SingleChildScrollView(
+            child: switch (sheetStyle(sheetContext)) {
+              1 => Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -279,8 +289,7 @@ class _HomePageState extends State<HomePage> with ShortcutHost {
                     const SizedBox(height: 14),
                     MinimalList(
                       children: [
-                        for (final (icon, label, onTap, danger)
-                            in actions)
+                        for (final (icon, label, onTap, danger) in actions)
                           MinimalRow(
                             label: label,
                             leading: Icon(
@@ -299,7 +308,7 @@ class _HomePageState extends State<HomePage> with ShortcutHost {
                   ],
                 ),
               ),
-            2 => Padding(
+              2 => Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -322,7 +331,7 @@ class _HomePageState extends State<HomePage> with ShortcutHost {
                   ],
                 ),
               ),
-            _ => Column(
+              _ => Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   for (final (icon, label, onTap, danger) in actions)
@@ -335,7 +344,8 @@ class _HomePageState extends State<HomePage> with ShortcutHost {
                   const SizedBox(height: 8),
                 ],
               ),
-          }),
+            },
+          ),
         );
       },
     );
@@ -439,12 +449,12 @@ class _HomePageState extends State<HomePage> with ShortcutHost {
         title: _reordering
             ? Text(context.l10n.reorder)
             : minimal || express || stackedRows(context)
-                ? null
-                : FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: AlignmentDirectional.centerStart,
-                    child: Text(context.l10n.today),
-                  ),
+            ? null
+            : FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: AlignmentDirectional.centerStart,
+                child: Text(context.l10n.today),
+              ),
 
         leadingWidth: minimal && !railed && !_reordering
             ? (shortcut == null ? 64 : 118)
@@ -487,7 +497,9 @@ class _HomePageState extends State<HomePage> with ShortcutHost {
         actions: minimal && !railed && !_reordering
             ? [
                 if (settings.focusEnabled &&
-                    context.select<FocusController, bool>((f) => f.isActive)) ...[
+                    context.select<FocusController, bool>(
+                      (f) => f.isActive,
+                    )) ...[
                   const FocusPill(compact: true),
                   const SizedBox(width: 6),
                 ],
@@ -576,101 +588,103 @@ class _HomePageState extends State<HomePage> with ShortcutHost {
                 const SizedBox(width: 16),
               ]
             : [
-          if (minimal && !railed && !_reordering && settings.planningEnabled)
-            IconButton(
-              tooltip: context.l10n.day_timeline,
-              icon: const Icon(LucideIcons.calendarClock, size: 22),
-              visualDensity: VisualDensity.compact,
-              onPressed: () => AppNavigator.push(const DayTimelinePage()),
-            ),
-          if (!_reordering && settings.notesEnabled)
-            IconButton(
-              tooltip: context.l10n.notes_all,
-              icon: const Icon(LucideIcons.notebookPen, size: 21),
-              visualDensity: VisualDensity.compact,
-              onPressed: () => AppNavigator.push(const AllNotesPage()),
-            ),
-          if (!minimal && !_reordering)
-            IconButton(
-              tooltip: settings.compactCards
-                  ? context.l10n.expand_cards
-                  : context.l10n.collapse_cards,
-              onPressed: () =>
-                  settings.setCompactCards(!settings.compactCards),
-              icon: Icon(
-                settings.compactCards
-                    ? LucideIcons.chevronsUpDown
-                    : LucideIcons.chevronsDownUp,
-                size: 20,
-              ),
-            ),
-          if (!_reordering)
-            FocusPill(compact: minimal || express),
-          if (minimal && !railed && !_reordering && settings.todosEnabled)
-            IconButton(
-              tooltip: context.l10n.todos,
-              icon: const Icon(LucideIcons.listChecks, size: 22),
-              onPressed: () => AppNavigator.push(const TodosPage()),
-            ),
-          if (minimal && !railed && !_reordering)
-            IconButton(
-              icon: const Icon(LucideIcons.chartColumn),
-              onPressed: () => AppNavigator.push(const StatisticsPage()),
-            ),
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: _reordering
-                ? FilledButton.icon(
-                    onPressed: () => setState(() => _reordering = false),
-                    icon: const Icon(LucideIcons.check, size: 18),
-                    label: Text(context.l10n.done),
-                    style: FilledButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
+                if (minimal &&
+                    !railed &&
+                    !_reordering &&
+                    settings.planningEnabled)
+                  IconButton(
+                    tooltip: context.l10n.day_timeline,
+                    icon: const Icon(LucideIcons.calendarClock, size: 22),
+                    visualDensity: VisualDensity.compact,
+                    onPressed: () => AppNavigator.push(const DayTimelinePage()),
+                  ),
+                if (!_reordering && settings.notesEnabled)
+                  IconButton(
+                    tooltip: context.l10n.notes_all,
+                    icon: const Icon(LucideIcons.notebookPen, size: 21),
+                    visualDensity: VisualDensity.compact,
+                    onPressed: () => AppNavigator.push(const AllNotesPage()),
+                  ),
+                if (!minimal && !_reordering)
+                  IconButton(
+                    tooltip: settings.compactCards
+                        ? context.l10n.expand_cards
+                        : context.l10n.collapse_cards,
+                    onPressed: () =>
+                        settings.setCompactCards(!settings.compactCards),
+                    icon: Icon(
+                      settings.compactCards
+                          ? LucideIcons.chevronsUpDown
+                          : LucideIcons.chevronsDownUp,
+                      size: 20,
                     ),
-                  )
-                : express
-                    ? const SizedBox.shrink()
-                    : minimal || bigText
-                    ? IconButton(
-                        onPressed: () => AppNavigator.push(
-                          const HabitFormPage(),
-                          fullscreenDialog: true,
-                        ),
-                        icon: Icon(
-                          LucideIcons.circlePlus,
-                          size: 26,
-                          color: context.colors.onSurface,
-                        ),
-                      )
-                    : FilledButton.icon(
-                        onPressed: () => AppNavigator.push(
-                          const HabitFormPage(),
-                          fullscreenDialog: true,
-                        ),
-                        icon: const Icon(LucideIcons.plus, size: 16),
-                        label: Text(
-                          context.l10n.new_label,
-                          style: const TextStyle(
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w700,
+                  ),
+                if (!_reordering) FocusPill(compact: minimal || express),
+                if (minimal && !railed && !_reordering && settings.todosEnabled)
+                  IconButton(
+                    tooltip: context.l10n.todos,
+                    icon: const Icon(LucideIcons.listChecks, size: 22),
+                    onPressed: () => AppNavigator.push(const TodosPage()),
+                  ),
+                if (minimal && !railed && !_reordering)
+                  IconButton(
+                    icon: const Icon(LucideIcons.chartColumn),
+                    onPressed: () => AppNavigator.push(const StatisticsPage()),
+                  ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: _reordering
+                      ? FilledButton.icon(
+                          onPressed: () => setState(() => _reordering = false),
+                          icon: const Icon(LucideIcons.check, size: 18),
+                          label: Text(context.l10n.done),
+                          style: FilledButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                        )
+                      : express
+                      ? const SizedBox.shrink()
+                      : minimal || bigText
+                      ? IconButton(
+                          onPressed: () => AppNavigator.push(
+                            const HabitFormPage(),
+                            fullscreenDialog: true,
+                          ),
+                          icon: Icon(
+                            LucideIcons.circlePlus,
+                            size: 26,
+                            color: context.colors.onSurface,
+                          ),
+                        )
+                      : FilledButton.icon(
+                          onPressed: () => AppNavigator.push(
+                            const HabitFormPage(),
+                            fullscreenDialog: true,
+                          ),
+                          icon: const Icon(LucideIcons.plus, size: 16),
+                          label: Text(
+                            context.l10n.new_label,
+                            style: const TextStyle(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          style: FilledButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
                           ),
                         ),
-                        style: FilledButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
-                      ),
-          ),
-        ],
+                ),
+              ],
       ),
       body: Stack(
         children: [
@@ -682,219 +696,239 @@ class _HomePageState extends State<HomePage> with ShortcutHost {
               return false;
             },
             child: Consumer<HabitsController>(
-            builder: (context, controller, _) {
-              if (controller.isEmpty) return const _EmptyState();
+              builder: (context, controller, _) {
+                if (controller.isEmpty) return const _EmptyState();
 
-              final all = controller.habits;
-              final today = AppClock.now();
-              final active = all
-                  .where((h) => !h.isPausedOn(today) && h.isScheduledOn(today))
-                  .toList();
-              final counted = active.where((h) => !h.tracking).toList();
-              final finished = counted
-                  .where((h) => h.isCompletedOn(today) || h.isCoveredOn(today))
-                  .toList();
-              final done = finished.length;
-              final total = counted.length;
-              final weight =
-                  counted.fold<int>(0, (sum, h) => sum + h.difficultyWeight);
-              final ratio = weight == 0
-                  ? 0.0
-                  : finished.fold<int>(0, (sum, h) => sum + h.difficultyWeight) /
-                      weight;
-
-              final categories = _categoriesOf(all, order);
-              if (_category != null && !categories.contains(_category)) {
-                _category = null;
-              }
-              final scheduled = settings.todayOnly
-                  ? all.where((h) => h.isScheduledOn(today)).toList()
-                  : all;
-              final tracked = settings.hideTracking
-                  ? scheduled.where((h) => !h.tracking).toList()
-                  : scheduled;
-              final listed = settings.hideClean
-                  ? tracked
-                      .where((h) =>
-                          h.kind != HabitKind.negative || h.isRelapseOn(today))
-                      .toList()
-                  : tracked;
-              final inCategory = _category == null
-                  ? listed
-                  : listed.where((h) => h.category == _category).toList();
-              final needle = _search.trim().toLowerCase();
-              final filtered = needle.isEmpty
-                  ? inCategory
-                  : inCategory
-                      .where((h) => h.name.toLowerCase().contains(needle))
-                      .toList();
-
-              final hidingDone = settings.hideDone && !_reordering;
-              final shown = hidingDone
-                  ? filtered
-                      .where((h) => !(_frozen[h.id] ?? h.isDoneForNow))
-                      .where((h) => !h.isPausedOn(today))
-                      .toList()
-                  : filtered;
-              final visible = _reordering || !sortCompletedLast
-                  ? shown
-                  : _completedLast(shown);
-              _visible = visible;
-              final hidden = _reordering || !todayFiltered(settings)
-                  ? const <Habit>[]
-                  : _hiddenFrom(all, visible, settings.hideTracking);
-              if (hidden.isEmpty) _peek = false;
-              final more = _peek ? hidden : const <Habit>[];
-              _peeked = {for (final habit in more) habit.id};
-              final fold = hidden.isEmpty
-                  ? null
-                  : FoldHeader(
-                      label: _foldLabel(hidden, today),
-                      expanded: _peek,
-                      onTap: () => setState(() => _peek = !_peek),
-                    );
-              final allDone =
-                  hidingDone && visible.isEmpty && filtered.isNotEmpty;
-              void openFilter() => _openFilter(settings);
-
-              final header = _reordering
-                  ? _ReorderBanner(text: context.l10n.reorder_hint)
-                  : express
-                  ? ExpressTodayHeader(
-                      habits: counted,
-                      done: done,
-                      total: total,
-                      ratio: ratio,
-                      showProgress: settings.showTodayProgress,
-                      mode: _mode,
-                      onMode: _changeMode,
-                      showModes:
-                          settings.cardActivity && settings.viewSwitcher,
-                      categories: categories,
-                      category: _category,
-                      onCategory: _pickCategory,
-                      filtered: todayFiltered(settings) || _search.isNotEmpty,
-                      onFilter: openFilter,
-                      allDone: allDone,
+                final all = controller.habits;
+                final today = AppClock.now();
+                final active = all
+                    .where(
+                      (h) => !h.isPausedOn(today) && h.isScheduledOn(today),
                     )
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (!minimal) const DailyQuote(),
-                        if (!minimal) const SizedBox(height: 8),
-                        if (!minimal && settings.showTodayProgress)
-                          TodayProgress(done: done, total: total, ratio: ratio),
-                        if (!minimal &&
-                            settings.cardActivity &&
-                            settings.viewSwitcher) ...[
-                          SizedBox(height: settings.showTodayProgress ? 20 : 6),
-                          _ViewSelector(mode: _mode, onChanged: _changeMode),
-                        ],
-                        if (!minimal || categories.isNotEmpty) ...[
+                    .toList();
+                final counted = active.where((h) => !h.tracking).toList();
+                final finished = counted
+                    .where(
+                      (h) => h.isCompletedOn(today) || h.isCoveredOn(today),
+                    )
+                    .toList();
+                final done = finished.length;
+                final total = counted.length;
+                final weight = counted.fold<int>(
+                  0,
+                  (sum, h) => sum + h.difficultyWeight,
+                );
+                final ratio = weight == 0
+                    ? 0.0
+                    : finished.fold<int>(
+                            0,
+                            (sum, h) => sum + h.difficultyWeight,
+                          ) /
+                          weight;
+
+                final categories = _categoriesOf(all, order);
+                if (_category != null && !categories.contains(_category)) {
+                  _category = null;
+                }
+                final scheduled = settings.todayOnly
+                    ? all.where((h) => h.isScheduledOn(today)).toList()
+                    : all;
+                final tracked = settings.hideTracking
+                    ? scheduled.where((h) => !h.tracking).toList()
+                    : scheduled;
+                final listed = settings.hideClean
+                    ? tracked
+                          .where(
+                            (h) =>
+                                h.kind != HabitKind.negative ||
+                                h.isRelapseOn(today),
+                          )
+                          .toList()
+                    : tracked;
+                final inCategory = _category == null
+                    ? listed
+                    : listed.where((h) => h.category == _category).toList();
+                final needle = _search.trim().toLowerCase();
+                final filtered = needle.isEmpty
+                    ? inCategory
+                    : inCategory
+                          .where((h) => h.name.toLowerCase().contains(needle))
+                          .toList();
+
+                final hidingDone = settings.hideDone && !_reordering;
+                final shown = hidingDone
+                    ? filtered
+                          .where((h) => !(_frozen[h.id] ?? h.isDoneForNow))
+                          .where((h) => !h.isPausedOn(today))
+                          .toList()
+                    : filtered;
+                final visible = _reordering || !sortCompletedLast
+                    ? shown
+                    : _completedLast(shown);
+                _visible = visible;
+                final hidden = _reordering || !todayFiltered(settings)
+                    ? const <Habit>[]
+                    : _hiddenFrom(all, visible, settings.hideTracking);
+                if (hidden.isEmpty) _peek = false;
+                final more = _peek ? hidden : const <Habit>[];
+                _peeked = {for (final habit in more) habit.id};
+                final fold = hidden.isEmpty
+                    ? null
+                    : FoldHeader(
+                        label: _foldLabel(hidden, today),
+                        expanded: _peek,
+                        onTap: () => setState(() => _peek = !_peek),
+                      );
+                final allDone =
+                    hidingDone && visible.isEmpty && filtered.isNotEmpty;
+                void openFilter() => _openFilter(settings);
+
+                final header = _reordering
+                    ? _ReorderBanner(text: context.l10n.reorder_hint)
+                    : express
+                    ? ExpressTodayHeader(
+                        habits: counted,
+                        done: done,
+                        total: total,
+                        ratio: ratio,
+                        showProgress: settings.showTodayProgress,
+                        mode: _mode,
+                        onMode: _changeMode,
+                        showModes:
+                            settings.cardActivity && settings.viewSwitcher,
+                        categories: categories,
+                        category: _category,
+                        onCategory: _pickCategory,
+                        filtered: todayFiltered(settings) || _search.isNotEmpty,
+                        onFilter: openFilter,
+                        allDone: allDone,
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (!minimal) const DailyQuote(),
+                          if (!minimal) const SizedBox(height: 8),
+                          if (!minimal && settings.showTodayProgress)
+                            TodayProgress(
+                              done: done,
+                              total: total,
+                              ratio: ratio,
+                            ),
+                          if (!minimal &&
+                              settings.cardActivity &&
+                              settings.viewSwitcher) ...[
+                            SizedBox(
+                              height: settings.showTodayProgress ? 20 : 6,
+                            ),
+                            _ViewSelector(mode: _mode, onChanged: _changeMode),
+                          ],
+                          if (!minimal || categories.isNotEmpty) ...[
+                            const SizedBox(height: 14),
+                            _CategoryBar(
+                              categories: categories,
+                              selected: _category,
+                              onSelected: _pickCategory,
+                              filtered:
+                                  todayFiltered(settings) || _search.isNotEmpty,
+                              onFilter: minimal ? null : openFilter,
+                            ),
+                          ],
                           const SizedBox(height: 14),
-                          _CategoryBar(
-                            categories: categories,
-                            selected: _category,
-                            onSelected: _pickCategory,
-                            filtered: todayFiltered(settings) || _search.isNotEmpty,
-                            onFilter: minimal ? null : openFilter,
-                          ),
+                          if (allDone) const TodayAllDone(),
                         ],
-                        const SizedBox(height: 14),
-                        if (allDone) const TodayAllDone(),
-                      ],
-                    );
+                      );
 
-              final strip = settings.todayWeekStrip && !_reordering
-                  ? TodayWeekStrip(
-                      habits: all,
-                      onSelected: (day) => showTodayDaySheet(
-                        context,
-                        day: day,
-                        onToggle: _toggle,
-                      ),
-                    )
-                  : null;
-              final headed = strip == null
-                  ? header
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [strip, header],
-                    );
+                final strip = settings.todayWeekStrip && !_reordering
+                    ? TodayWeekStrip(
+                        habits: all,
+                        onSelected: (day) => showTodayDaySheet(
+                          context,
+                          day: day,
+                          onToggle: _toggle,
+                        ),
+                      )
+                    : null;
+                final headed = strip == null
+                    ? header
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [strip, header],
+                      );
 
-              final ValueChanged<Habit>? swipe = settings.swipeCards
-                  ? (habit) => _toggle(habit, today)
-                  : null;
-              return RefreshIndicator(
-                color: minimal
-                    ? context.colors.onSurface
-                    : context.colors.primary,
-                backgroundColor: express
-                    ? expressSurface(context)
-                    : minimal
-                        ? context.colors.surfaceContainerHighest
-                        : null,
-                strokeWidth: express ? 3.4 : (minimal ? 2 : 2.5),
-                edgeOffset: classic ? MediaQuery.paddingOf(context).top : 0,
-                displacement: express ? 58 : (minimal ? 32 : 40),
-                onRefresh: () async {
-                  await Future<void>.delayed(
-                      const Duration(milliseconds: 300));
-                  controller.reload();
-                },
-                child: express
-                    ? ExpressHabitList(
-                        habits: visible,
-                        mode: _mode,
-                        reordering: _reordering,
-                        header: headed,
-                        fold: fold,
-                        more: more,
-                        onReorder: (oldIndex, newIndex) =>
-                            controller.reorder(visible, oldIndex, newIndex),
-                        onOpen: _openDetails,
-                        onToggleToday: (habit) => _toggle(habit, today),
-                        onToggleDay: _toggle,
-                        onLongPress: (habit) =>
-                            _showHabitActions(controller, habit),
-                        onSwipe: swipe,
-                        leaving: _leaving,
-                      )
-                    : minimal && !_reordering
-                    ? MinimalHabitList(
-                        habits: visible,
-                        mode: _mode,
-                        header: headed,
-                        fold: fold,
-                        more: more,
-                        onOpen: _openDetails,
-                        onToggleToday: (habit) => _toggle(habit, today),
-                        onToggleDay: _toggle,
-                        onLongPress: (habit) =>
-                            _showHabitActions(controller, habit),
-                        onSwipe: swipe,
-                        leaving: _leaving,
-                      )
-                    : ClassicHabitList(
-                        habits: visible,
-                        mode: _mode,
-                        reordering: _reordering,
-                        header: headed,
-                        fold: fold,
-                        more: more,
-                        onReorder: (oldIndex, newIndex) =>
-                            controller.reorder(visible, oldIndex, newIndex),
-                        onOpen: _openDetails,
-                        onToggleToday: (habit) => _toggle(habit, today),
-                        onToggleDay: _toggle,
-                        onLongPress: (habit) =>
-                            _showHabitActions(controller, habit),
-                        onSwipe: swipe,
-                        leaving: _leaving,
-                      ),
-              );
-            },
-          ),
+                final ValueChanged<Habit>? swipe = settings.swipeCards
+                    ? (habit) => _toggle(habit, today)
+                    : null;
+                return RefreshIndicator(
+                  color: minimal
+                      ? context.colors.onSurface
+                      : context.colors.primary,
+                  backgroundColor: express
+                      ? expressSurface(context)
+                      : minimal
+                      ? context.colors.surfaceContainerHighest
+                      : null,
+                  strokeWidth: express ? 3.4 : (minimal ? 2 : 2.5),
+                  edgeOffset: classic ? MediaQuery.paddingOf(context).top : 0,
+                  displacement: express ? 58 : (minimal ? 32 : 40),
+                  onRefresh: () async {
+                    await Future<void>.delayed(
+                      const Duration(milliseconds: 300),
+                    );
+                    controller.reload();
+                  },
+                  child: express
+                      ? ExpressHabitList(
+                          habits: visible,
+                          mode: _mode,
+                          reordering: _reordering,
+                          header: headed,
+                          fold: fold,
+                          more: more,
+                          onReorder: (oldIndex, newIndex) =>
+                              controller.reorder(visible, oldIndex, newIndex),
+                          onOpen: _openDetails,
+                          onToggleToday: (habit) => _toggle(habit, today),
+                          onToggleDay: _toggle,
+                          onLongPress: (habit) =>
+                              _showHabitActions(controller, habit),
+                          onSwipe: swipe,
+                          leaving: _leaving,
+                        )
+                      : minimal && !_reordering
+                      ? MinimalHabitList(
+                          habits: visible,
+                          mode: _mode,
+                          header: headed,
+                          fold: fold,
+                          more: more,
+                          onOpen: _openDetails,
+                          onToggleToday: (habit) => _toggle(habit, today),
+                          onToggleDay: _toggle,
+                          onLongPress: (habit) =>
+                              _showHabitActions(controller, habit),
+                          onSwipe: swipe,
+                          leaving: _leaving,
+                        )
+                      : ClassicHabitList(
+                          habits: visible,
+                          mode: _mode,
+                          reordering: _reordering,
+                          header: headed,
+                          fold: fold,
+                          more: more,
+                          onReorder: (oldIndex, newIndex) =>
+                              controller.reorder(visible, oldIndex, newIndex),
+                          onOpen: _openDetails,
+                          onToggleToday: (habit) => _toggle(habit, today),
+                          onToggleDay: _toggle,
+                          onLongPress: (habit) =>
+                              _showHabitActions(controller, habit),
+                          onSwipe: swipe,
+                          leaving: _leaving,
+                        ),
+                );
+              },
+            ),
           ),
           if (classic) HeaderBlur(scrolled: _scrolled),
           if (minimal && !_reordering && settings.viewSwitcher)
@@ -1232,53 +1266,57 @@ class _CategoryBar extends StatelessWidget {
     final filter = onFilter;
     return Row(
       children: [
-        Expanded(child: SizedBox(
-      height: 36,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: [
-          if (categories.isNotEmpty)
-          _Chip(
-            label: context.l10n.all,
-            active: selected == null,
-            onTap: () => onSelected(null),
-            onLongPress: () => showCategoryOrderSheet(context),
-          ),
-          for (final category in categories)
-            _Chip(
-              label: context.categoryLabel(category),
-              active: selected == category,
-              onTap: () => onSelected(category),
-              onLongPress: () => showCategoryOrderSheet(context),
-            ),
-        ],
-      ),
-        )),
-        if (filter != null) ...[
-        const SizedBox(width: 8),
-        Semantics(
-          button: true,
-          selected: filtered,
-          label: context.l10n.today_filter,
-          child: GestureDetector(
-            onTap: filter,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 220),
-              curve: Curves.easeOutCubic,
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: filtered ? scheme.primary : scheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                LucideIcons.listFilter,
-                size: 16,
-                color: filtered ? scheme.onPrimary : context.tokens.muted,
-              ),
+        Expanded(
+          child: SizedBox(
+            height: 36,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                if (categories.isNotEmpty)
+                  _Chip(
+                    label: context.l10n.all,
+                    active: selected == null,
+                    onTap: () => onSelected(null),
+                    onLongPress: () => showCategoryOrderSheet(context),
+                  ),
+                for (final category in categories)
+                  _Chip(
+                    label: context.categoryLabel(category),
+                    active: selected == category,
+                    onTap: () => onSelected(category),
+                    onLongPress: () => showCategoryOrderSheet(context),
+                  ),
+              ],
             ),
           ),
         ),
+        if (filter != null) ...[
+          const SizedBox(width: 8),
+          Semantics(
+            button: true,
+            selected: filtered,
+            label: context.l10n.today_filter,
+            child: GestureDetector(
+              onTap: filter,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: filtered
+                      ? scheme.primary
+                      : scheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  LucideIcons.listFilter,
+                  size: 16,
+                  color: filtered ? scheme.onPrimary : context.tokens.muted,
+                ),
+              ),
+            ),
+          ),
         ],
       ],
     );
@@ -1319,8 +1357,7 @@ class _Chip extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color:
-                    active ? scheme.primary : scheme.surfaceContainerHighest,
+                color: active ? scheme.primary : scheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: AnimatedDefaultTextStyle(

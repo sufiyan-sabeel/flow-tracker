@@ -46,7 +46,12 @@ Future<void> showDayActionsSheet(
     builder: (sheet) => SafeArea(
       top: false,
       child: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(20, 0, 20, 14 + MediaQuery.viewInsetsOf(sheet).bottom),
+        padding: EdgeInsets.fromLTRB(
+          20,
+          0,
+          20,
+          14 + MediaQuery.viewInsetsOf(sheet).bottom,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -181,7 +186,9 @@ class _DayStatus extends StatelessWidget {
   Future<void> _type(BuildContext context, Habit habit, double current) async {
     final value = await showNumberKeypadDialog(
       context,
-      title: DateFormat.yMMMMd(Localizations.localeOf(context).toString()).format(date),
+      title: DateFormat.yMMMMd(
+        Localizations.localeOf(context).toString(),
+      ).format(date),
       value: current,
       unit: habit.unitLabel,
       target: habit.goalOn(date) > 0 ? habit.goalOn(date) : null,
@@ -201,21 +208,26 @@ class _DayStatus extends StatelessWidget {
     final count = habit.completions[date.dayKey]?.count ?? 0;
     final negative = habit.kind == HabitKind.negative;
     final quantity = habit.kind == HabitKind.quantitative;
-    final counted = !negative && !habit.hasSubsteps && (quantity || habit.perDayTarget > 1);
+    final counted =
+        !negative && !habit.hasSubsteps && (quantity || habit.perDayTarget > 1);
     final goal = habit.goalOn(date);
     final done = habit.isCompletedOn(date);
     final relapsed = habit.isRelapseOn(date);
     final relapses = relapsed ? count.round().clamp(1, 999) : 0;
-    final unit = habit.isTimeAmount || habit.unitLabel.isEmpty ? '' : ' ${habit.unitLabel}';
+    final unit = habit.isTimeAmount || habit.unitLabel.isEmpty
+        ? ''
+        : ' ${habit.unitLabel}';
     String amount(double value) => '${habit.amountText(value)}$unit';
 
     final status = negative
-        ? (relapsed ? context.l10n.day_relapses(relapses) : context.l10n.day_clean)
+        ? (relapsed
+              ? context.l10n.day_relapses(relapses)
+              : context.l10n.day_clean)
         : counted
-            ? (goal > 0
-                ? context.l10n.day_amount(amount(count), amount(goal))
-                : amount(count))
-            : (done ? context.l10n.done : context.l10n.day_not_done);
+        ? (goal > 0
+              ? context.l10n.day_amount(amount(count), amount(goal))
+              : amount(count))
+        : (done ? context.l10n.done : context.l10n.day_not_done);
     final good = negative ? !relapsed : done;
     final step = quantity ? habit.incrementAmount : 1.0;
     final tint = relapsed ? context.colors.error : color;
@@ -265,8 +277,8 @@ class _DayStatus extends StatelessWidget {
                           color: relapsed
                               ? context.colors.error
                               : good
-                                  ? color
-                                  : context.tokens.muted,
+                              ? color
+                              : context.tokens.muted,
                         ),
                       ),
                     ),
@@ -281,7 +293,11 @@ class _DayStatus extends StatelessWidget {
                   onTap: () => _relapse(context, habit),
                 )
               else if (!counted && !habit.hasSubsteps)
-                _CheckButton(done: done, color: color, onTap: () => _toggle(context, habit)),
+                _CheckButton(
+                  done: done,
+                  color: color,
+                  onTap: () => _toggle(context, habit),
+                ),
             ],
           ),
           if (relapsed) ...[
@@ -291,19 +307,29 @@ class _DayStatus extends StatelessWidget {
                 _RoundIcon(
                   icon: LucideIcons.minus,
                   color: context.colors.error,
-                  onTap: () => context.read<HabitsController>().dropRelapse(habit.id, date),
+                  onTap: () => context.read<HabitsController>().dropRelapse(
+                    habit.id,
+                    date,
+                  ),
                 ),
                 Expanded(
                   child: Text(
                     '$relapses',
                     textAlign: TextAlign.center,
-                    style: sheetTitleStyle(context, size: 24, color: context.colors.error),
+                    style: sheetTitleStyle(
+                      context,
+                      size: 24,
+                      color: context.colors.error,
+                    ),
                   ),
                 ),
                 _RoundIcon(
                   icon: LucideIcons.plus,
                   color: context.colors.error,
-                  onTap: () => context.read<HabitsController>().addRelapse(habit.id, date),
+                  onTap: () => context.read<HabitsController>().addRelapse(
+                    habit.id,
+                    date,
+                  ),
                 ),
               ],
             ),
@@ -311,8 +337,11 @@ class _DayStatus extends StatelessWidget {
               const SizedBox(height: 12),
               SpentField(
                 value: habit.completions[date.dayKey]?.spent ?? 0,
-                onChanged: (value) =>
-                    context.read<HabitsController>().setSpent(habit.id, date, value),
+                onChanged: (value) => context.read<HabitsController>().setSpent(
+                  habit.id,
+                  date,
+                  value,
+                ),
               ),
             ],
           ],
@@ -342,7 +371,9 @@ class _DayStatus extends StatelessWidget {
                 _RoundIcon(
                   icon: LucideIcons.minus,
                   color: color,
-                  onTap: count <= 0 ? null : () => _set(context, habit, count - step),
+                  onTap: count <= 0
+                      ? null
+                      : () => _set(context, habit, count - step),
                 ),
                 Expanded(
                   child: GestureDetector(
@@ -359,9 +390,16 @@ class _DayStatus extends StatelessWidget {
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(LucideIcons.pencil, size: 12, color: context.tokens.muted),
+                              Icon(
+                                LucideIcons.pencil,
+                                size: 12,
+                                color: context.tokens.muted,
+                              ),
                               const SizedBox(width: 4),
-                              Text(context.l10n.edit, style: sheetLabelStyle(context, size: 12)),
+                              Text(
+                                context.l10n.edit,
+                                style: sheetLabelStyle(context, size: 12),
+                              ),
                             ],
                           ),
                       ],
@@ -383,7 +421,11 @@ class _DayStatus extends StatelessWidget {
 }
 
 class _CheckButton extends StatelessWidget {
-  const _CheckButton({required this.done, required this.color, required this.onTap});
+  const _CheckButton({
+    required this.done,
+    required this.color,
+    required this.onTap,
+  });
 
   final bool done;
   final Color color;
@@ -405,7 +447,10 @@ class _CheckButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: done ? color : Colors.transparent,
             shape: BoxShape.circle,
-            border: Border.all(color: done ? color : color.withValues(alpha: 0.45), width: 2),
+            border: Border.all(
+              color: done ? color : color.withValues(alpha: 0.45),
+              width: 2,
+            ),
           ),
           child: AnimatedScale(
             scale: done ? 1 : 0.6,
@@ -424,7 +469,11 @@ class _CheckButton extends StatelessWidget {
 }
 
 class _RoundIcon extends StatelessWidget {
-  const _RoundIcon({required this.icon, required this.color, required this.onTap});
+  const _RoundIcon({
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
 
   final IconData icon;
   final Color color;
@@ -442,7 +491,11 @@ class _RoundIcon extends StatelessWidget {
         child: SizedBox(
           width: 44,
           height: 44,
-          child: Icon(icon, size: 20, color: enabled ? color : color.withValues(alpha: 0.35)),
+          child: Icon(
+            icon,
+            size: 20,
+            color: enabled ? color : color.withValues(alpha: 0.35),
+          ),
         ),
       ),
     );
@@ -450,7 +503,12 @@ class _RoundIcon extends StatelessWidget {
 }
 
 class _Pill extends StatelessWidget {
-  const _Pill({required this.label, required this.color, required this.filled, required this.onTap});
+  const _Pill({
+    required this.label,
+    required this.color,
+    required this.filled,
+    required this.onTap,
+  });
 
   final String label;
   final Color color;
@@ -462,14 +520,20 @@ class _Pill extends StatelessWidget {
     return Material(
       color: filled ? color.withValues(alpha: 0.14) : Colors.transparent,
       shape: StadiumBorder(
-        side: BorderSide(color: color.withValues(alpha: filled ? 0 : 0.5), width: 1.4),
+        side: BorderSide(
+          color: color.withValues(alpha: filled ? 0 : 0.5),
+          width: 1.4,
+        ),
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          child: Text(label, style: sheetHeadingStyle(context, size: 13.5, color: color)),
+          child: Text(
+            label,
+            style: sheetHeadingStyle(context, size: 13.5, color: color),
+          ),
         ),
       ),
     );
