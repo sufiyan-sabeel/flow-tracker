@@ -97,33 +97,40 @@ void main() {
     expect(taps, [0, 1, 2, 3, 4]);
   });
 
-  testWidgets('the glass capsule follows the selected destination', (
+  testWidgets('the glass capsule sits on the selected destination', (
     tester,
   ) async {
     for (var i = 0; i < _items.length; i++) {
       await pumpDock(tester, index: i);
-      final align = tester.widget<AnimatedAlign>(
-        find.descendant(
-          of: find.byType(LiquidGlassNavBar),
-          matching: find.byType(AnimatedAlign),
-        ),
+      final dock = tester.getRect(find.byType(LiquidGlassNavBar));
+      final capsule = tester.getRect(find.byKey(capsuleKey));
+      // the dock has 16dp side margins; five equal slots fill the rest
+      final inner = dock.width - 32;
+      final slot = inner / _items.length;
+      final expected = dock.left + 16 + (i + 0.5) * slot;
+      expect(
+        capsule.center.dx,
+        closeTo(expected, 1),
+        reason: 'index $i',
       );
-      final expected = (2 * i + 1) / _items.length - 1;
-      final x = (align.alignment as Alignment).x;
-      expect(x, closeTo(expected, 0.001), reason: 'index $i');
+      // and it never leaves the dock
+      expect(capsule.top, greaterThanOrEqualTo(dock.top));
+      expect(capsule.bottom, lessThanOrEqualTo(dock.bottom));
+      expect(capsule.left, greaterThanOrEqualTo(dock.left));
+      expect(capsule.right, lessThanOrEqualTo(dock.right));
     }
   });
 
   testWidgets('the capsule slides rather than jumping', (tester) async {
     await pumpDock(tester);
-    final align = tester.widget<AnimatedAlign>(
-      find.descendant(
-        of: find.byType(LiquidGlassNavBar),
-        matching: find.byType(AnimatedAlign),
+    final capsule = tester.widget<AnimatedPositioned>(
+      find.ancestor(
+        of: find.byKey(capsuleKey),
+        matching: find.byType(AnimatedPositioned),
       ),
     );
-    expect(align.duration, const Duration(milliseconds: 340));
-    expect(align.curve, Curves.easeInOutCubic);
+    expect(capsule.duration, const Duration(milliseconds: 340));
+    expect(capsule.curve, Curves.easeInOutCubic);
   });
 
   testWidgets('the active icon takes the accent from the theme', (
@@ -199,13 +206,13 @@ void main() {
     await tester.pump();
 
     expect(taps, [3]);
-    final align = tester.widget<AnimatedAlign>(
-      find.descendant(
-        of: find.byType(LiquidGlassNavBar),
-        matching: find.byType(AnimatedAlign),
+    final capsule = tester.widget<AnimatedPositioned>(
+      find.ancestor(
+        of: find.byKey(capsuleKey),
+        matching: find.byType(AnimatedPositioned),
       ),
     );
-    expect(align.duration, Duration.zero);
+    expect(capsule.duration, Duration.zero);
   });
 
   testWidgets('the dock keeps to a single blur node', (tester) async {

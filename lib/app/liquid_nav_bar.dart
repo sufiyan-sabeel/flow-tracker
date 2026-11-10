@@ -22,6 +22,9 @@ class LiquidNavItem {
 /// Settings repaints the dock immediately. When `glassEffects` is off — or the
 /// platform asks for reduced motion — the blur is dropped and the transitions
 /// collapse to a cross-fade, which keeps the dock cheap on low-end devices.
+/// Identifies the sliding capsule, so tests can measure it.
+const capsuleKey = ValueKey('liquid-nav-capsule');
+
 class LiquidGlassNavBar extends StatefulWidget {
   const LiquidGlassNavBar({
     super.key,
@@ -206,19 +209,21 @@ class _LiquidGlassNavBarState extends State<LiquidGlassNavBar> {
           final slot = box.maxWidth / count;
           return Stack(
             children: [
-              AnimatedAlign(
-                alignment: Alignment((2 * widget.index + 1) / count - 1, 0),
+              // Positioned by slot rather than by Alignment: the inset has to be
+              // part of the maths, or the capsule drifts off its destination.
+              AnimatedPositioned(
+                left: widget.index * slot + 5,
+                top: 11,
+                bottom: 11,
+                width: slot - 10,
                 duration: slide,
                 curve: _curve,
-                child: Padding(
-                  padding: const EdgeInsets.all(5),
-                  child: Container(
-                    width: slot - 10,
-                    decoration: _capsule(
-                      dark: dark,
-                      amoled: amoled,
-                      scheme: scheme,
-                    ),
+                child: DecoratedBox(
+                  key: capsuleKey,
+                  decoration: _capsule(
+                    dark: dark,
+                    amoled: amoled,
+                    scheme: scheme,
                   ),
                 ),
               ),
@@ -270,9 +275,9 @@ class _LiquidGlassNavBarState extends State<LiquidGlassNavBar> {
       ),
       boxShadow: [
         BoxShadow(
-          color: scheme.primary.withValues(alpha: 0.22),
-          blurRadius: 12,
-          offset: const Offset(0, 3),
+          color: scheme.primary.withValues(alpha: 0.16),
+          blurRadius: 6,
+          offset: const Offset(0, 1),
         ),
       ],
     );
