@@ -1,0 +1,144 @@
+name: Android release
+
+# Builds the release APKs, runs the checks, and publishes them with checksums.
+#   * push a tag like v1.0.0  -> full release
+#   * workflow_dispatch       -> release for the tag you type
+#   * pull_request            -> build + checks only, no release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag, e.g. v1.0.0'
+        required: true
+        type: string
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+# Pinned tool versions keep the build reproducible from one release to the next.
+env:
+  FLUTTER_VERSION: '3.41.9'
+  JAVA_VERSION: '17'
+
+jobs:
+  build:
+    name: Build, test and publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Show versions
+        run: flutter --version
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
+
+      - name: Test
+        run: flutter test
+
+      # Signing keys never live in the repository. When the four secrets are
+      # present the APKs are signed with the release key; otherwise Gradle falls
+      # back to the debug key so the artifact is still installable for testing.
+      - name: Configure signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          if [ -n "${KEYSTORE_BASE64:-}" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > android/app/flow-tracker-release.jks
+            cat > android/key.properties <<EOF
+          storePassword=$KEYSTORE_PASSWORD
+          keyPassword=$KEY_PASSWORD
+          keyAlias=$KEY_ALIAS
+          storeFile=flow-tracker-release.jks
+          EOF
+            echo "Signing with the release keystore." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::warning::No signing secrets configured — the APK is signed with the debug key and is for testing only."
+            echo "Signed with the **debug** key (no release secrets configured)." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # ABI splits keep each APK small (~15-20 MB) instead of one fat ~58 MB APK.
+      - name: Build release APKs
+        run: flutter build apk --release --split-per-abi
+
+      - name: Collect and verify artifacts
+        run: |
+          set -euo pipefail
+          cd build/app/outputs/flutter-apk
+          mv app-arm64-v8a-release.apk    Flow-tracker-arm64-v8a.apk
+          mv app-armeabi-v7a-release.apk  Flow-tracker-armeabi-v7a.apk
+          mv app-x86_64-release.apk       Flow-tracker-x86_64.apk
+          for f in Flow-tracker-*.apk; do
+            size=$(stat -c%s "$f")
+            if [ "$size" -lt 1000000 ]; then
+              echo "::error::$f is only $size bytes — the build did not produce a usable APK."
+              exit 1
+            fi
+            echo "$f — $((size / 1024 / 1024)) MB"
+          done
+          sha256sum Flow-tracker-*.apk | tee SHA256SUMS.txt
+
+      - name: Upload APK artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: flow-tracker-apks
+          path: |
+            build/app/outputs/flutter-apk/Flow-tracker-*.apk
+            build/app/outputs/flutter-apk/SHA256SUMS.txt
+          if-no-files-found: error
+
+      - name: Publish GitHub release
+        if: github.event_name != 'pull_request'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+          name: Flow-tracker ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+          generate_release_notes: true
+          body: |
+            **Flow-tracker — habit tracking that stays on your phone.**
+
+            Created by Umaiz Sufiyan. Based on [Streak](https://github.com/InlitX/streak) by InlitX,
+            released under the GNU GPLv3 with the additional terms of its section 7.
+
+            ### Install
+            1. Download the APK for your device (`arm64-v8a` covers almost every phone from 2017 on).
+            2. Allow installing from this source when Android asks.
+            3. Open the file and install.
+
+            Verify the download against `SHA256SUMS.txt`:
+            ```
+            sha256sum -c SHA256SUMS.txt
+            ```
+
+            Source code is available under the *Source code* archives below.
+          files: |
+            build/app/outputs/flutter-apk/Flow-tracker-arm64-v8a.apk
+            build/app/outputs/flutter-apk/Flow-tracker-armeabi-v7a.apk
+            build/app/outputs/flutter-apk/Flow-tracker-x86_64.apk
+            build/app/outputs/flutter-apk/SHA256SUMS.txt
