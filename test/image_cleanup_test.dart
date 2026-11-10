@@ -37,12 +37,18 @@ void main() {
     final scene = await _image('focus', 'scene.jpg');
 
     await LocalStore.writeHabit(
-      testHabit(id: 'a', name: 'Read')
-          .copyWith(coverPath: cover, bookCoverPath: book),
+      testHabit(
+        id: 'a',
+        name: 'Read',
+      ).copyWith(coverPath: cover, bookCoverPath: book),
     );
     await LocalStore.writeNote(
-      testNote(id: 'n', habitId: 'a', day: DateTime(2026, 8, 16), text: 'x')
-          .copyWith(photos: [notePhoto]),
+      testNote(
+        id: 'n',
+        habitId: 'a',
+        day: DateTime(2026, 8, 16),
+        text: 'x',
+      ).copyWith(photos: [notePhoto]),
     );
     await LocalStore.writeTodo(
       testTodo(id: 't', text: 'x').copyWith(photos: [todoPhoto]),
@@ -116,12 +122,20 @@ void main() {
     final other = await _image('journey', 'other.jpg');
     final day = DateTime(2026, 8, 16);
     await LocalStore.writeNote(
-      testNote(id: 'a', habitId: 'h', day: day, text: 'x')
-          .copyWith(photos: [gone]),
+      testNote(
+        id: 'a',
+        habitId: 'h',
+        day: day,
+        text: 'x',
+      ).copyWith(photos: [gone]),
     );
     await LocalStore.writeNote(
-      testNote(id: 'b', habitId: 'h', day: day, text: 'y')
-          .copyWith(photos: [other]),
+      testNote(
+        id: 'b',
+        habitId: 'h',
+        day: day,
+        text: 'y',
+      ).copyWith(photos: [other]),
     );
 
     await NotesController().remove('a');
@@ -167,12 +181,20 @@ void main() {
       testHabit(id: 'a', name: 'Read').copyWith(coverPath: cover),
     );
     await LocalStore.writeNote(
-      testNote(id: 'n', habitId: 'a', day: DateTime(2026, 8, 16), text: 'x')
-          .copyWith(photos: [photo]),
+      testNote(
+        id: 'n',
+        habitId: 'a',
+        day: DateTime(2026, 8, 16),
+        text: 'x',
+      ).copyWith(photos: [photo]),
     );
     await LocalStore.writeNote(
-      testNote(id: 'm', habitId: 'b', day: DateTime(2026, 8, 16), text: 'y')
-          .copyWith(photos: [other]),
+      testNote(
+        id: 'm',
+        habitId: 'b',
+        day: DateTime(2026, 8, 16),
+        text: 'y',
+      ).copyWith(photos: [other]),
     );
 
     await HabitsController().remove('a');

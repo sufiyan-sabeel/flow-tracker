@@ -16,8 +16,10 @@ Habit _reading(double goal, Map<int, double> pages) {
     createdAt: today.addDays(-30),
     completions: {
       for (final MapEntry(key: ago, value: count) in pages.entries)
-        today.addDays(-ago).dayKey:
-            Completion(date: today.addDays(-ago).dayKey, count: count),
+        today.addDays(-ago).dayKey: Completion(
+          date: today.addDays(-ago).dayKey,
+          count: count,
+        ),
     },
   );
 }
@@ -70,8 +72,7 @@ void main() {
 
   test('any amount days stay done when a goal comes back', () {
     final before = _reading(20, {1: 5}).copyWith(anyAmount: true);
-    final after =
-        before.copyWith(anyAmount: false).rememberGoal(before);
+    final after = before.copyWith(anyAmount: false).rememberGoal(before);
     expect(after.isCompletedOn(today.addDays(-1)), isTrue);
   });
 

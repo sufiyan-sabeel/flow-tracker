@@ -14,24 +14,23 @@ FocusSession _session(
   int target = 25,
   int span = 0,
   int pauses = 0,
-}) =>
-    FocusSession(
-      id: id,
-      habitId: habitId,
-      targetMinutes: target,
-      seconds: minutes * 60,
-      completed: true,
-      startedAt: DateTime(day.year, day.month, day.day, 12),
-      span: span,
-      pauses: pauses,
-    );
+}) => FocusSession(
+  id: id,
+  habitId: habitId,
+  targetMinutes: target,
+  seconds: minutes * 60,
+  completed: true,
+  startedAt: DateTime(day.year, day.month, day.day, 12),
+  span: span,
+  pauses: pauses,
+);
 
 FocusStats _stats(List<FocusSession> sessions) => FocusStats.compute(
-      sessions: sessions,
-      range: FocusRange.week,
-      now: DateTime.now(),
-      weekStart: 1,
-    );
+  sessions: sessions,
+  range: FocusRange.week,
+  now: DateTime.now(),
+  weekStart: 1,
+);
 
 void main() {
   useEmptyStore();

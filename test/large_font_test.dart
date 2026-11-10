@@ -17,26 +17,26 @@ void main() {
   useEmptyStore();
 
   Future<void> seed(WidgetTester tester) => seedHabits(tester, [
-        testHabit(
-          id: 'a',
-          name: 'Read a chapter',
-          order: 0,
-          done: lastDays(4),
-          startMinute: 9 * 60,
-          durationMinutes: 60,
-        ),
-        testHabit(
-          id: 'b',
-          name: 'Drink water',
-          order: 1,
-          kind: HabitKind.quantitative,
-          perDayTarget: 8,
-          unitLabel: 'glasses',
-          category: 'health',
-          done: lastDays(2),
-        ),
-        testHabit(id: 'c', name: 'No sugar', order: 2, kind: HabitKind.negative),
-      ]);
+    testHabit(
+      id: 'a',
+      name: 'Read a chapter',
+      order: 0,
+      done: lastDays(4),
+      startMinute: 9 * 60,
+      durationMinutes: 60,
+    ),
+    testHabit(
+      id: 'b',
+      name: 'Drink water',
+      order: 1,
+      kind: HabitKind.quantitative,
+      perDayTarget: 8,
+      unitLabel: 'glasses',
+      category: 'health',
+      done: lastDays(2),
+    ),
+    testHabit(id: 'c', name: 'No sugar', order: 2, kind: HabitKind.negative),
+  ]);
 
   final screens = <String, Widget>{
     'today': const HomePage(),
@@ -50,8 +50,9 @@ void main() {
 
   for (final entry in screens.entries) {
     for (final minimal in [false, true]) {
-      testWidgets('${entry.key} ${minimal ? "minimal" : "classic"} fits',
-          (tester) async {
+      testWidgets('${entry.key} ${minimal ? "minimal" : "classic"} fits', (
+        tester,
+      ) async {
         await seed(tester);
         await pumpScreen(tester, entry.value, minimal: minimal, textScale: 2);
         await scrollToEnd(tester, drags: 6);

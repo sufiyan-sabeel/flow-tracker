@@ -18,8 +18,9 @@ import 'support/app_harness.dart';
 void main() {
   useEmptyStore();
 
-  testWidgets('a positive habit shows its streaks and activity',
-      (tester) async {
+  testWidgets('a positive habit shows its streaks and activity', (
+    tester,
+  ) async {
     await seedHabits(tester, [
       testHabit(id: 'a', name: 'Read', done: lastDays(6)),
     ]);
@@ -98,8 +99,9 @@ void main() {
     await scrollToEnd(tester);
   });
 
-  testWidgets('a past day can have its checklist edited from the day sheet',
-      (tester) async {
+  testWidgets('a past day can have its checklist edited from the day sheet', (
+    tester,
+  ) async {
     await seedHabits(tester, [
       testHabit(
         id: 'd',
@@ -147,10 +149,12 @@ void main() {
     expect(habits.byId('d')!.isCompletedOn(yesterday), isFalse);
 
     for (final title in ['No chocolate', 'No cookies']) {
-      await tester.tap(find.descendant(
-        of: find.byType(BottomSheet),
-        matching: find.text(title),
-      ));
+      await tester.tap(
+        find.descendant(
+          of: find.byType(BottomSheet),
+          matching: find.text(title),
+        ),
+      );
       await tester.pumpAndSettle();
     }
     await tester.pump(const Duration(milliseconds: 800));

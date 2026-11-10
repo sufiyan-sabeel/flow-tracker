@@ -9,20 +9,19 @@ Habit _habit({
   required int daysOld,
   double dailyCost = 8,
   List<DateTime> relapses = const [],
-}) =>
-    Habit(
-      id: 'h',
-      name: 'Smoke',
-      color: const Color(0xFF00FF00),
-      order: 0,
-      kind: kind,
-      dailyCost: dailyCost,
-      createdAt: AppClock.now().subtract(Duration(days: daysOld)),
-      completions: {
-        for (final day in relapses)
-          day.dayKey: Completion(date: day.dayKey, count: 1),
-      },
-    );
+}) => Habit(
+  id: 'h',
+  name: 'Smoke',
+  color: const Color(0xFF00FF00),
+  order: 0,
+  kind: kind,
+  dailyCost: dailyCost,
+  createdAt: AppClock.now().subtract(Duration(days: daysOld)),
+  completions: {
+    for (final day in relapses)
+      day.dayKey: Completion(date: day.dayKey, count: 1),
+  },
+);
 
 void main() {
   final today = AppClock.now();

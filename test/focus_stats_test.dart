@@ -8,15 +8,14 @@ FocusSession _session({
   required String habitId,
   required DateTime startedAt,
   required int minutes,
-}) =>
-    FocusSession(
-      id: '$habitId-${startedAt.toIso8601String()}',
-      habitId: habitId,
-      targetMinutes: minutes,
-      seconds: minutes * 60,
-      completed: true,
-      startedAt: startedAt,
-    );
+}) => FocusSession(
+  id: '$habitId-${startedAt.toIso8601String()}',
+  habitId: habitId,
+  targetMinutes: minutes,
+  seconds: minutes * 60,
+  completed: true,
+  startedAt: startedAt,
+);
 
 FocusStats _stats(
   List<FocusSession> sessions, {
@@ -24,15 +23,14 @@ FocusStats _stats(
   int weekStart = DateTime.monday,
   String? habitId,
   int offset = 0,
-}) =>
-    FocusStats.compute(
-      sessions: sessions,
-      range: range,
-      now: _now,
-      weekStart: weekStart,
-      habitId: habitId,
-      offset: offset,
-    );
+}) => FocusStats.compute(
+  sessions: sessions,
+  range: range,
+  now: _now,
+  weekStart: weekStart,
+  habitId: habitId,
+  offset: offset,
+);
 
 void main() {
   test('today, week, month and total are separate windows', () {

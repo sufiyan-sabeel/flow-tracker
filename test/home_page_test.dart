@@ -14,30 +14,29 @@ import 'package:flow_tracker/features/habits/widgets/habit_heatmap.dart';
 import 'support/app_harness.dart';
 
 Future<void> _seedThree(WidgetTester tester) => seedHabits(tester, [
-      testHabit(id: 'a', name: 'Read', order: 0, done: lastDays(4)),
-      testHabit(
-        id: 'b',
-        name: 'Water',
-        order: 1,
-        kind: HabitKind.quantitative,
-        perDayTarget: 8,
-        unitLabel: 'glasses',
-        done: lastDays(2),
-      ),
-      testHabit(id: 'c', name: 'No sugar', order: 2, kind: HabitKind.negative),
-    ]);
+  testHabit(id: 'a', name: 'Read', order: 0, done: lastDays(4)),
+  testHabit(
+    id: 'b',
+    name: 'Water',
+    order: 1,
+    kind: HabitKind.quantitative,
+    perDayTarget: 8,
+    unitLabel: 'glasses',
+    done: lastDays(2),
+  ),
+  testHabit(id: 'c', name: 'No sugar', order: 2, kind: HabitKind.negative),
+]);
 
 Future<void> _pumpHome(
   WidgetTester tester,
   HeatmapMode mode, {
   bool minimal = false,
-}) =>
-    pumpScreen(
-      tester,
-      const HomePage(),
-      minimal: minimal,
-      settings: {'heatmapMode': mode.index},
-    );
+}) => pumpScreen(
+  tester,
+  const HomePage(),
+  minimal: minimal,
+  settings: {'heatmapMode': mode.index},
+);
 
 const _views = [HeatmapMode.week, HeatmapMode.month, HeatmapMode.year];
 
@@ -101,8 +100,9 @@ void main() {
       expect(find.text('Add habit'), findsOneWidget);
     });
 
-    testWidgets('hiding the activity drops the grids and the view selector',
-        (tester) async {
+    testWidgets('hiding the activity drops the grids and the view selector', (
+      tester,
+    ) async {
       await _seedThree(tester);
       await pumpScreen(
         tester,
@@ -118,7 +118,9 @@ void main() {
       expect(find.text('Week'), findsNothing);
     });
 
-    testWidgets('the week strip stamps every day with its date', (tester) async {
+    testWidgets('the week strip stamps every day with its date', (
+      tester,
+    ) async {
       await _seedThree(tester);
       await _pumpHome(tester, HeatmapMode.week);
 
@@ -132,8 +134,9 @@ void main() {
       }
     });
 
-    testWidgets('every day in the strip can be logged on its own',
-        (tester) async {
+    testWidgets('every day in the strip can be logged on its own', (
+      tester,
+    ) async {
       final handle = tester.ensureSemantics();
       await seedHabits(tester, [testHabit(id: 'a', name: 'Read')]);
       await _pumpHome(tester, HeatmapMode.week);
@@ -150,8 +153,9 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('the collapse button is there to shrink the cards',
-        (tester) async {
+    testWidgets('the collapse button is there to shrink the cards', (
+      tester,
+    ) async {
       await _seedThree(tester);
       await _pumpHome(tester, HeatmapMode.week);
 
@@ -159,8 +163,9 @@ void main() {
       expect(find.byType(HabitHeatmap), findsWidgets);
     });
 
-    testWidgets('collapsed cards shrink and join into one block',
-        (tester) async {
+    testWidgets('collapsed cards shrink and join into one block', (
+      tester,
+    ) async {
       await _seedThree(tester);
       await pumpScreen(
         tester,
@@ -180,7 +185,6 @@ void main() {
       expect(cards.first.corners!.bottomLeft.x, lessThan(15));
       expect(cards.last.corners!.bottomLeft.x, greaterThan(15));
     });
-
   });
 
   group('minimal', () {
@@ -192,8 +196,9 @@ void main() {
       expect(find.text('Read'), findsOneWidget);
     });
 
-    testWidgets('the week card keeps the name on one line with the days',
-        (tester) async {
+    testWidgets('the week card keeps the name on one line with the days', (
+      tester,
+    ) async {
       await _seedThree(tester);
       await _pumpHome(tester, HeatmapMode.week, minimal: true);
 
@@ -258,7 +263,9 @@ void main() {
     });
   });
 
-  testWidgets('holding the add button asks for a custom amount', (tester) async {
+  testWidgets('holding the add button asks for a custom amount', (
+    tester,
+  ) async {
     await seedHabits(tester, [
       testHabit(
         id: 'w',
@@ -270,7 +277,9 @@ void main() {
     ]);
     await pumpScreen(tester, const HomePage());
 
-    final habits = tester.element(find.byType(HomePage)).read<HabitsController>();
+    final habits = tester
+        .element(find.byType(HomePage))
+        .read<HabitsController>();
     expect(habits.byId('w')!.completions, isEmpty);
 
     await tester.longPress(find.bySemanticsLabel(RegExp('Water')).last);

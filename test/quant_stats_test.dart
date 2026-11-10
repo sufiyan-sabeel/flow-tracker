@@ -8,34 +8,33 @@ import 'package:flow_tracker/features/habits/data/quant_stats.dart';
 final _now = DateTime(2026, 8, 12, 18, 30);
 
 Habit _habit(Map<DateTime, double> log, {double target = 60}) => Habit(
-      id: 'h',
-      name: 'Read',
-      color: const Color(0xFF00FF00),
-      order: 0,
-      kind: HabitKind.quantitative,
-      unitLabel: 'min',
-      perDayTarget: target,
-      createdAt: DateTime(2025, 1, 1),
-      completions: {
-        for (final entry in log.entries)
-          entry.key.dayKey: Completion(
-            date: entry.key.dayKey,
-            count: entry.value,
-          ),
-      },
-    );
+  id: 'h',
+  name: 'Read',
+  color: const Color(0xFF00FF00),
+  order: 0,
+  kind: HabitKind.quantitative,
+  unitLabel: 'min',
+  perDayTarget: target,
+  createdAt: DateTime(2025, 1, 1),
+  completions: {
+    for (final entry in log.entries)
+      entry.key.dayKey: Completion(
+        date: entry.key.dayKey,
+        count: entry.value,
+      ),
+  },
+);
 
 QuantStats _stats(
   Habit habit, {
   QuantRange range = QuantRange.week,
   int weekStart = DateTime.monday,
-}) =>
-    QuantStats.compute(
-      habit: habit,
-      range: range,
-      now: _now,
-      weekStart: weekStart,
-    );
+}) => QuantStats.compute(
+  habit: habit,
+  range: range,
+  now: _now,
+  weekStart: weekStart,
+);
 
 void main() {
   final habit = _habit({
@@ -97,11 +96,13 @@ void main() {
   });
 
   test('days ahead of today and empty records do not count', () {
-    final stats = _stats(_habit({
-      _now: 25,
-      DateTime(2026, 8, 11): 0,
-      DateTime(2026, 8, 14): 50,
-    }));
+    final stats = _stats(
+      _habit({
+        _now: 25,
+        DateTime(2026, 8, 11): 0,
+        DateTime(2026, 8, 14): 50,
+      }),
+    );
 
     expect(stats.totals.total, 25);
     expect(stats.totals.loggedDays, 1);

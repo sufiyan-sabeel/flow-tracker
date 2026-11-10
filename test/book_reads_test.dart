@@ -18,8 +18,10 @@ Habit _book(Map<int, double> pages, {double size = 100}) {
     createdAt: today.addDays(-40),
     completions: {
       for (final MapEntry(key: ago, value: count) in pages.entries)
-        today.addDays(-ago).dayKey:
-            Completion(date: today.addDays(-ago).dayKey, count: count),
+        today.addDays(-ago).dayKey: Completion(
+          date: today.addDays(-ago).dayKey,
+          count: count,
+        ),
     },
   );
 }
@@ -62,10 +64,12 @@ void main() {
     final habit = _book({2: 95, 0: 5}).newBook(300);
     expect(habit.book.finished, 1);
     expect(habit.book.page, 0);
-    final later = habit.copyWith(completions: {
-      ...habit.completions,
-      today.dayKey: Completion(date: today.dayKey, count: 25),
-    });
+    final later = habit.copyWith(
+      completions: {
+        ...habit.completions,
+        today.dayKey: Completion(date: today.dayKey, count: 25),
+      },
+    );
     expect(later.book.page, 20);
   });
 
@@ -100,9 +104,11 @@ void main() {
   test('the page given adds up with what comes after', () {
     final habit = _book({}, size: 320)
         .atPage(310)
-        .copyWith(completions: {
-      today.dayKey: Completion(date: today.dayKey, count: 15),
-    });
+        .copyWith(
+          completions: {
+            today.dayKey: Completion(date: today.dayKey, count: 15),
+          },
+        );
     expect(habit.book.finished, 1);
     expect(habit.book.page, 5);
   });

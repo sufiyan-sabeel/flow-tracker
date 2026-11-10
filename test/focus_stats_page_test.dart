@@ -14,25 +14,23 @@ FocusSession _session({
   required String habitId,
   required DateTime startedAt,
   required int minutes,
-}) =>
-    FocusSession(
-      id: id,
-      habitId: habitId,
-      targetMinutes: minutes,
-      seconds: minutes * 60,
-      completed: true,
-      startedAt: startedAt,
-    );
+}) => FocusSession(
+  id: id,
+  habitId: habitId,
+  targetMinutes: minutes,
+  seconds: minutes * 60,
+  completed: true,
+  startedAt: startedAt,
+);
 
 Future<void> _seedSessions(
   WidgetTester tester,
   List<FocusSession> sessions,
-) =>
-    tester.runAsync(() async {
-      for (final session in sessions) {
-        await LocalStore.writeFocusSession(session);
-      }
-    });
+) => tester.runAsync(() async {
+  for (final session in sessions) {
+    await LocalStore.writeFocusSession(session);
+  }
+});
 
 Future<void> _waitFor(WidgetTester tester, Finder target) async {
   for (var i = 0; i < 80; i++) {
@@ -54,8 +52,9 @@ void main() {
     expect(find.byType(ValueBars), findsNothing);
   });
 
-  testWidgets('it totals today, the week, the month and everything',
-      (tester) async {
+  testWidgets('it totals today, the week, the month and everything', (
+    tester,
+  ) async {
     final today = AppClock.now();
     await seedHabits(tester, [
       testHabit(id: 'a', name: 'Read'),

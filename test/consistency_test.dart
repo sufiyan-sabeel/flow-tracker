@@ -13,27 +13,26 @@ Habit _habit({
   HabitInterval interval = HabitInterval.daily,
   List<int> scheduleWeekdays = const [],
   List<int> restDays = const [],
-}) =>
-    Habit(
-      id: 'h',
-      name: 'Test',
-      color: const Color(0xFF00FF00),
-      order: 0,
-      interval: interval,
-      scheduleWeekdays: scheduleWeekdays,
-      restDays: restDays,
-      createdAt: _today.subtract(Duration(days: daysOld)),
-      completions: {
-        for (final day in done)
-          day.dayKey: Completion(date: day.dayKey, hour: 9, count: 1),
-      },
-    );
+}) => Habit(
+  id: 'h',
+  name: 'Test',
+  color: const Color(0xFF00FF00),
+  order: 0,
+  interval: interval,
+  scheduleWeekdays: scheduleWeekdays,
+  restDays: restDays,
+  createdAt: _today.subtract(Duration(days: daysOld)),
+  completions: {
+    for (final day in done)
+      day.dayKey: Completion(date: day.dayKey, hour: 9, count: 1),
+  },
+);
 
 List<DateTime> _every(int days, bool Function(DateTime) when) => [
-      for (var i = 0; i < days; i++)
-        if (when(_today.subtract(Duration(days: i))))
-          _today.subtract(Duration(days: i)),
-    ];
+  for (var i = 0; i < days; i++)
+    if (when(_today.subtract(Duration(days: i))))
+      _today.subtract(Duration(days: i)),
+];
 
 void main() {
   test('a habit done every day since it was created is at 100', () {
@@ -76,7 +75,10 @@ void main() {
   });
 
   test('missing every day leaves it at zero', () {
-    final habit = _habit(daysOld: 60, done: [_today.subtract(const Duration(days: 59))]);
+    final habit = _habit(
+      daysOld: 60,
+      done: [_today.subtract(const Duration(days: 59))],
+    );
 
     expect(habit.consistency, lessThan(5));
   });

@@ -28,33 +28,40 @@ void main() {
     expect(await DataLocation.resolve(support), isNull);
   });
 
-  test('a move copies our files, rewrites the paths and clears the old ones',
-      () async {
-    await DataLocation.resolve(support);
-    DataLocation.schedule(from: from, to: to);
+  test(
+    'a move copies our files, rewrites the paths and clears the old ones',
+    () async {
+      await DataLocation.resolve(support);
+      DataLocation.schedule(from: from, to: to);
 
-    final moved = await DataLocation.resolve(support);
-    expect(moved?.path, to.path);
-    expect(File('${to.path}/habits.hive').readAsStringSync(), 'habits');
-    expect(File('${to.path}/covers/1.jpg').readAsStringSync(), 'cover');
-    expect(File('${to.path}/profile_1.jpg').existsSync(), isTrue);
-    expect(File('${to.path}/notes.txt').existsSync(), isFalse);
-    expect(DataLocation.rewriteFrom, from.path);
+      final moved = await DataLocation.resolve(support);
+      expect(moved?.path, to.path);
+      expect(File('${to.path}/habits.hive').readAsStringSync(), 'habits');
+      expect(File('${to.path}/covers/1.jpg').readAsStringSync(), 'cover');
+      expect(File('${to.path}/profile_1.jpg').existsSync(), isTrue);
+      expect(File('${to.path}/notes.txt').existsSync(), isFalse);
+      expect(DataLocation.rewriteFrom, from.path);
 
-    final cover = {'coverPath': '${from.path}/covers/1.jpg', 'name': 'Run'};
-    final rewritten = DataLocation.rewrite(cover, from.path, to.path) as Map;
-    expect(rewritten['coverPath'], '${to.path}/covers/1.jpg');
-    expect(rewritten['name'], 'Run');
-    final untouched = {'name': 'Run'};
-    expect(identical(DataLocation.rewrite(untouched, from.path, to.path), untouched),
-        isTrue);
+      final cover = {'coverPath': '${from.path}/covers/1.jpg', 'name': 'Run'};
+      final rewritten = DataLocation.rewrite(cover, from.path, to.path) as Map;
+      expect(rewritten['coverPath'], '${to.path}/covers/1.jpg');
+      expect(rewritten['name'], 'Run');
+      final untouched = {'name': 'Run'};
+      expect(
+        identical(
+          DataLocation.rewrite(untouched, from.path, to.path),
+          untouched,
+        ),
+        isTrue,
+      );
 
-    DataLocation.finish();
-    expect(File('${from.path}/habits.hive').existsSync(), isFalse);
-    expect(Directory('${from.path}/covers').existsSync(), isFalse);
-    expect(File('${from.path}/notes.txt').existsSync(), isTrue);
-    expect(DataLocation.rewriteFrom, isNull);
+      DataLocation.finish();
+      expect(File('${from.path}/habits.hive').existsSync(), isFalse);
+      expect(Directory('${from.path}/covers').existsSync(), isFalse);
+      expect(File('${from.path}/notes.txt').existsSync(), isTrue);
+      expect(DataLocation.rewriteFrom, isNull);
 
-    expect((await DataLocation.resolve(support))?.path, to.path);
-  });
+      expect((await DataLocation.resolve(support))?.path, to.path);
+    },
+  );
 }

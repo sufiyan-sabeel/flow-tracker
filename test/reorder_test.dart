@@ -49,8 +49,9 @@ void main() {
     expect(_orderOf(tester), ['Water', 'Read', 'Walk']);
   });
 
-  testWidgets('a habit hidden by the today filter does not swallow the move',
-      (tester) async {
+  testWidgets('a habit hidden by the today filter does not swallow the move', (
+    tester,
+  ) async {
     await seedHabits(tester, [
       testHabit(id: 'a', name: 'Read', order: 0),
       testHabit(

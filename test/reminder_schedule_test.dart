@@ -7,16 +7,15 @@ Habit _habit({
   HabitInterval interval = HabitInterval.daily,
   List<int> weekdays = const [],
   List<int> restDays = const [],
-}) =>
-    Habit(
-      id: 'h',
-      name: 'Test',
-      color: const Color(0xFF00FF00),
-      order: 0,
-      interval: interval,
-      scheduleWeekdays: weekdays,
-      restDays: restDays,
-    );
+}) => Habit(
+  id: 'h',
+  name: 'Test',
+  color: const Color(0xFF00FF00),
+  order: 0,
+  interval: interval,
+  scheduleWeekdays: weekdays,
+  restDays: restDays,
+);
 
 void main() {
   group('which weekdays a reminder may ring on', () {
@@ -25,20 +24,25 @@ void main() {
         interval: HabitInterval.weekdays,
         weekdays: [1, 3, 5],
       );
-      expect([for (var d = 1; d <= 7; d++) habit.ringsOnWeekday(d)],
-          [true, false, true, false, true, false, false]);
+      expect(
+        [for (var d = 1; d <= 7; d++) habit.ringsOnWeekday(d)],
+        [true, false, true, false, true, false, false],
+      );
     });
 
     test('a daily habit rings any day, minus its rest days', () {
       final habit = _habit(restDays: [6, 7]);
-      expect([for (var d = 1; d <= 7; d++) habit.ringsOnWeekday(d)],
-          [true, true, true, true, true, false, false]);
+      expect(
+        [for (var d = 1; d <= 7; d++) habit.ringsOnWeekday(d)],
+        [true, true, true, true, true, false, false],
+      );
     });
 
     test('a habit with no chosen weekdays is not silenced', () {
       final habit = _habit(interval: HabitInterval.weekdays);
-      expect([for (var d = 1; d <= 7; d++) habit.ringsOnWeekday(d)],
-          List.filled(7, true));
+      expect([
+        for (var d = 1; d <= 7; d++) habit.ringsOnWeekday(d),
+      ], List.filled(7, true));
     });
   });
 
@@ -218,7 +222,11 @@ void main() {
       final ids = <int>{
         for (var day = 0; day < 7; day++)
           for (var slot = 0; slot < cap; slot++)
-            ReminderSchedule.notificationId('habit-1', 'rem-1', day * cap + slot),
+            ReminderSchedule.notificationId(
+              'habit-1',
+              'rem-1',
+              day * cap + slot,
+            ),
       };
       final other = ReminderSchedule.notificationId('habit-1', 'rem-2', 0);
 
@@ -247,12 +255,20 @@ void main() {
       final due = DateTime(2026, 8, 18);
       expect(
         ReminderSchedule.todoFireAt(
-            now: now, done: true, due: due, minutes: 18 * 60),
+          now: now,
+          done: true,
+          due: due,
+          minutes: 18 * 60,
+        ),
         isNull,
       );
       expect(
         ReminderSchedule.todoFireAt(
-            now: now, done: false, due: due, minutes: 8 * 60),
+          now: now,
+          done: false,
+          due: due,
+          minutes: 8 * 60,
+        ),
         isNull,
       );
       expect(

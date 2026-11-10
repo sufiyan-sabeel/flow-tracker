@@ -11,8 +11,9 @@ import 'support/app_harness.dart';
 void main() {
   useEmptyStore();
 
-  testWidgets('focus setup lists the habits and the start button',
-      (tester) async {
+  testWidgets('focus setup lists the habits and the start button', (
+    tester,
+  ) async {
     await seedHabits(tester, [
       testHabit(id: 'a', name: 'Read', order: 0),
       testHabit(id: 'b', name: 'Walk', order: 1),

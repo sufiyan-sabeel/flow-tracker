@@ -44,16 +44,18 @@ Future<FocusController> _pumpPill(WidgetTester tester) async {
 void main() {
   useEmptyStore();
 
-  testWidgets('a flip clock past the hour takes no more room than before',
-      (tester) async {
+  testWidgets('a flip clock past the hour takes no more room than before', (
+    tester,
+  ) async {
     final short = await _flipHeight(tester, 1502);
     final long = await _flipHeight(tester, 3661);
 
     expect(long, closeTo(short, 5));
   });
 
-  testWidgets('the pill counts up in flowtime and down in a timed session',
-      (tester) async {
+  testWidgets('the pill counts up in flowtime and down in a timed session', (
+    tester,
+  ) async {
     final focus = await _pumpPill(tester);
 
     focus.start(habitId: '', targetMinutes: 0);

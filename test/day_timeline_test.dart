@@ -36,8 +36,9 @@ void main() {
     expect(find.byType(TimelineBlock), findsNothing);
   });
 
-  testWidgets('planned habits are drawn in order with the free time between',
-      (tester) async {
+  testWidgets('planned habits are drawn in order with the free time between', (
+    tester,
+  ) async {
     await seedHabits(tester, [
       testHabit(
         id: 'b',
@@ -60,8 +61,14 @@ void main() {
     expect(find.byType(TimelineBlock), findsNWidgets(2));
     expect(find.byType(TimelineGap), findsOneWidget);
     expect(find.text('3h free'), findsOneWidget);
-    expect(find.textContaining(RegExp(r'^9:00\sAM - 10:00\sAM  ·  1h$')), findsOneWidget);
-    expect(find.textContaining(RegExp(r'^1:00\sPM - 1:30\sPM  ·  30m$')), findsOneWidget);
+    expect(
+      find.textContaining(RegExp(r'^9:00\sAM - 10:00\sAM  ·  1h$')),
+      findsOneWidget,
+    );
+    expect(
+      find.textContaining(RegExp(r'^1:00\sPM - 1:30\sPM  ·  30m$')),
+      findsOneWidget,
+    );
 
     final blocks = tester.widgetList<TimelineBlock>(find.byType(TimelineBlock));
     expect(blocks.map((b) => b.habit.name), ['Read', 'Run']);
@@ -94,8 +101,9 @@ void main() {
     await tester.pumpAndSettle();
   });
 
-  testWidgets('a focus only habit asks for a session instead of ticking',
-      (tester) async {
+  testWidgets('a focus only habit asks for a session instead of ticking', (
+    tester,
+  ) async {
     await seedHabits(tester, [
       testHabit(
         id: 'a',
@@ -115,16 +123,18 @@ void main() {
     expect(find.byType(TimelineBlock), findsOneWidget);
   });
 
-  testWidgets('Today hides the day button until planning is on',
-      (tester) async {
+  testWidgets('Today hides the day button until planning is on', (
+    tester,
+  ) async {
     await seedHabits(tester, [testHabit(id: 'a', name: 'Read')]);
     await pumpScreen(tester, const HomePage());
 
     expect(find.byIcon(LucideIcons.calendarClock), findsNothing);
   });
 
-  testWidgets('Minimal shows the day button on Today once planning is on',
-      (tester) async {
+  testWidgets('Minimal shows the day button on Today once planning is on', (
+    tester,
+  ) async {
     await seedHabits(tester, [testHabit(id: 'a', name: 'Read')]);
     await pumpScreen(
       tester,
@@ -138,8 +148,9 @@ void main() {
     expect(find.byIcon(LucideIcons.calendarClock), findsOneWidget);
   });
 
-  testWidgets('a habit measured in amounts adds one tap at a time',
-      (tester) async {
+  testWidgets('a habit measured in amounts adds one tap at a time', (
+    tester,
+  ) async {
     await seedHabits(tester, [
       testHabit(
         id: 'a',
@@ -170,8 +181,9 @@ void main() {
     await tester.pumpAndSettle();
   });
 
-  testWidgets('the week arrows move the day and nothing is done yet',
-      (tester) async {
+  testWidgets('the week arrows move the day and nothing is done yet', (
+    tester,
+  ) async {
     await seedHabits(tester, [
       testHabit(
         id: 'a',

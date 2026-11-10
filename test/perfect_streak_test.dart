@@ -17,22 +17,21 @@ Habit _habit({
   List<int> scheduleWeekdays = const [],
   List<int> restDays = const [],
   HabitKind kind = HabitKind.positive,
-}) =>
-    Habit(
-      id: id,
-      name: id,
-      color: const Color(0xFF00FF00),
-      order: 0,
-      kind: kind,
-      interval: interval,
-      scheduleWeekdays: scheduleWeekdays,
-      restDays: restDays,
-      createdAt: _ago(daysOld),
-      completions: {
-        for (final day in done)
-          day.dayKey: Completion(date: day.dayKey, hour: 9, count: 1),
-      },
-    );
+}) => Habit(
+  id: id,
+  name: id,
+  color: const Color(0xFF00FF00),
+  order: 0,
+  kind: kind,
+  interval: interval,
+  scheduleWeekdays: scheduleWeekdays,
+  restDays: restDays,
+  createdAt: _ago(daysOld),
+  completions: {
+    for (final day in done)
+      day.dayKey: Completion(date: day.dayKey, hour: 9, count: 1),
+  },
+);
 
 ({int current, int best}) _streak(List<Habit> habits) =>
     HabitStats.perfectStreakOf(habits, _today);
@@ -106,7 +105,11 @@ void main() {
 
   test('a habit that did not exist yet does not break the day', () {
     final streak = _streak([
-      _habit(id: 'old', daysOld: 5, done: [for (var i = 0; i <= 5; i++) _ago(i)]),
+      _habit(
+        id: 'old',
+        daysOld: 5,
+        done: [for (var i = 0; i <= 5; i++) _ago(i)],
+      ),
       _habit(id: 'new', daysOld: 1, done: [_ago(0), _ago(1)]),
     ]);
 

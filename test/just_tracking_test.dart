@@ -6,9 +6,11 @@ import 'package:flow_tracker/features/statistics/data/habit_stats.dart';
 
 import 'support/app_harness.dart';
 
-Habit _tracked() =>
-    testHabit(id: 'soda', name: 'Coke zero', done: lastDays(3))
-        .copyWith(tracking: true);
+Habit _tracked() => testHabit(
+  id: 'soda',
+  name: 'Coke zero',
+  done: lastDays(3),
+).copyWith(tracking: true);
 
 Habit _normal() => testHabit(id: 'run', name: 'Run', done: lastDays(3));
 
@@ -18,10 +20,12 @@ void main() {
       expect(testHabit(id: 'a', name: 'A').tracking, isFalse);
     });
 
-    test('a habit already marked keeps its switch even if the option is off',
-        () {
-      expect(_tracked().tracking, isTrue);
-    });
+    test(
+      'a habit already marked keeps its switch even if the option is off',
+      () {
+        expect(_tracked().tracking, isTrue);
+      },
+    );
 
     test('survives a backup round trip', () {
       final map = json.decode(json.encode(_tracked().toMap()));
@@ -45,8 +49,10 @@ void main() {
     });
 
     test('so the shared numbers read as if it were not there', () {
-      final together =
-          HabitStats.compute(HabitStats.counted([_normal(), _tracked()]), 2026);
+      final together = HabitStats.compute(
+        HabitStats.counted([_normal(), _tracked()]),
+        2026,
+      );
       final alone = HabitStats.compute([_normal()], 2026);
 
       expect(together.consistency, alone.consistency);

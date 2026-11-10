@@ -45,8 +45,9 @@ void main() {
     await pumpScreen(tester, const HomeShell());
   }
 
-  testWidgets('number keys jump between tabs and the settings key opens them',
-      (tester) async {
+  testWidgets('number keys jump between tabs and the settings key opens them', (
+    tester,
+  ) async {
     await shell(tester);
     expect(find.byType(HomePage), findsOneWidget);
 
@@ -60,8 +61,9 @@ void main() {
     expect(find.byType(SettingsPage), findsOneWidget);
   });
 
-  testWidgets('control tab walks the tabs and wraps around both ways',
-      (tester) async {
+  testWidgets('control tab walks the tabs and wraps around both ways', (
+    tester,
+  ) async {
     await shell(tester);
 
     await chord(tester, LogicalKeyboardKey.tab, shift: true);
@@ -82,20 +84,27 @@ void main() {
     expect(find.byType(StatisticsPage), findsOneWidget);
   });
 
-  testWidgets('new opens the habit form and save closes it with the habit',
-      (tester) async {
+  testWidgets('new opens the habit form and save closes it with the habit', (
+    tester,
+  ) async {
     await shell(tester);
 
     await chord(tester, LogicalKeyboardKey.keyN);
     expect(find.byType(HabitFormPage), findsOneWidget);
 
     await chord(tester, LogicalKeyboardKey.keyN);
-    expect(find.byType(HabitFormPage), findsOneWidget,
-        reason: 'no apila otro formulario');
+    expect(
+      find.byType(HabitFormPage),
+      findsOneWidget,
+      reason: 'no apila otro formulario',
+    );
 
     await chord(tester, LogicalKeyboardKey.keyS);
-    expect(find.byType(HabitFormPage), findsOneWidget,
-        reason: 'sin nombre no guarda');
+    expect(
+      find.byType(HabitFormPage),
+      findsOneWidget,
+      reason: 'sin nombre no guarda',
+    );
 
     await tester.enterText(find.byType(TextField).first, 'Stretch');
     await chord(tester, LogicalKeyboardKey.keyS);
@@ -104,8 +113,9 @@ void main() {
     expect(find.text('Stretch'), findsOneWidget);
   });
 
-  testWidgets('new in the to-do tab opens the editor, save keeps the to-do',
-      (tester) async {
+  testWidgets('new in the to-do tab opens the editor, save keeps the to-do', (
+    tester,
+  ) async {
     await shell(tester);
     await chord(tester, LogicalKeyboardKey.digit2);
 
@@ -113,8 +123,11 @@ void main() {
     expect(find.byType(TodoEditorPage), findsOneWidget);
 
     await chord(tester, LogicalKeyboardKey.keyN);
-    expect(find.byType(TodoEditorPage), findsOneWidget,
-        reason: 'no apila otro editor');
+    expect(
+      find.byType(TodoEditorPage),
+      findsOneWidget,
+      reason: 'no apila otro editor',
+    );
 
     await tester.enterText(find.byType(TextField).first, 'Buy a lamp');
     await tester.pumpAndSettle();
@@ -134,8 +147,9 @@ void main() {
     expect(find.byType(TodoEditorPage), findsNothing);
   });
 
-  testWidgets('find opens the to-do search and escape closes it again',
-      (tester) async {
+  testWidgets('find opens the to-do search and escape closes it again', (
+    tester,
+  ) async {
     await shell(tester);
     await chord(tester, LogicalKeyboardKey.digit2);
 
@@ -147,8 +161,9 @@ void main() {
     expect(find.byType(TodosPage), findsOneWidget);
   });
 
-  testWidgets('F1 shows the list and shortcuts stay quiet behind it',
-      (tester) async {
+  testWidgets('F1 shows the list and shortcuts stay quiet behind it', (
+    tester,
+  ) async {
     await shell(tester);
 
     await chord(tester, LogicalKeyboardKey.f1, control: false);
@@ -166,8 +181,7 @@ void main() {
     expect(find.text('Keyboard shortcuts'), findsNothing);
   });
 
-  testWidgets('plain letters and shift alone are never taken',
-      (tester) async {
+  testWidgets('plain letters and shift alone are never taken', (tester) async {
     await shell(tester);
     await tester.sendKeyEvent(LogicalKeyboardKey.keyN);
     await tester.sendKeyEvent(LogicalKeyboardKey.digit2);

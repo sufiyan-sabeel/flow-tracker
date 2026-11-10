@@ -13,17 +13,17 @@ void main() {
   final lastDay = DateTime(month.year, month.month + 1, 0).day;
 
   Habit avoid(Map<String, Completion> completions) => Habit(
-        id: 'a',
-        name: 'Alcohol',
-        color: const Color(0xFF7C5CFF),
-        order: 0,
-        kind: HabitKind.negative,
-        dailyCost: 10,
-        trackSpent: true,
-        cleanGoal: 7,
-        createdAt: created,
-        completions: completions,
-      );
+    id: 'a',
+    name: 'Alcohol',
+    color: const Color(0xFF7C5CFF),
+    order: 0,
+    kind: HabitKind.negative,
+    dailyCost: 10,
+    trackSpent: true,
+    cleanGoal: 7,
+    createdAt: created,
+    completions: completions,
+  );
 
   final twelfth = DateTime(month.year, month.month, 12);
   final twentieth = DateTime(month.year, month.month, 20);

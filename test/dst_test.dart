@@ -56,15 +56,18 @@ void main() {
         : 'esta maquina no cambia la hora, el test no prueba nada',
   );
 
-  test('a focus day border stays on the cutoff hour when the clock changes', () {
-    addTearDown(() => AppClock.cutoffHour = 0);
-    for (final cutoff in [0, 3]) {
-      AppClock.cutoffHour = cutoff;
-      for (final around in [autumn, spring]) {
-        final border = dayBorderAfter(around.addDays(-1).copyWith(hour: 12));
-        expect(border.hour, cutoff);
-        expect(border.day, around.day);
+  test(
+    'a focus day border stays on the cutoff hour when the clock changes',
+    () {
+      addTearDown(() => AppClock.cutoffHour = 0);
+      for (final cutoff in [0, 3]) {
+        AppClock.cutoffHour = cutoff;
+        for (final around in [autumn, spring]) {
+          final border = dayBorderAfter(around.addDays(-1).copyWith(hour: 12));
+          expect(border.hour, cutoff);
+          expect(border.day, around.day);
+        }
       }
-    }
-  });
+    },
+  );
 }

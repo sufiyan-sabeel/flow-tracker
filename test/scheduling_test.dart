@@ -9,9 +9,9 @@ DateTime _today() => DateTime.now().atMidnight;
 DateTime _ago(int days) => _today().subtract(Duration(days: days));
 
 Map<String, Completion> _done(Iterable<DateTime> days) => {
-      for (final d in days)
-        d.atMidnight.dayKey: Completion(date: d.atMidnight.dayKey, count: 1),
-    };
+  for (final d in days)
+    d.atMidnight.dayKey: Completion(date: d.atMidnight.dayKey, count: 1),
+};
 
 Habit _habit({
   required HabitInterval interval,
@@ -19,18 +19,17 @@ Habit _habit({
   int every = 2,
   required DateTime createdAt,
   Map<String, Completion> completions = const {},
-}) =>
-    Habit(
-      id: 'h',
-      name: 'Test',
-      color: const Color(0xFF00FF00),
-      order: 0,
-      interval: interval,
-      scheduleWeekdays: weekdays,
-      scheduleEvery: every,
-      createdAt: createdAt,
-      completions: completions,
-    );
+}) => Habit(
+  id: 'h',
+  name: 'Test',
+  color: const Color(0xFF00FF00),
+  order: 0,
+  interval: interval,
+  scheduleWeekdays: weekdays,
+  scheduleEvery: every,
+  createdAt: createdAt,
+  completions: completions,
+);
 
 void main() {
   group('everyXDays scheduling', () {
@@ -148,11 +147,11 @@ void main() {
 
   group('everyXDays counted from the last time done', () {
     Habit since(List<DateTime> done) => _habit(
-          interval: HabitInterval.everyXDays,
-          every: 3,
-          createdAt: _ago(10),
-          completions: _done(done),
-        ).copyWith(fromLastDone: true);
+      interval: HabitInterval.everyXDays,
+      every: 3,
+      createdAt: _ago(10),
+      completions: _done(done),
+    ).copyWith(fromLastDone: true);
 
     test('a late day moves the next due day', () {
       final h = since([_ago(10), _ago(7), _ago(3)]);
@@ -187,13 +186,16 @@ void main() {
     test('the switch survives a round trip', () {
       final h = since(const []);
       expect(Habit.fromMap(h.toMap()).fromLastDone, isTrue);
-      expect(Habit.fromMap(h.copyWith(fromLastDone: false).toMap()).fromLastDone,
-          isFalse);
+      expect(
+        Habit.fromMap(h.copyWith(fromLastDone: false).toMap()).fromLastDone,
+        isFalse,
+      );
     });
   });
 
   group('same weekday every month', () {
-    Habit monthly(DateTime start, {int every = 1}) => _habit(
+    Habit monthly(DateTime start, {int every = 1}) =>
+        _habit(
           interval: HabitInterval.everyXDays,
           every: every,
           createdAt: start,
@@ -329,9 +331,10 @@ void main() {
 
     test('archivedAt round-trips and clearArchived restores', () {
       final stamp = DateTime(2026, 3, 14, 9, 30);
-      final archived =
-          _habit(interval: HabitInterval.daily, createdAt: _ago(2))
-              .copyWith(archivedAt: stamp);
+      final archived = _habit(
+        interval: HabitInterval.daily,
+        createdAt: _ago(2),
+      ).copyWith(archivedAt: stamp);
       final back = Habit.fromMap(archived.toMap());
       expect(back.isArchived, isTrue);
       expect(back.archivedAt, stamp);
@@ -349,8 +352,9 @@ void main() {
 
     test('a cutoff shifts the logical day back by that many hours', () {
       AppClock.cutoffHour = 3;
-      final expected =
-          DateTime.now().subtract(const Duration(hours: 3)).atMidnight;
+      final expected = DateTime.now()
+          .subtract(const Duration(hours: 3))
+          .atMidnight;
       expect(AppClock.today(), expected);
     });
   });

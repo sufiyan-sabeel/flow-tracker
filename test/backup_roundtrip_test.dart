@@ -18,19 +18,19 @@ import 'package:flow_tracker/services/vault_writer.dart';
 import 'support/app_harness.dart';
 
 Habit _habit(int i) => testHabit(
-      id: 'h$i',
-      name: 'Habit $i',
-      order: i,
-      color: Color(0xFF000000 + i * 977),
-      kind: HabitKind.values[i % HabitKind.values.length],
-      perDayTarget: i.isEven ? 1 : 3,
-      unitLabel: i.isEven ? '' : 'glasses',
-      category: i % 3 == 0 ? 'Health' : '',
-      done: lastDays(i % 9),
-      substeps: i % 4 == 0
-          ? const [Substep(id: 's1', title: 'One'), Substep(id: 's2', title: 'Two')]
-          : const [],
-    );
+  id: 'h$i',
+  name: 'Habit $i',
+  order: i,
+  color: Color(0xFF000000 + i * 977),
+  kind: HabitKind.values[i % HabitKind.values.length],
+  perDayTarget: i.isEven ? 1 : 3,
+  unitLabel: i.isEven ? '' : 'glasses',
+  category: i % 3 == 0 ? 'Health' : '',
+  done: lastDays(i % 9),
+  substeps: i % 4 == 0
+      ? const [Substep(id: 's1', title: 'One'), Substep(id: 's2', title: 'Two')]
+      : const [],
+);
 
 Future<void> _seedEverything(int count) async {
   for (var i = 0; i < count; i++) {
@@ -112,7 +112,10 @@ void main() {
       expect(habit.unitLabel, original.unitLabel);
       expect(habit.category, original.category);
       expect(habit.order, original.order);
-      expect(habit.substeps.map((s) => s.id), original.substeps.map((s) => s.id));
+      expect(
+        habit.substeps.map((s) => s.id),
+        original.substeps.map((s) => s.id),
+      );
       expect(habit.completions.keys.toSet(), original.completions.keys.toSet());
       for (final entry in original.completions.entries) {
         expect(habit.completions[entry.key]!.count, entry.value.count);
@@ -268,68 +271,87 @@ void main() {
     );
   });
 
-  test('the automatic backup drops the json, the zip and the readable copy', () async {
-    await _seedEverything(5);
-    final dir = await Directory.systemTemp.createTemp('streak_auto');
-    addTearDown(() => dir.deleteSync(recursive: true));
+  test(
+    'the automatic backup drops the json, the zip and the readable copy',
+    () async {
+      await _seedEverything(5);
+      final dir = await Directory.systemTemp.createTemp('streak_auto');
+      addTearDown(() => dir.deleteSync(recursive: true));
 
-    final path = await BackupService.runAuto(folder: dir.path);
+      final path = await BackupService.runAuto(folder: dir.path);
 
-    expect(path, isNotNull);
-    expect(File(path!).existsSync(), isTrue);
-    expect(BackupService.parse(File(path).readAsStringSync()).habits, hasLength(5));
-    expect(File(path.replaceFirst('.json', '.zip')).existsSync(), isTrue);
-    expect(
-      dir.listSync().where((f) => f.path.endsWith('.part')),
-      isEmpty,
-    );
+      expect(path, isNotNull);
+      expect(File(path!).existsSync(), isTrue);
+      expect(
+        BackupService.parse(File(path).readAsStringSync()).habits,
+        hasLength(5),
+      );
+      expect(File(path.replaceFirst('.json', '.zip')).existsSync(), isTrue);
+      expect(
+        dir.listSync().where((f) => f.path.endsWith('.part')),
+        isEmpty,
+      );
 
-    final vault = '${dir.path}/$vaultFolder';
-    expect(File('$vault/README.md').existsSync(), isTrue);
-    expect(File('$vault/habits/Habit 0.md').existsSync(), isTrue);
-    expect(File('$vault/tasks.md').existsSync(), isTrue);
-    expect(File('$vault/notes.md').existsSync(), isTrue);
-    expect(File('$vault/focus.md').existsSync(), isTrue);
-  });
+      final vault = '${dir.path}/$vaultFolder';
+      expect(File('$vault/README.md').existsSync(), isTrue);
+      expect(File('$vault/habits/Habit 0.md').existsSync(), isTrue);
+      expect(File('$vault/tasks.md').existsSync(), isTrue);
+      expect(File('$vault/notes.md').existsSync(), isTrue);
+      expect(File('$vault/focus.md').existsSync(), isTrue);
+    },
+  );
 
   test('an empty app never writes a backup over the good ones', () async {
     final dir = await Directory.systemTemp.createTemp('streak_auto');
     addTearDown(() => dir.deleteSync(recursive: true));
     for (var i = 0; i < 6; i++) {
-      File('${dir.path}/streak_backup_2026-01-0${i + 1}_00-00-00.json')
-          .writeAsStringSync('{}');
+      File(
+        '${dir.path}/streak_backup_2026-01-0${i + 1}_00-00-00.json',
+      ).writeAsStringSync('{}');
     }
 
     expect(await BackupService.runAuto(folder: dir.path), isNull);
     expect(dir.listSync().whereType<File>(), hasLength(6));
   });
 
-  test('old copies keep one per day and the other device is left alone', () async {
-    await _seedEverything(1);
-    final dir = await Directory.systemTemp.createTemp('streak_auto');
-    addTearDown(() => dir.deleteSync(recursive: true));
-    final me = LocalStore.deviceId;
-    String name(String stamp, String device) =>
-        '${dir.path}/streak_backup_${stamp}_$device.json';
-    for (var day = 1; day <= 3; day++) {
-      for (var minute = 0; minute < 4; minute++) {
-        File(name('2026-01-0${day}_10-0$minute-00', me)).writeAsStringSync('{}');
+  test(
+    'old copies keep one per day and the other device is left alone',
+    () async {
+      await _seedEverything(1);
+      final dir = await Directory.systemTemp.createTemp('streak_auto');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      final me = LocalStore.deviceId;
+      String name(String stamp, String device) =>
+          '${dir.path}/streak_backup_${stamp}_$device.json';
+      for (var day = 1; day <= 3; day++) {
+        for (var minute = 0; minute < 4; minute++) {
+          File(
+            name('2026-01-0${day}_10-0$minute-00', me),
+          ).writeAsStringSync('{}');
+        }
       }
-    }
-    File(name('2026-01-01_09-00-00', 'other123')).writeAsStringSync('{}');
+      File(name('2026-01-01_09-00-00', 'other123')).writeAsStringSync('{}');
 
-    await BackupService.runAuto(folder: dir.path, readable: false, archive: false);
+      await BackupService.runAuto(
+        folder: dir.path,
+        readable: false,
+        archive: false,
+      );
 
-    final left = dir
-        .listSync()
-        .whereType<File>()
-        .map((f) => f.uri.pathSegments.last)
-        .toSet();
-    expect(left, contains('streak_backup_2026-01-01_09-00-00_other123.json'));
-    expect(left, contains('streak_backup_2026-01-01_10-03-00_$me.json'));
-    expect(left, contains('streak_backup_2026-01-02_10-03-00_$me.json'));
-    expect(left, isNot(contains('streak_backup_2026-01-01_10-00-00_$me.json')));
-  });
+      final left = dir
+          .listSync()
+          .whereType<File>()
+          .map((f) => f.uri.pathSegments.last)
+          .toSet();
+      expect(left, contains('streak_backup_2026-01-01_09-00-00_other123.json'));
+      expect(left, contains('streak_backup_2026-01-01_10-03-00_$me.json'));
+      expect(left, contains('streak_backup_2026-01-02_10-03-00_$me.json'));
+      expect(
+        left,
+        isNot(contains('streak_backup_2026-01-01_10-00-00_$me.json')),
+      );
+    },
+  );
 
   test('a completion keeps its steps, hour and amount through the trip', () {
     final day = AppClock.now().dayKey;
@@ -344,9 +366,11 @@ void main() {
       },
     );
 
-    final data = BackupService.parse(json.encode({
-      'habits': [habit.toMap()],
-    }));
+    final data = BackupService.parse(
+      json.encode({
+        'habits': [habit.toMap()],
+      }),
+    );
 
     final entry = data.habits.single.completions[day]!;
     expect(entry.count, 4.5);

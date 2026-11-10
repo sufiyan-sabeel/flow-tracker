@@ -9,11 +9,11 @@ void main() {
   final yesterday = today.addDays(-1);
 
   Habit everyThree({DateTime? start}) => testHabit(
-        id: 'sink',
-        name: 'Clean the sink',
-        interval: HabitInterval.everyXDays,
-        daysOld: 0,
-      ).copyWith(scheduleEvery: 3, scheduleStart: start);
+    id: 'sink',
+    name: 'Clean the sink',
+    interval: HabitInterval.everyXDays,
+    daysOld: 0,
+  ).copyWith(scheduleEvery: 3, scheduleStart: start);
 
   test('without a start day the count begins the day it was created', () {
     final habit = everyThree();

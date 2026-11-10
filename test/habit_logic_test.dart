@@ -13,18 +13,17 @@ Habit _base({
   Map<String, Completion> completions = const {},
   HabitKind kind = HabitKind.positive,
   DateTime? createdAt,
-}) =>
-    Habit(
-      id: 'h',
-      name: 'Test',
-      color: const Color(0xFF00FF00),
-      order: 0,
-      kind: kind,
-      substeps: substeps,
-      vacations: vacations,
-      completions: completions,
-      createdAt: createdAt ?? DateTime.now().subtract(const Duration(days: 30)),
-    );
+}) => Habit(
+  id: 'h',
+  name: 'Test',
+  color: const Color(0xFF00FF00),
+  order: 0,
+  kind: kind,
+  substeps: substeps,
+  vacations: vacations,
+  completions: completions,
+  createdAt: createdAt ?? DateTime.now().subtract(const Duration(days: 30)),
+);
 
 void main() {
   final today = DateTime.now();
@@ -95,18 +94,18 @@ void main() {
     addTearDown(() => Habit.weekStart = DateTime.monday);
     final sunday = today.atMidnight.startOfWeek(DateTime.sunday).addDays(-7);
     Habit weekly() => Habit(
-          id: 'w',
-          name: 'Gym',
-          color: const Color(0xFF00FF00),
-          order: 0,
-          interval: HabitInterval.weekly,
-          targetFrequency: 2,
-          completions: {
-            for (final day in [sunday, sunday.addDays(1)])
-              day.dayKey: Completion(date: day.dayKey, count: 1),
-          },
-          createdAt: sunday.addDays(-30),
-        );
+      id: 'w',
+      name: 'Gym',
+      color: const Color(0xFF00FF00),
+      order: 0,
+      interval: HabitInterval.weekly,
+      targetFrequency: 2,
+      completions: {
+        for (final day in [sunday, sunday.addDays(1)])
+          day.dayKey: Completion(date: day.dayKey, count: 1),
+      },
+      createdAt: sunday.addDays(-30),
+    );
 
     Habit.weekStart = DateTime.monday;
     expect(weekly().longestStreak, 0);
@@ -118,9 +117,8 @@ void main() {
 
   group('vacation', () {
     Map<String, Completion> completed(List<DateTime> days) => {
-          for (final d in days)
-            d.dayKey: Completion(date: d.dayKey, hour: 8),
-        };
+      for (final d in days) d.dayKey: Completion(date: d.dayKey, hour: 8),
+    };
 
     test('paused days do not break the daily streak', () {
       final done = [today, today.subtract(const Duration(days: 4))];
@@ -144,8 +142,10 @@ void main() {
         end: today.subtract(const Duration(days: 1)),
       );
       final loggedDay = today.subtract(const Duration(days: 2));
-      final habit =
-          _base(completions: completed([loggedDay]), vacations: [vac]);
+      final habit = _base(
+        completions: completed([loggedDay]),
+        vacations: [vac],
+      );
       expect(habit.isPausedOn(loggedDay), isTrue);
       expect(habit.isNeutralOn(loggedDay), isFalse);
       expect(
@@ -160,7 +160,10 @@ void main() {
         end: today.subtract(const Duration(days: 390)),
       );
       final habit = _base(vacations: [vac]);
-      expect(habit.isPausedOn(today.subtract(const Duration(days: 395))), isTrue);
+      expect(
+        habit.isPausedOn(today.subtract(const Duration(days: 395))),
+        isTrue,
+      );
       expect(
         habit.isNeutralOn(today.subtract(const Duration(days: 395))),
         isFalse,
@@ -168,7 +171,9 @@ void main() {
     });
 
     test('open period pauses through today', () {
-      final vac = VacationPeriod(start: today.subtract(const Duration(days: 2)));
+      final vac = VacationPeriod(
+        start: today.subtract(const Duration(days: 2)),
+      );
       final habit = _base(vacations: [vac]);
       expect(habit.isOnVacation, isTrue);
       expect(habit.isPausedOn(today), isTrue);
@@ -196,7 +201,9 @@ void main() {
       var habit = _base(createdAt: today);
       expect(habit.isCompletedOn(yesterday), isFalse);
 
-      habit = habit.copyWith(completions: CompletionOps.toggle(habit, yesterday));
+      habit = habit.copyWith(
+        completions: CompletionOps.toggle(habit, yesterday),
+      );
       expect(habit.isCompletedOn(yesterday), isTrue);
     });
 
@@ -204,10 +211,14 @@ void main() {
       final yesterday = today.subtract(const Duration(days: 1));
       var habit = _base(createdAt: today);
 
-      habit = habit.copyWith(completions: CompletionOps.toggle(habit, yesterday));
+      habit = habit.copyWith(
+        completions: CompletionOps.toggle(habit, yesterday),
+      );
       expect(habit.completions.containsKey(yesterday.dayKey), isTrue);
 
-      habit = habit.copyWith(completions: CompletionOps.toggle(habit, yesterday));
+      habit = habit.copyWith(
+        completions: CompletionOps.toggle(habit, yesterday),
+      );
       expect(habit.completions.containsKey(yesterday.dayKey), isFalse);
     });
 
@@ -223,18 +234,24 @@ void main() {
         createdAt: today,
       );
 
-      habit = habit.copyWith(completions: CompletionOps.toggle(habit, twoDaysAgo));
+      habit = habit.copyWith(
+        completions: CompletionOps.toggle(habit, twoDaysAgo),
+      );
       expect(habit.isCompletedOn(twoDaysAgo), isTrue);
 
-      habit = habit.copyWith(completions: CompletionOps.toggle(habit, twoDaysAgo));
+      habit = habit.copyWith(
+        completions: CompletionOps.toggle(habit, twoDaysAgo),
+      );
       expect(habit.isCompletedOn(twoDaysAgo), isFalse);
       expect(habit.completions, isEmpty);
     });
 
     test('a past day amount can be raised and cleared again', () {
       final wednesday = today.subtract(const Duration(days: 3));
-      var habit = _base(kind: HabitKind.quantitative, createdAt: today)
-          .copyWith(perDayTarget: 2);
+      var habit = _base(
+        kind: HabitKind.quantitative,
+        createdAt: today,
+      ).copyWith(perDayTarget: 2);
 
       habit = habit.copyWith(
         completions: CompletionOps.addProgress(habit, wednesday, 1),
@@ -265,7 +282,10 @@ void main() {
       final habit = _base(kind: HabitKind.negative, createdAt: today);
 
       final relapsed = CompletionOps.toggle(habit, today);
-      expect(habit.copyWith(completions: relapsed).isCompletedOn(today), isFalse);
+      expect(
+        habit.copyWith(completions: relapsed).isCompletedOn(today),
+        isFalse,
+      );
 
       final clean = CompletionOps.toggle(
         habit.copyWith(completions: relapsed),
@@ -299,8 +319,10 @@ void main() {
       expect(habit.startedAt, before.atMidnight);
       expect(habit.isCompletedOn(before), isFalse);
       expect(habit.isCompletedOn(before.add(const Duration(days: 1))), isTrue);
-      expect(habit.isCompletedOn(before.subtract(const Duration(days: 1))),
-          isFalse);
+      expect(
+        habit.isCompletedOn(before.subtract(const Duration(days: 1))),
+        isFalse,
+      );
       expect(habit.currentStreak, 40);
     });
 
@@ -333,8 +355,10 @@ void main() {
       var habit = _base(createdAt: today);
       for (var i = 0; i <= 5; i++) {
         habit = habit.copyWith(
-          completions:
-              CompletionOps.toggle(habit, today.subtract(Duration(days: i))),
+          completions: CompletionOps.toggle(
+            habit,
+            today.subtract(Duration(days: i)),
+          ),
         );
       }
       expect(habit.currentStreak, 6);
@@ -374,8 +398,10 @@ void main() {
       final wall = DateTime.now();
       final habit = _base(createdAt: today);
 
-      final entry = CompletionOps.toggle(habit, AppClock.today())[
-          AppClock.today().dayKey]!;
+      final entry = CompletionOps.toggle(
+        habit,
+        AppClock.today(),
+      )[AppClock.today().dayKey]!;
 
       final wallMinute = wall.hour * 60 + wall.minute;
       expect((entry.marks.first - wallMinute).abs(), lessThanOrEqualTo(1));
@@ -409,8 +435,9 @@ void main() {
       final checklist = _base(substeps: steps).copyWith(focusOnly: true);
       expect(checklist.blocksManualCheck(today), isFalse);
 
-      final quantitative =
-          _base(kind: HabitKind.quantitative).copyWith(focusOnly: true);
+      final quantitative = _base(
+        kind: HabitKind.quantitative,
+      ).copyWith(focusOnly: true);
       expect(quantitative.blocksManualCheck(today), isFalse);
     });
   });

@@ -8,33 +8,32 @@ Future<void> _pump(
   WidgetTester tester,
   String text, {
   bool animations = true,
-}) =>
-    tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: MediaQuery(
-              data: MediaQueryData(disableAnimations: !animations),
-              child: SizedBox(
-                width: 120,
-                child: ScrollingText(text, style: _style),
-              ),
-            ),
+}) => tester.pumpWidget(
+  MaterialApp(
+    home: Scaffold(
+      body: Center(
+        child: MediaQuery(
+          data: MediaQueryData(disableAnimations: !animations),
+          child: SizedBox(
+            width: 120,
+            child: ScrollingText(text, style: _style),
           ),
         ),
       ),
-    );
+    ),
+  ),
+);
 
-double _offset(WidgetTester tester) =>
-    tester.widget<SingleChildScrollView>(find.byType(SingleChildScrollView))
-        .controller!
-        .offset;
+double _offset(WidgetTester tester) => tester
+    .widget<SingleChildScrollView>(find.byType(SingleChildScrollView))
+    .controller!
+    .offset;
 
-double _room(WidgetTester tester) =>
-    tester.widget<SingleChildScrollView>(find.byType(SingleChildScrollView))
-        .controller!
-        .position
-        .maxScrollExtent;
+double _room(WidgetTester tester) => tester
+    .widget<SingleChildScrollView>(find.byType(SingleChildScrollView))
+    .controller!
+    .position
+    .maxScrollExtent;
 
 void main() {
   testWidgets('a name that fits never moves', (tester) async {
@@ -64,10 +63,14 @@ void main() {
     expect(tester.hasRunningAnimations, isFalse);
   });
 
-  testWidgets('with animations off it stays still and the finger moves it',
-      (tester) async {
-    await _pump(tester, 'Read twenty pages before going to sleep',
-        animations: false);
+  testWidgets('with animations off it stays still and the finger moves it', (
+    tester,
+  ) async {
+    await _pump(
+      tester,
+      'Read twenty pages before going to sleep',
+      animations: false,
+    );
     await tester.pump();
     await tester.pump(const Duration(seconds: 6));
 

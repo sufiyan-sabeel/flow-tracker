@@ -8,31 +8,33 @@ import 'support/app_harness.dart';
 void main() {
   useEmptyStore();
 
-  testWidgets('clearing progress keeps the habits and drops everything logged',
-      (tester) async {
-    await seedHabits(tester, [
-      testHabit(id: 'a', name: 'Read', order: 0, done: lastDays(5)),
-      testHabit(id: 'b', name: 'Water', order: 1, done: lastDays(3)),
-    ]);
-    await seedNotes(tester, [
-      testNote(
-        id: 'n',
-        habitId: 'a',
-        day: lastDays(1).first,
-        text: 'a note',
-      ),
-    ]);
+  testWidgets(
+    'clearing progress keeps the habits and drops everything logged',
+    (tester) async {
+      await seedHabits(tester, [
+        testHabit(id: 'a', name: 'Read', order: 0, done: lastDays(5)),
+        testHabit(id: 'b', name: 'Water', order: 1, done: lastDays(3)),
+      ]);
+      await seedNotes(tester, [
+        testNote(
+          id: 'n',
+          habitId: 'a',
+          day: lastDays(1).first,
+          text: 'a note',
+        ),
+      ]);
 
-    await tester.runAsync(LocalStore.clearProgress);
+      await tester.runAsync(LocalStore.clearProgress);
 
-    final habits = LocalStore.readHabits();
-    expect(habits.length, 2);
-    expect(habits['a']!.name, 'Read');
-    expect(habits['a']!.completions, isEmpty);
-    expect(habits['b']!.completions, isEmpty);
-    expect(LocalStore.readNotes(), isEmpty);
-    expect(LocalStore.readFocusSessions(), isEmpty);
-  });
+      final habits = LocalStore.readHabits();
+      expect(habits.length, 2);
+      expect(habits['a']!.name, 'Read');
+      expect(habits['a']!.completions, isEmpty);
+      expect(habits['b']!.completions, isEmpty);
+      expect(LocalStore.readNotes(), isEmpty);
+      expect(LocalStore.readFocusSessions(), isEmpty);
+    },
+  );
 
   testWidgets('classic lists the four sections', (tester) async {
     await pumpScreen(tester, const SettingsPage());

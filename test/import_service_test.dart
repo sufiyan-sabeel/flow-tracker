@@ -45,10 +45,10 @@ Run,,Health,3,2024-01-03,0,
 
   group('a Loop database file', () {
     List<int> sqlite() => [
-          ...'SQLite format 3'.codeUnits,
-          0,
-          ...List<int>.filled(200, 7),
-        ];
+      ...'SQLite format 3'.codeUnits,
+      0,
+      ...List<int>.filled(200, 7),
+    ];
 
     test('is refused with instructions even without a file name', () {
       expect(
@@ -88,8 +88,10 @@ Date,Meditate,Exercise
 ''';
 
     test('parses a loose Checkmarks.csv', () {
-      final o =
-          ImportService.parseBytes(_b(checkmarks), fileName: 'Checkmarks.csv');
+      final o = ImportService.parseBytes(
+        _b(checkmarks),
+        fileName: 'Checkmarks.csv',
+      );
       expect(o.source, 'Loop Habit Tracker');
       expect(_byName(o, 'Meditate').completions.length, 2);
       expect(_byName(o, 'Exercise').completions.length, 1);
@@ -97,10 +99,16 @@ Date,Meditate,Exercise
 
     test('parses a zipped CSV export', () {
       final archive = Archive()
-        ..addFile(ArchiveFile(
-            'Habits.csv', 0, _b('Position,Name\n1,Meditate\n2,Exercise\n')))
-        ..addFile(ArchiveFile(
-            'Checkmarks.csv', checkmarks.length, _b(checkmarks)));
+        ..addFile(
+          ArchiveFile(
+            'Habits.csv',
+            0,
+            _b('Position,Name\n1,Meditate\n2,Exercise\n'),
+          ),
+        )
+        ..addFile(
+          ArchiveFile('Checkmarks.csv', checkmarks.length, _b(checkmarks)),
+        );
       final zipped = ZipEncoder().encode(archive)!;
 
       final o = ImportService.parseBytes(zipped, fileName: 'Loop Habits.zip');
@@ -115,10 +123,18 @@ Date,Meditate,Exercise
     test('parses a Habit Builder backup', () {
       final day = DateTime(2024, 3, 5, 9).millisecondsSinceEpoch;
       final archive = Archive()
-        ..addFile(ArchiveFile.string('habits.csv',
-            'id,name,color,order,archived,notes\n1,Read,Red,1,false,\n2,Run,Blue,0,false,Morning\n'))
-        ..addFile(ArchiveFile.string(
-            'actions.csv', 'id,habit_id,timestamp\n1,1,$day\n2,2,$day\n3,1,$day\n'))
+        ..addFile(
+          ArchiveFile.string(
+            'habits.csv',
+            'id,name,color,order,archived,notes\n1,Read,Red,1,false,\n2,Run,Blue,0,false,Morning\n',
+          ),
+        )
+        ..addFile(
+          ArchiveFile.string(
+            'actions.csv',
+            'id,habit_id,timestamp\n1,1,$day\n2,2,$day\n3,1,$day\n',
+          ),
+        )
         ..addFile(ArchiveFile.string('metadata.txt', 'backup_version=1'));
       final zipped = ZipEncoder().encode(archive)!;
 
@@ -132,15 +148,21 @@ Date,Meditate,Exercise
 
     test('imports habits from Habits.csv even with zero history', () {
       final archive = Archive()
-        ..addFile(ArchiveFile(
+        ..addFile(
+          ArchiveFile(
             'Habits.csv',
             0,
-            _b('Position,Name,Type,Color\n'
-                '001,Cgf,YES_NO,#1976D2\n'
-                '002,Fggg,NUMERICAL,#E53935\n')))
+            _b(
+              'Position,Name,Type,Color\n'
+              '001,Cgf,YES_NO,#1976D2\n'
+              '002,Fggg,NUMERICAL,#E53935\n',
+            ),
+          ),
+        )
         ..addFile(ArchiveFile('Checkmarks.csv', 0, _b('Date,Cgf,Fggg,\n')))
-        ..addFile(ArchiveFile(
-            '001 Cgf/Checkmarks.csv', 0, _b('Date,Value,Notes\n')));
+        ..addFile(
+          ArchiveFile('001 Cgf/Checkmarks.csv', 0, _b('Date,Value,Notes\n')),
+        );
       final zipped = ZipEncoder().encode(archive)!;
 
       final o = ImportService.parseBytes(zipped, fileName: 'loop.zip');
@@ -153,11 +175,15 @@ Date,Meditate,Exercise
 
     test('attaches per-habit Checkmarks when the matrix is empty', () {
       final archive = Archive()
-        ..addFile(ArchiveFile(
-            'Habits.csv', 0, _b('Position,Name\n001,Cgf\n')))
+        ..addFile(ArchiveFile('Habits.csv', 0, _b('Position,Name\n001,Cgf\n')))
         ..addFile(ArchiveFile('Checkmarks.csv', 0, _b('Date,Cgf,\n')))
-        ..addFile(ArchiveFile('001 Cgf/Checkmarks.csv', 0,
-            _b('Date,Value,Notes\n2024-01-01,2,\n2024-01-02,2,\n')));
+        ..addFile(
+          ArchiveFile(
+            '001 Cgf/Checkmarks.csv',
+            0,
+            _b('Date,Value,Notes\n2024-01-01,2,\n2024-01-02,2,\n'),
+          ),
+        );
       final zipped = ZipEncoder().encode(archive)!;
       final o = ImportService.parseBytes(zipped, fileName: 'loop.zip');
       expect(_byName(o, 'Cgf').completions.length, 2);
@@ -165,13 +191,26 @@ Date,Meditate,Exercise
 
     test('a NUMERICAL habit imports as measurable with its target', () {
       final archive = Archive()
-        ..addFile(ArchiveFile(
+        ..addFile(
+          ArchiveFile(
             'Habits.csv',
             0,
-            _b('Position,Name,Type,Unit,Target Type,Target Value\n'
-                '001,Water,NUMERICAL,glasses,AT_LEAST,8\n')))
-        ..addFile(ArchiveFile('Checkmarks.csv', 0, _b('Date,Water\n'
-            '2024-03-01,8000\n2024-03-02,3000\n')));
+            _b(
+              'Position,Name,Type,Unit,Target Type,Target Value\n'
+              '001,Water,NUMERICAL,glasses,AT_LEAST,8\n',
+            ),
+          ),
+        )
+        ..addFile(
+          ArchiveFile(
+            'Checkmarks.csv',
+            0,
+            _b(
+              'Date,Water\n'
+              '2024-03-01,8000\n2024-03-02,3000\n',
+            ),
+          ),
+        );
       final zipped = ZipEncoder().encode(archive)!;
       final o = ImportService.parseBytes(zipped, fileName: 'loop.zip');
       final w = _byName(o, 'Water');
@@ -182,58 +221,92 @@ Date,Meditate,Exercise
       expect(w.isCompletedOn(DateTime(2024, 3, 2)), isFalse);
     });
 
-    test('reads the current export: named values, thousandths and archived',
-        () {
-      final archive = Archive()
-        ..addFile(ArchiveFile(
-            'Habits.csv',
-            0,
-            _b('Position,Name,Type,Question,Description,FrequencyNumerator,'
+    test(
+      'reads the current export: named values, thousandths and archived',
+      () {
+        final archive = Archive()
+          ..addFile(
+            ArchiveFile(
+              'Habits.csv',
+              0,
+              _b(
+                'Position,Name,Type,Question,Description,FrequencyNumerator,'
                 'FrequencyDenominator,Color,Unit,Target Type,Target Value,'
                 'Archived?\n'
                 '001,Read,YES_NO,,,1,1,#1976D2,,,,false\n'
                 '002,Walk,NUMERICAL,,,1,1,#E53935,km,AT_LEAST,2.5,false\n'
-                '003,Old,YES_NO,,,1,1,#43A047,,,,true\n')))
-        ..addFile(ArchiveFile('Checkmarks.csv', 0, _b('Date,Read,Walk,Old,\n'
-            '2024-03-03,YES_MANUAL,2750,UNKNOWN,\n'
-            '2024-03-02,YES_AUTO,1250,YES_MANUAL,\n'
-            '2024-03-01,SKIP,-1,NO,\n')));
-      final zipped = ZipEncoder().encode(archive)!;
-      final o = ImportService.parseBytes(zipped, fileName: 'loop.zip');
+                '003,Old,YES_NO,,,1,1,#43A047,,,,true\n',
+              ),
+            ),
+          )
+          ..addFile(
+            ArchiveFile(
+              'Checkmarks.csv',
+              0,
+              _b(
+                'Date,Read,Walk,Old,\n'
+                '2024-03-03,YES_MANUAL,2750,UNKNOWN,\n'
+                '2024-03-02,YES_AUTO,1250,YES_MANUAL,\n'
+                '2024-03-01,SKIP,-1,NO,\n',
+              ),
+            ),
+          );
+        final zipped = ZipEncoder().encode(archive)!;
+        final o = ImportService.parseBytes(zipped, fileName: 'loop.zip');
 
-      final read = _byName(o, 'Read');
-      expect(read.completions.length, 1);
-      expect(read.isCompletedOn(DateTime(2024, 3, 3)), isTrue);
+        final read = _byName(o, 'Read');
+        expect(read.completions.length, 1);
+        expect(read.isCompletedOn(DateTime(2024, 3, 3)), isTrue);
 
-      final walk = _byName(o, 'Walk');
-      expect(walk.perDayTarget, 2.5);
-      expect(walk.completions[DateTime(2024, 3, 3).dayKey]!.count, 2.75);
-      expect(walk.isCompletedOn(DateTime(2024, 3, 3)), isTrue);
-      expect(walk.isCompletedOn(DateTime(2024, 3, 2)), isFalse);
+        final walk = _byName(o, 'Walk');
+        expect(walk.perDayTarget, 2.5);
+        expect(walk.completions[DateTime(2024, 3, 3).dayKey]!.count, 2.75);
+        expect(walk.isCompletedOn(DateTime(2024, 3, 3)), isTrue);
+        expect(walk.isCompletedOn(DateTime(2024, 3, 2)), isFalse);
 
-      expect(_byName(o, 'Old').isArchived, isTrue);
-      expect(read.isArchived, isFalse);
-    });
+        expect(_byName(o, 'Old').isArchived, isTrue);
+        expect(read.isArchived, isFalse);
+      },
+    );
 
     test('brings frequency, question, notes and comma decimals', () {
       final archive = Archive()
-        ..addFile(ArchiveFile(
+        ..addFile(
+          ArchiveFile(
             'Habits.csv',
             0,
-            _b('Position,Name,Type,Question,Description,FrequencyNumerator,'
-                'FrequencyDenominator,Color,Unit,Target Type,Target Value,'
-                'Archived?\n'
-                '001,Gym,YES_NO,Did you train?,Legs and back,3,7,#1976D2,,,,false\n'
-                '002,Water,NUMERICAL,,,1,1,#E53935,l,AT_LEAST,"1,5",false\n'
-                '003,Bills,YES_NO,,,1,30,#43A047,,,,false\n'
-                '004,Plants,YES_NO,,,1,3,#43A047,,,,false\n')))
-        ..addFile(ArchiveFile('001 Gym/Checkmarks.csv', 0,
-            _b('Date,Value,Notes\n2024-03-02,YES_MANUAL,"Heavy day\nnew PR"\n'
-                '2024-03-01,YES_AUTO,\n')))
-        ..addFile(ArchiveFile('Checkmarks.csv', 0,
-            _b('Date,Gym,Water,Bills,Plants,\n'
-                '2024-03-02,YES_MANUAL,1500,NO,NO,\n'
-                '2024-03-01,YES_MANUAL,0,NO,YES_MANUAL,\n')));
+            _b(
+              'Position,Name,Type,Question,Description,FrequencyNumerator,'
+              'FrequencyDenominator,Color,Unit,Target Type,Target Value,'
+              'Archived?\n'
+              '001,Gym,YES_NO,Did you train?,Legs and back,3,7,#1976D2,,,,false\n'
+              '002,Water,NUMERICAL,,,1,1,#E53935,l,AT_LEAST,"1,5",false\n'
+              '003,Bills,YES_NO,,,1,30,#43A047,,,,false\n'
+              '004,Plants,YES_NO,,,1,3,#43A047,,,,false\n',
+            ),
+          ),
+        )
+        ..addFile(
+          ArchiveFile(
+            '001 Gym/Checkmarks.csv',
+            0,
+            _b(
+              'Date,Value,Notes\n2024-03-02,YES_MANUAL,"Heavy day\nnew PR"\n'
+              '2024-03-01,YES_AUTO,\n',
+            ),
+          ),
+        )
+        ..addFile(
+          ArchiveFile(
+            'Checkmarks.csv',
+            0,
+            _b(
+              'Date,Gym,Water,Bills,Plants,\n'
+              '2024-03-02,YES_MANUAL,1500,NO,NO,\n'
+              '2024-03-01,YES_MANUAL,0,NO,YES_MANUAL,\n',
+            ),
+          ),
+        );
       final zipped = ZipEncoder().encode(archive)!;
       final o = ImportService.parseBytes(zipped, fileName: 'loop.zip');
 
@@ -258,10 +331,16 @@ Date,Meditate,Exercise
 
     test('without Habits.csv the top-level Checkmarks.csv is used', () {
       final archive = Archive()
-        ..addFile(ArchiveFile('001 Meditate/Checkmarks.csv', 0,
-            _b('Date,Meditate\n2024-01-01,2\n')))
         ..addFile(
-            ArchiveFile('Checkmarks.csv', checkmarks.length, _b(checkmarks)));
+          ArchiveFile(
+            '001 Meditate/Checkmarks.csv',
+            0,
+            _b('Date,Meditate\n2024-01-01,2\n'),
+          ),
+        )
+        ..addFile(
+          ArchiveFile('Checkmarks.csv', checkmarks.length, _b(checkmarks)),
+        );
       final zipped = ZipEncoder().encode(archive)!;
       final o = ImportService.parseBytes(zipped, fileName: 'loop.zip');
       expect(o.habits.length, 2);
@@ -270,30 +349,30 @@ Date,Meditate,Exercise
 
   group('HabitKit JSON', () {
     String hk({int perDay = 1}) => json.encode({
-          'habits': [
-            {'id': 'a', 'name': 'Ytyy', 'color': 'blue', 'archived': false},
-            {'id': 'b', 'name': 'Cgg', 'color': 'red', 'archived': false},
-            {'id': 'z', 'name': 'Old', 'color': 'green', 'archived': true},
-          ],
-          'completions': [
-            {
-              'date': '2026-07-21T22:00:00.000Z',
-              'habitId': 'a',
-              'timezoneOffsetInMinutes': 120,
-              'amountOfCompletions': 1,
-            },
-            {
-              'date': '2026-07-20T22:00:00.000Z',
-              'habitId': 'b',
-              'timezoneOffsetInMinutes': 120,
-              'amountOfCompletions': 3,
-            },
-            {'date': 'x', 'habitId': 'zzz', 'amountOfCompletions': 1},
-          ],
-          'intervals': [
-            {'habitId': 'b', 'requiredNumberOfCompletionsPerDay': perDay},
-          ],
-        });
+      'habits': [
+        {'id': 'a', 'name': 'Ytyy', 'color': 'blue', 'archived': false},
+        {'id': 'b', 'name': 'Cgg', 'color': 'red', 'archived': false},
+        {'id': 'z', 'name': 'Old', 'color': 'green', 'archived': true},
+      ],
+      'completions': [
+        {
+          'date': '2026-07-21T22:00:00.000Z',
+          'habitId': 'a',
+          'timezoneOffsetInMinutes': 120,
+          'amountOfCompletions': 1,
+        },
+        {
+          'date': '2026-07-20T22:00:00.000Z',
+          'habitId': 'b',
+          'timezoneOffsetInMinutes': 120,
+          'amountOfCompletions': 3,
+        },
+        {'date': 'x', 'habitId': 'zzz', 'amountOfCompletions': 1},
+      ],
+      'intervals': [
+        {'habitId': 'b', 'requiredNumberOfCompletionsPerDay': perDay},
+      ],
+    });
 
     test('imports habits + completions, skips archived, maps colours', () {
       final o = ImportService.parseBytes(_b(hk()), fileName: 'habitkit.json');
@@ -305,9 +384,13 @@ Date,Meditate,Exercise
 
     test('shifts UTC completion to the local calendar day', () {
       final o = ImportService.parseBytes(_b(hk()), fileName: 'habitkit.json');
-      expect(_byName(o, 'Ytyy')
-          .completions
-          .containsKey(DateTime(2026, 7, 22).dayKey), isTrue);
+      expect(
+        _byName(
+          o,
+          'Ytyy',
+        ).completions.containsKey(DateTime(2026, 7, 22).dayKey),
+        isTrue,
+      );
     });
 
     test('an interval target > 1 imports as a measurable habit', () {
@@ -441,7 +524,8 @@ Date,Meditate,Exercise
 
   group('Generic CSV', () {
     test('date-matrix with semicolons and truthy strings', () {
-      const csv = 'Timestamp;Leer;Correr\n'
+      const csv =
+          'Timestamp;Leer;Correr\n'
           '2024-01-01;x;\n'
           '2024-01-02;yes;1\n'
           '2024-01-03;;true\n';
@@ -452,7 +536,8 @@ Date,Meditate,Exercise
     });
 
     test('long/tidy format (habit,date,value)', () {
-      const csv = 'habit,date,value\n'
+      const csv =
+          'habit,date,value\n'
           'Yoga,2024-02-01,1\n'
           'Yoga,2024-02-02,1\n'
           'Yoga,2024-02-03,0\n';
@@ -463,7 +548,8 @@ Date,Meditate,Exercise
     });
 
     test('parses dd/MM/yyyy and MM/dd/yyyy day-first-safely', () {
-      const csv = 'Date,A\n'
+      const csv =
+          'Date,A\n'
           '31/01/2024,1\n'
           '01/02/2024,1\n';
       final o = ImportService.parseBytes(_b(csv), fileName: 'x.csv');

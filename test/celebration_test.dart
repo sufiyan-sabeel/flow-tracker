@@ -34,8 +34,9 @@ void main() {
     expect(find.byType(ConfettiOverlay), findsNothing);
   });
 
-  testWidgets('switching in on the first completion still animates',
-      (tester) async {
+  testWidgets('switching in on the first completion still animates', (
+    tester,
+  ) async {
     await tester.runAsync(() => LocalStore.writeSetting('celebration', 1));
 
     await pumpCelebration(tester, 0);
@@ -75,19 +76,22 @@ void main() {
 
     Future<void> check(WidgetTester tester, int index) async {
       await tester.runAsync(() async {
-        await tester.tap(find.bySemanticsLabel(RegExp(r'^Mark \w+ as')).at(index));
+        await tester.tap(
+          find.bySemanticsLabel(RegExp(r'^Mark \w+ as')).at(index),
+        );
         await Future<void>.delayed(const Duration(milliseconds: 80));
       });
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 32));
     }
 
-    int triggerOf(WidgetTester tester) =>
-        tester.widget<CelebrationOverlay>(find.byType(CelebrationOverlay))
-            .trigger;
+    int triggerOf(WidgetTester tester) => tester
+        .widget<CelebrationOverlay>(find.byType(CelebrationOverlay))
+        .trigger;
 
-    testWidgets('checking a single habit celebrates, not only the last one',
-        (tester) async {
+    testWidgets('checking a single habit celebrates, not only the last one', (
+      tester,
+    ) async {
       await pumpThree(tester);
       expect(triggerOf(tester), 0);
 
@@ -96,8 +100,9 @@ void main() {
       expect(triggerOf(tester), 1);
     });
 
-    testWidgets('the fireworks come out for a single habit too',
-        (tester) async {
+    testWidgets('the fireworks come out for a single habit too', (
+      tester,
+    ) async {
       await pumpThree(tester, style: 1);
 
       await check(tester, 0);

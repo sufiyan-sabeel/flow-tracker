@@ -10,21 +10,20 @@ Habit _habit({
   List<DateTime> done = const [],
   int daysOld = 90,
   List<int> restDays = const [],
-}) =>
-    Habit(
-      id: 'h',
-      name: 'Gym',
-      color: const Color(0xFF00FF00),
-      order: 0,
-      interval: interval,
-      targetFrequency: frequency,
-      restDays: restDays,
-      createdAt: AppClock.now().addDays(-daysOld),
-      completions: {
-        for (final day in done)
-          day.dayKey: Completion(date: day.dayKey, count: 1, hour: 9),
-      },
-    );
+}) => Habit(
+  id: 'h',
+  name: 'Gym',
+  color: const Color(0xFF00FF00),
+  order: 0,
+  interval: interval,
+  targetFrequency: frequency,
+  restDays: restDays,
+  createdAt: AppClock.now().addDays(-daysOld),
+  completions: {
+    for (final day in done)
+      day.dayKey: Completion(date: day.dayKey, count: 1, hour: 9),
+  },
+);
 
 void main() {
   final today = AppClock.now().atMidnight;

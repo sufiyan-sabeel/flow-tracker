@@ -6,16 +6,16 @@ import 'package:flow_tracker/features/habits/data/habit.dart';
 import 'package:flow_tracker/services/reminder_schedule.dart';
 
 Habit _monthly(DateTime start, {int every = 1}) => Habit(
-      id: 'bill',
-      name: 'Pay the bill',
-      color: const Color(0xFF00FF00),
-      order: 0,
-      interval: HabitInterval.everyXDays,
-      scheduleUnit: ScheduleUnit.months,
-      scheduleEvery: every,
-      scheduleStart: start,
-      createdAt: start,
-    );
+  id: 'bill',
+  name: 'Pay the bill',
+  color: const Color(0xFF00FF00),
+  order: 0,
+  interval: HabitInterval.everyXDays,
+  scheduleUnit: ScheduleUnit.months,
+  scheduleEvery: every,
+  scheduleStart: start,
+  createdAt: start,
+);
 
 FocusSession _session(String id, {String label = '', int minutes = 30}) =>
     FocusSession(
@@ -110,19 +110,22 @@ void main() {
       expect(pieces.every((piece) => piece.label == 'Reading'), isTrue);
     });
 
-    test('a session started less than a second before midnight still splits',
-        () {
-      final edge = FocusSession(
-        id: 'edge',
-        habitId: '',
-        targetMinutes: 50,
-        seconds: 50 * 60,
-        completed: true,
-        startedAt: DateTime(2026, 10, 8, 23, 59, 59, 500),
-      );
-      final pieces = edge.split();
-      expect(pieces.fold(0, (sum, piece) => sum + piece.seconds), 50 * 60);
-    }, timeout: const Timeout(Duration(seconds: 5)));
+    test(
+      'a session started less than a second before midnight still splits',
+      () {
+        final edge = FocusSession(
+          id: 'edge',
+          habitId: '',
+          targetMinutes: 50,
+          seconds: 50 * 60,
+          completed: true,
+          startedAt: DateTime(2026, 10, 8, 23, 59, 59, 500),
+        );
+        final pieces = edge.split();
+        expect(pieces.fold(0, (sum, piece) => sum + piece.seconds), 50 * 60);
+      },
+      timeout: const Timeout(Duration(seconds: 5)),
+    );
 
     test('time adds up per label and unlabelled sessions stay out', () {
       final stats = FocusStats.compute(

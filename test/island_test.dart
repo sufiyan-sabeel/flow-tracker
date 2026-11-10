@@ -15,14 +15,13 @@ Habit _habit({
   required List<DateTime> done,
   bool tracking = false,
   List<int> weekdays = const [],
-}) =>
-    testHabit(
-      id: id,
-      name: id,
-      done: done,
-      interval: weekdays.isEmpty ? HabitInterval.daily : HabitInterval.weekdays,
-      scheduleWeekdays: weekdays,
-    ).copyWith(tracking: tracking);
+}) => testHabit(
+  id: id,
+  name: id,
+  done: done,
+  interval: weekdays.isEmpty ? HabitInterval.daily : HabitInterval.weekdays,
+  scheduleWeekdays: weekdays,
+).copyWith(tracking: tracking);
 
 FocusSession _session(DateTime day, int minutes) => FocusSession(
   id: '${day.dayKey}-$minutes',
@@ -40,29 +39,41 @@ void main() {
   final yesterday = today.subtract(const Duration(days: 1));
 
   test('every check is worth ten points', () {
-    final ledger = IslandLedger.of([
-      _habit(id: 'a', done: [today, yesterday]),
-    ], const [], const []);
+    final ledger = IslandLedger.of(
+      [
+        _habit(id: 'a', done: [today, yesterday]),
+      ],
+      const [],
+      const [],
+    );
     expect(ledger.checks, 2);
     expect(ledger.earned, 2 * 10 + 2 * 25);
   });
 
   test('archived habits keep their coins but stop counting after', () {
-    final ledger = IslandLedger.of([
-      _habit(
-        id: 'a',
-        done: [yesterday, today],
-      ).copyWith(archivedAt: yesterday),
-      _habit(id: 'b', done: [today]),
-    ], const [], const []);
+    final ledger = IslandLedger.of(
+      [
+        _habit(
+          id: 'a',
+          done: [yesterday, today],
+        ).copyWith(archivedAt: yesterday),
+        _habit(id: 'b', done: [today]),
+      ],
+      const [],
+      const [],
+    );
     expect(ledger.checks, 2);
     expect(ledger.perfectDays, 1);
   });
 
   test('tracking habits earn nothing', () {
-    final ledger = IslandLedger.of([
-      _habit(id: 'a', done: [today], tracking: true),
-    ], const [], const []);
+    final ledger = IslandLedger.of(
+      [
+        _habit(id: 'a', done: [today], tracking: true),
+      ],
+      const [],
+      const [],
+    );
     expect(ledger.checks, 0);
     expect(ledger.earned, 0);
   });
@@ -77,41 +88,60 @@ void main() {
   });
 
   test('a perfect day needs every habit that was due', () {
-    final partial = IslandLedger.of([
-      _habit(id: 'a', done: [today]),
-      _habit(id: 'b', done: const []),
-    ], const [], const []);
+    final partial = IslandLedger.of(
+      [
+        _habit(id: 'a', done: [today]),
+        _habit(id: 'b', done: const []),
+      ],
+      const [],
+      const [],
+    );
     expect(partial.perfectDays, 0);
 
-    final full = IslandLedger.of([
-      _habit(id: 'a', done: [today]),
-      _habit(id: 'b', done: [today]),
-    ], const [], const []);
+    final full = IslandLedger.of(
+      [
+        _habit(id: 'a', done: [today]),
+        _habit(id: 'b', done: [today]),
+      ],
+      const [],
+      const [],
+    );
     expect(full.perfectDays, 1);
   });
 
   test('a habit that was not due does not spoil the day', () {
-    final ledger = IslandLedger.of([
-      _habit(id: 'a', done: [today]),
-      _habit(id: 'b', done: const [], weekdays: [today.weekday % 7 + 1]),
-    ], const [], const []);
+    final ledger = IslandLedger.of(
+      [
+        _habit(id: 'a', done: [today]),
+        _habit(id: 'b', done: const [], weekdays: [today.weekday % 7 + 1]),
+      ],
+      const [],
+      const [],
+    );
     expect(ledger.perfectDays, 1);
   });
 
   test('buying takes points away and survives a cold start', () async {
     final island = IslandController();
     final piece = islandPieces.firstWhere((p) => p.price == 80);
-    final ledger = IslandLedger.of([
-      _habit(id: 'a', done: [today, yesterday]),
-    ], const [], const []);
+    final ledger = IslandLedger.of(
+      [
+        _habit(id: 'a', done: [today, yesterday]),
+      ],
+      const [],
+      const [],
+    );
 
     expect(island.balanceFrom(ledger), 70);
     expect(island.canBuy(piece, ledger), isFalse);
 
-    final rich = IslandLedger.of([
-      for (var i = 0; i < 8; i++)
-        _habit(id: 'h$i', done: [today, yesterday]),
-    ], const [], const []);
+    final rich = IslandLedger.of(
+      [
+        for (var i = 0; i < 8; i++) _habit(id: 'h$i', done: [today, yesterday]),
+      ],
+      const [],
+      const [],
+    );
     expect(island.canBuy(piece, rich), isTrue);
     await island.buy(piece);
 

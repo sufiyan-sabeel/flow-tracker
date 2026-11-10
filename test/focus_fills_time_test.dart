@@ -7,19 +7,18 @@ import 'package:flow_tracker/features/habits/data/habit.dart';
 import 'support/app_harness.dart';
 
 Habit _timeHabit({double target = 60}) => testHabit(
-      id: 'study',
-      name: 'Study',
-      kind: HabitKind.quantitative,
-      perDayTarget: target,
-    ).copyWith(quantKind: QuantKind.time, unitLabel: 'min');
+  id: 'study',
+  name: 'Study',
+  kind: HabitKind.quantitative,
+  perDayTarget: target,
+).copyWith(quantKind: QuantKind.time, unitLabel: 'min');
 
 double _minutes(Habit habit) =>
     habit.completions[AppClock.now().dayKey]?.count ?? 0;
 
 Habit _addSession(Habit habit, int seconds) => habit.copyWith(
-      completions:
-          CompletionOps.addProgress(habit, AppClock.now(), seconds / 60),
-    );
+  completions: CompletionOps.addProgress(habit, AppClock.now(), seconds / 60),
+);
 
 void main() {
   group('focus filling a time habit', () {
@@ -27,8 +26,11 @@ void main() {
       expect(_timeHabit().isTimeAmount, isTrue);
       expect(testHabit(id: 'a', name: 'A').isTimeAmount, isFalse);
       expect(
-        testHabit(id: 'b', name: 'B', kind: HabitKind.quantitative)
-            .isTimeAmount,
+        testHabit(
+          id: 'b',
+          name: 'B',
+          kind: HabitKind.quantitative,
+        ).isTimeAmount,
         isFalse,
       );
     });
@@ -71,17 +73,16 @@ void main() {
 
   group('a session that crosses the day', () {
     FocusSession session(DateTime startedAt, int seconds) => FocusSession(
-          id: 'night',
-          habitId: 'study',
-          targetMinutes: seconds ~/ 60,
-          seconds: seconds,
-          completed: true,
-          startedAt: startedAt,
-        );
+      id: 'night',
+      habitId: 'study',
+      targetMinutes: seconds ~/ 60,
+      seconds: seconds,
+      completed: true,
+      startedAt: startedAt,
+    );
 
     test('splits where the day changes and keeps every second', () {
-      final pieces =
-          session(DateTime(2026, 9, 14, 21), 8 * 3600).split();
+      final pieces = session(DateTime(2026, 9, 14, 21), 8 * 3600).split();
 
       expect(pieces.length, 2);
       expect(pieces.first.startedAt, DateTime(2026, 9, 14, 21));

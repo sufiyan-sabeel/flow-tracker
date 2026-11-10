@@ -16,29 +16,28 @@ Habit _habit({
   List<int> scheduleWeekdays = const [],
   List<int> restDays = const [],
   DateTime? createdAt,
-}) =>
-    Habit(
-      id: id,
-      name: id,
-      color: const Color(0xFF00FF00),
-      order: order,
-      kind: kind,
-      interval: interval,
-      scheduleWeekdays: scheduleWeekdays,
-      restDays: restDays,
-      startMinute: start,
-      durationMinutes: duration,
-      createdAt: createdAt ?? DateTime(2026, 1, 1),
-    );
+}) => Habit(
+  id: id,
+  name: id,
+  color: const Color(0xFF00FF00),
+  order: order,
+  kind: kind,
+  interval: interval,
+  scheduleWeekdays: scheduleWeekdays,
+  restDays: restDays,
+  startMinute: start,
+  durationMinutes: duration,
+  createdAt: createdAt ?? DateTime(2026, 1, 1),
+);
 
 Todo _todo(String id, {int? minutes, int? estimate}) => Todo(
-      id: id,
-      text: id,
-      createdAt: DateTime(2026, 8, 1),
-      date: '12-08-2026',
-      minutes: minutes,
-      estimate: estimate,
-    );
+  id: id,
+  text: id,
+  createdAt: DateTime(2026, 8, 1),
+  date: '12-08-2026',
+  minutes: minutes,
+  estimate: estimate,
+);
 
 void main() {
   test('timed to-dos sit in the timeline between the habits', () {
@@ -158,8 +157,11 @@ void main() {
   });
 
   test('a habit can sit in the timeline more than once a day', () {
-    final study = _habit(id: 'study', start: 7 * 60, duration: 30)
-        .copyWith(moreTimes: [(18 * 60, 20), (12 * 60, 45)]);
+    final study = _habit(
+      id: 'study',
+      start: 7 * 60,
+      duration: 30,
+    ).copyWith(moreTimes: [(18 * 60, 20), (12 * 60, 45)]);
     final plan = DayPlan.of([study], _day);
 
     final blocks = plan.slots.where((s) => s.habit != null).toList();
@@ -172,20 +174,35 @@ void main() {
 
     final back = Habit.fromMap(study.toMap());
     expect(back.moreTimes, [(18 * 60, 20), (12 * 60, 45)]);
-    expect(Habit.fromMap(_habit(id: 'one', start: 60).toMap()).moreTimes, isEmpty);
+    expect(
+      Habit.fromMap(_habit(id: 'one', start: 60).toMap()).moreTimes,
+      isEmpty,
+    );
   });
 
   test('free time starts when a to-do was finished early', () {
     final read = _habit(id: 'read', start: 14 * 60, duration: 30);
-    final early = _todo('report', minutes: 9 * 60, estimate: 120)
-        .copyWith(doneAt: DateTime(2026, 8, 12, 10));
-    final late = _todo('late', minutes: 9 * 60, estimate: 90)
-        .copyWith(doneAt: DateTime(2026, 8, 12, 12));
-    final otherDay = _todo('old', minutes: 9 * 60, estimate: 120)
-        .copyWith(doneAt: DateTime(2026, 8, 11, 9, 30));
+    final early = _todo(
+      'report',
+      minutes: 9 * 60,
+      estimate: 120,
+    ).copyWith(doneAt: DateTime(2026, 8, 12, 10));
+    final late = _todo(
+      'late',
+      minutes: 9 * 60,
+      estimate: 90,
+    ).copyWith(doneAt: DateTime(2026, 8, 12, 12));
+    final otherDay = _todo(
+      'old',
+      minutes: 9 * 60,
+      estimate: 120,
+    ).copyWith(doneAt: DateTime(2026, 8, 11, 9, 30));
 
     expect(DayPlan.of([read], _day, todos: [early]).slots[1].minutes, 4 * 60);
     expect(DayPlan.of([read], _day, todos: [late]).slots[1].minutes, 210);
-    expect(DayPlan.of([read], _day, todos: [otherDay]).slots[1].minutes, 3 * 60);
+    expect(
+      DayPlan.of([read], _day, todos: [otherDay]).slots[1].minutes,
+      3 * 60,
+    );
   });
 }

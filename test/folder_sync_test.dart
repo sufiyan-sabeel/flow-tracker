@@ -16,11 +16,11 @@ final _monday = DateTime(2026, 3, 2);
 final _tuesday = DateTime(2026, 3, 3);
 
 Habit _run({List<DateTime> done = const []}) => testHabit(
-      id: 'run',
-      name: 'Run',
-      done: done,
-      daysOld: 400,
-    );
+  id: 'run',
+  name: 'Run',
+  done: done,
+  daysOld: 400,
+);
 
 Future<Directory> _folder() async {
   final dir = await Directory.systemTemp.createTemp('streak_sync');
@@ -56,8 +56,9 @@ Future<void> _drop(
     'settings': ?settings,
   };
   final suffix = device.isEmpty ? '' : '_$device';
-  File('${dir.path}/streak_backup_$stamp$suffix.json')
-      .writeAsStringSync(json.encode(payload));
+  File(
+    '${dir.path}/streak_backup_$stamp$suffix.json',
+  ).writeAsStringSync(json.encode(payload));
 }
 
 int _ago(Duration offset) =>
@@ -140,32 +141,44 @@ void main() {
 
     test('a broken file does not stop the older good one', () async {
       final dir = await _folder();
-      await _drop(dir, [_run()],
-          at: DateTime(2026, 3, 3, 10), stamp: '2026-03-03_10-00-00');
-      File('${dir.path}/streak_backup_2026-03-04_10-00-00.json')
-          .writeAsStringSync('{ this is not json');
+      await _drop(
+        dir,
+        [_run()],
+        at: DateTime(2026, 3, 3, 10),
+        stamp: '2026-03-03_10-00-00',
+      );
+      File(
+        '${dir.path}/streak_backup_2026-03-04_10-00-00.json',
+      ).writeAsStringSync('{ this is not json');
 
       final data = FolderSync.incoming(dir, null);
       expect(data, hasLength(1));
       expect(data.single.habits.single.id, 'run');
     });
 
-    test('a file that could not be read is tried again, even unchanged', () async {
-      final dir = await _folder();
-      await _drop(dir, [_run()],
-          at: DateTime(2026, 3, 3, 10), stamp: '2026-03-03_10-00-00');
-      final file = File('${dir.path}/streak_backup_2026-03-03_10-00-00.json');
-      final good = file.readAsStringSync();
-      final modified = file.lastModifiedSync();
+    test(
+      'a file that could not be read is tried again, even unchanged',
+      () async {
+        final dir = await _folder();
+        await _drop(
+          dir,
+          [_run()],
+          at: DateTime(2026, 3, 3, 10),
+          stamp: '2026-03-03_10-00-00',
+        );
+        final file = File('${dir.path}/streak_backup_2026-03-03_10-00-00.json');
+        final good = file.readAsStringSync();
+        final modified = file.lastModifiedSync();
 
-      file.writeAsStringSync('{ half downloaded');
-      file.setLastModifiedSync(modified);
-      expect(FolderSync.incoming(dir, null), isEmpty);
+        file.writeAsStringSync('{ half downloaded');
+        file.setLastModifiedSync(modified);
+        expect(FolderSync.incoming(dir, null), isEmpty);
 
-      file.writeAsStringSync(good);
-      file.setLastModifiedSync(modified);
-      expect(FolderSync.incoming(dir, null), hasLength(1));
-    });
+        file.writeAsStringSync(good);
+        file.setLastModifiedSync(modified);
+        expect(FolderSync.incoming(dir, null), hasLength(1));
+      },
+    );
 
     test('an empty folder is simply nothing to do', () async {
       final dir = await _folder();
@@ -178,22 +191,29 @@ void main() {
     test('the other device\'s day arrives and ours stays', () async {
       final dir = await _folder();
       await LocalStore.writeHabit(_run(done: [_tuesday]));
-      await _drop(dir, [_run(done: [_monday])], at: DateTime(2026, 3, 3, 10));
+      await _drop(dir, [
+        _run(done: [_monday]),
+      ], at: DateTime(2026, 3, 3, 10));
 
       expect(await FolderSync.pull(), 1);
 
       final after = LocalStore.readHabits()['run']!;
-      expect(after.completions.keys, containsAll([
-        _monday.dayKey,
-        _tuesday.dayKey,
-      ]));
+      expect(
+        after.completions.keys,
+        containsAll([
+          _monday.dayKey,
+          _tuesday.dayKey,
+        ]),
+      );
     });
 
     test('a habit only this device has is left alone', () async {
       final dir = await _folder();
       await LocalStore.writeHabit(_run(done: [_tuesday]));
       await LocalStore.writeHabit(testHabit(id: 'mine', name: 'Only here'));
-      await _drop(dir, [_run(done: [_monday])], at: DateTime(2026, 3, 3, 10));
+      await _drop(dir, [
+        _run(done: [_monday]),
+      ], at: DateTime(2026, 3, 3, 10));
 
       await FolderSync.pull();
 
@@ -216,7 +236,9 @@ void main() {
     test('pulling twice does not do the work twice', () async {
       final dir = await _folder();
       await LocalStore.writeHabit(_run(done: [_tuesday]));
-      await _drop(dir, [_run(done: [_monday])], at: DateTime(2026, 3, 3, 10));
+      await _drop(dir, [
+        _run(done: [_monday]),
+      ], at: DateTime(2026, 3, 3, 10));
 
       expect(await FolderSync.pull(), 1);
       expect(await FolderSync.pull(), 0);
@@ -241,23 +263,36 @@ void main() {
   });
 
   group('the newest change wins', () {
-    test('a rename here is not undone by an older copy from the other device', () async {
-      final dir = await _folder();
-      await LocalStore.writeHabit(_run(done: [_tuesday]));
-      await _drop(
-        dir,
-        [testHabit(id: 'run', name: 'Old name', done: [_monday], daysOld: 400)],
-        at: DateTime(2026, 3, 3, 10),
-        changes: {'run': _ago(const Duration(hours: 1))},
-        device: 'phone',
-      );
+    test(
+      'a rename here is not undone by an older copy from the other device',
+      () async {
+        final dir = await _folder();
+        await LocalStore.writeHabit(_run(done: [_tuesday]));
+        await _drop(
+          dir,
+          [
+            testHabit(
+              id: 'run',
+              name: 'Old name',
+              done: [_monday],
+              daysOld: 400,
+            ),
+          ],
+          at: DateTime(2026, 3, 3, 10),
+          changes: {'run': _ago(const Duration(hours: 1))},
+          device: 'phone',
+        );
 
-      await FolderSync.pull();
+        await FolderSync.pull();
 
-      final after = LocalStore.readHabits()['run']!;
-      expect(after.name, 'Run');
-      expect(after.completions.keys, containsAll([_monday.dayKey, _tuesday.dayKey]));
-    });
+        final after = LocalStore.readHabits()['run']!;
+        expect(after.name, 'Run');
+        expect(
+          after.completions.keys,
+          containsAll([_monday.dayKey, _tuesday.dayKey]),
+        );
+      },
+    );
 
     test('a newer rename from the other device arrives', () async {
       final dir = await _folder();
@@ -297,27 +332,30 @@ void main() {
   });
 
   group('several copies', () {
-    test('every new copy from the other device is read, not only the last', () async {
-      final dir = await _folder();
-      await _drop(
-        dir,
-        [testHabit(id: 'read', name: 'Read')],
-        at: DateTime(2026, 3, 3, 9),
-        stamp: '2026-03-03_09-00-00',
-        device: 'phone',
-      );
-      await _drop(
-        dir,
-        [testHabit(id: 'walk', name: 'Walk')],
-        at: DateTime(2026, 3, 3, 10),
-        stamp: '2026-03-03_10-00-00',
-        device: 'phone',
-      );
+    test(
+      'every new copy from the other device is read, not only the last',
+      () async {
+        final dir = await _folder();
+        await _drop(
+          dir,
+          [testHabit(id: 'read', name: 'Read')],
+          at: DateTime(2026, 3, 3, 9),
+          stamp: '2026-03-03_09-00-00',
+          device: 'phone',
+        );
+        await _drop(
+          dir,
+          [testHabit(id: 'walk', name: 'Walk')],
+          at: DateTime(2026, 3, 3, 10),
+          stamp: '2026-03-03_10-00-00',
+          device: 'phone',
+        );
 
-      expect(await FolderSync.pull(), 2);
+        expect(await FolderSync.pull(), 2);
 
-      expect(LocalStore.readHabits().keys, containsAll(['read', 'walk']));
-    });
+        expect(LocalStore.readHabits().keys, containsAll(['read', 'walk']));
+      },
+    );
 
     test('copies written by this device are skipped', () async {
       final dir = await _folder();
@@ -334,31 +372,41 @@ void main() {
   });
 
   group('island', () {
-    test('pieces bought on the other device arrive and are paid once', () async {
-      final dir = await _folder();
-      final ours = islandPieces[0];
-      final theirs = islandPieces[1];
-      await LocalStore.writeSetting('islandOwned', [ours.id]);
-      await LocalStore.writeSetting('islandSpent', ours.price);
-      await _drop(dir, [_run()], at: DateTime(2026, 3, 3, 10), settings: {
-        'islandOwned': [ours.id, theirs.id],
-        'islandSpent': ours.price + theirs.price,
-      });
+    test(
+      'pieces bought on the other device arrive and are paid once',
+      () async {
+        final dir = await _folder();
+        final ours = islandPieces[0];
+        final theirs = islandPieces[1];
+        await LocalStore.writeSetting('islandOwned', [ours.id]);
+        await LocalStore.writeSetting('islandSpent', ours.price);
+        await _drop(
+          dir,
+          [_run()],
+          at: DateTime(2026, 3, 3, 10),
+          settings: {
+            'islandOwned': [ours.id, theirs.id],
+            'islandSpent': ours.price + theirs.price,
+          },
+        );
 
-      expect(await FolderSync.pull(), 2);
-      expect(
-        LocalStore.setting<List<dynamic>>('islandOwned', const []),
-        unorderedEquals([ours.id, theirs.id]),
-      );
-      expect(LocalStore.setting('islandSpent', 0), ours.price + theirs.price);
-      expect(await FolderSync.pull(), 0);
-    });
+        expect(await FolderSync.pull(), 2);
+        expect(
+          LocalStore.setting<List<dynamic>>('islandOwned', const []),
+          unorderedEquals([ours.id, theirs.id]),
+        );
+        expect(LocalStore.setting('islandSpent', 0), ours.price + theirs.price);
+        expect(await FolderSync.pull(), 0);
+      },
+    );
   });
 
   group('deleting', () {
     test('a habit deleted on the other device is deleted here', () async {
       final dir = await _syncing();
-      await LocalStore.quietly(() => LocalStore.writeHabit(_run(done: [_monday])));
+      await LocalStore.quietly(
+        () => LocalStore.writeHabit(_run(done: [_monday])),
+      );
       await _drop(
         dir,
         [testHabit(id: 'walk', name: 'Walk')],
@@ -372,25 +420,30 @@ void main() {
       expect(LocalStore.readHabits().keys, ['walk']);
     });
 
-    test('a habit edited here after the other device deleted it stays', () async {
-      final dir = await _syncing();
-      await _drop(
-        dir,
-        [testHabit(id: 'walk', name: 'Walk')],
-        at: DateTime(2026, 3, 3, 10),
-        deleted: {'run': _ago(const Duration(hours: 1))},
-        device: 'phone',
-      );
-      await LocalStore.writeHabit(_run(done: [_monday]));
+    test(
+      'a habit edited here after the other device deleted it stays',
+      () async {
+        final dir = await _syncing();
+        await _drop(
+          dir,
+          [testHabit(id: 'walk', name: 'Walk')],
+          at: DateTime(2026, 3, 3, 10),
+          deleted: {'run': _ago(const Duration(hours: 1))},
+          device: 'phone',
+        );
+        await LocalStore.writeHabit(_run(done: [_monday]));
 
-      await FolderSync.pull();
+        await FolderSync.pull();
 
-      expect(LocalStore.readHabits()['run'], isNotNull);
-    });
+        expect(LocalStore.readHabits()['run'], isNotNull);
+      },
+    );
 
     test('with keep in sync off nothing is deleted', () async {
       final dir = await _folder();
-      await LocalStore.quietly(() => LocalStore.writeHabit(_run(done: [_monday])));
+      await LocalStore.quietly(
+        () => LocalStore.writeHabit(_run(done: [_monday])),
+      );
       await _drop(
         dir,
         [testHabit(id: 'walk', name: 'Walk')],
@@ -404,83 +457,106 @@ void main() {
       expect(LocalStore.readHabits()['run'], isNotNull);
     });
 
-    test('something deleted here is not brought back by an older copy', () async {
-      final dir = await _syncing();
-      await LocalStore.writeHabit(_run());
-      await LocalStore.removeHabit('run');
-      await _drop(
-        dir,
-        [_run(done: [_monday])],
-        at: DateTime(2026, 3, 3, 10),
-        changes: {'run': _ago(const Duration(hours: 1))},
-        device: 'phone',
-      );
+    test(
+      'something deleted here is not brought back by an older copy',
+      () async {
+        final dir = await _syncing();
+        await LocalStore.writeHabit(_run());
+        await LocalStore.removeHabit('run');
+        await _drop(
+          dir,
+          [
+            _run(done: [_monday]),
+          ],
+          at: DateTime(2026, 3, 3, 10),
+          changes: {'run': _ago(const Duration(hours: 1))},
+          device: 'phone',
+        );
 
-      await FolderSync.pull();
+        await FolderSync.pull();
 
-      expect(LocalStore.readHabits()['run'], isNull);
-    });
+        expect(LocalStore.readHabits()['run'], isNull);
+      },
+    );
 
-    test('with keep in sync off something deleted here stays deleted', () async {
-      final dir = await _folder();
-      await LocalStore.writeHabit(_run());
-      await LocalStore.removeHabit('run');
-      await _drop(
-        dir,
-        [_run(done: [_monday])],
-        at: DateTime(2026, 3, 3, 10),
-        changes: {'run': _ago(const Duration(hours: 1))},
-        device: 'phone',
-      );
+    test(
+      'with keep in sync off something deleted here stays deleted',
+      () async {
+        final dir = await _folder();
+        await LocalStore.writeHabit(_run());
+        await LocalStore.removeHabit('run');
+        await _drop(
+          dir,
+          [
+            _run(done: [_monday]),
+          ],
+          at: DateTime(2026, 3, 3, 10),
+          changes: {'run': _ago(const Duration(hours: 1))},
+          device: 'phone',
+        );
 
-      await FolderSync.pull();
+        await FolderSync.pull();
 
-      expect(LocalStore.readHabits()['run'], isNull);
-    });
+        expect(LocalStore.readHabits()['run'], isNull);
+      },
+    );
 
-    test('a copy from an older version does not bring it back either', () async {
-      final dir = await _syncing();
-      await LocalStore.writeHabit(_run());
-      await LocalStore.removeHabit('run');
-      await _drop(dir, [_run(done: [_monday])], at: DateTime(2026, 3, 3, 10));
+    test(
+      'a copy from an older version does not bring it back either',
+      () async {
+        final dir = await _syncing();
+        await LocalStore.writeHabit(_run());
+        await LocalStore.removeHabit('run');
+        await _drop(dir, [
+          _run(done: [_monday]),
+        ], at: DateTime(2026, 3, 3, 10));
 
-      await FolderSync.pull();
+        await FolderSync.pull();
 
-      expect(LocalStore.readHabits()['run'], isNull);
-    });
+        expect(LocalStore.readHabits()['run'], isNull);
+      },
+    );
 
-    test('something deleted here comes back if the other device edited it later', () async {
-      final dir = await _syncing();
-      await LocalStore.writeHabit(_run());
-      await LocalStore.removeHabit('run');
-      await _drop(
-        dir,
-        [testHabit(id: 'run', name: 'Morning run', daysOld: 400)],
-        at: DateTime(2026, 3, 3, 10),
-        changes: {'run': _ago(const Duration(hours: -1))},
-        device: 'phone',
-      );
+    test(
+      'something deleted here comes back if the other device edited it later',
+      () async {
+        final dir = await _syncing();
+        await LocalStore.writeHabit(_run());
+        await LocalStore.removeHabit('run');
+        await _drop(
+          dir,
+          [testHabit(id: 'run', name: 'Morning run', daysOld: 400)],
+          at: DateTime(2026, 3, 3, 10),
+          changes: {'run': _ago(const Duration(hours: -1))},
+          device: 'phone',
+        );
 
-      await FolderSync.pull();
+        await FolderSync.pull();
 
-      expect(LocalStore.readHabits()['run']!.name, 'Morning run');
-      expect(LocalStore.deletedAt('run'), isNull);
-    });
+        expect(LocalStore.readHabits()['run']!.name, 'Morning run');
+        expect(LocalStore.deletedAt('run'), isNull);
+      },
+    );
 
-    test('deleting is written down and creating it again forgets that', () async {
-      await _folder();
-      await LocalStore.writeHabit(_run());
-      await LocalStore.removeHabit('run');
-      expect(LocalStore.deletedAt('run'), isNotNull);
-      expect(LocalStore.changedAt('run'), isNull);
+    test(
+      'deleting is written down and creating it again forgets that',
+      () async {
+        await _folder();
+        await LocalStore.writeHabit(_run());
+        await LocalStore.removeHabit('run');
+        expect(LocalStore.deletedAt('run'), isNotNull);
+        expect(LocalStore.changedAt('run'), isNull);
 
-      await LocalStore.writeHabit(_run());
-      expect(LocalStore.deletedAt('run'), isNull);
-    });
+        await LocalStore.writeHabit(_run());
+        expect(LocalStore.deletedAt('run'), isNull);
+      },
+    );
 
     test('a to-do deleted on the other device is deleted here', () async {
       final dir = await _syncing();
-      await LocalStore.quietly(() => LocalStore.writeTodo(testTodo(id: 'milk', text: 'Buy milk')));
+      await LocalStore.quietly(
+        () => LocalStore.writeTodo(testTodo(id: 'milk', text: 'Buy milk')),
+      );
       await _drop(
         dir,
         [testHabit(id: 'walk', name: 'Walk')],
@@ -512,33 +588,46 @@ void main() {
   });
 
   group('more than two devices', () {
-    test('a copy that arrives late from a third device is still read', () async {
-      final dir = await _folder();
-      await _drop(dir, [testHabit(id: 'walk', name: 'Walk')],
+    test(
+      'a copy that arrives late from a third device is still read',
+      () async {
+        final dir = await _folder();
+        await _drop(
+          dir,
+          [testHabit(id: 'walk', name: 'Walk')],
           at: DateTime(2026, 3, 3, 10, 5),
           stamp: '2026-03-03_10-05-00',
-          device: 'tablet');
-      expect(await FolderSync.pull(), 1);
+          device: 'tablet',
+        );
+        expect(await FolderSync.pull(), 1);
 
-      await _drop(dir, [testHabit(id: 'read', name: 'Read')],
+        await _drop(
+          dir,
+          [testHabit(id: 'read', name: 'Read')],
           at: DateTime(2026, 3, 3, 10, 3),
           stamp: '2026-03-03_10-03-00',
-          device: 'laptop');
-      expect(await FolderSync.pull(), 1);
+          device: 'laptop',
+        );
+        expect(await FolderSync.pull(), 1);
 
-      expect(LocalStore.readHabits().keys, containsAll(['walk', 'read']));
-    });
+        expect(LocalStore.readHabits().keys, containsAll(['walk', 'read']));
+      },
+    );
   });
 
   group('missed day reasons', () {
     test('a newer reason from the other device replaces ours', () async {
       final dir = await _syncing();
-      await LocalStore.quietly(() => LocalStore.writeHabit(
-            _run().copyWith(missReasons: {_monday.dayKey: 'sick'}),
-          ));
+      await LocalStore.quietly(
+        () => LocalStore.writeHabit(
+          _run().copyWith(missReasons: {_monday.dayKey: 'sick'}),
+        ),
+      );
       await _drop(
         dir,
-        [_run().copyWith(missReasons: {_monday.dayKey: 'travelling'})],
+        [
+          _run().copyWith(missReasons: {_monday.dayKey: 'travelling'}),
+        ],
         at: DateTime(2026, 3, 3, 10),
         changes: {'run': _ago(Duration.zero)},
         device: 'phone',
@@ -546,8 +635,10 @@ void main() {
 
       await FolderSync.pull();
 
-      expect(LocalStore.readHabits()['run']!.missReasons[_monday.dayKey],
-          'travelling');
+      expect(
+        LocalStore.readHabits()['run']!.missReasons[_monday.dayKey],
+        'travelling',
+      );
     });
   });
 
@@ -558,7 +649,9 @@ void main() {
       await LocalStore.clearProgress();
       await _drop(
         dir,
-        [_run(done: [_monday, _tuesday])],
+        [
+          _run(done: [_monday, _tuesday]),
+        ],
         at: DateTime(2026, 3, 3, 10),
         device: 'phone',
       );
@@ -589,17 +682,21 @@ void main() {
   });
   group('unchecking travels', () {
     Habit steps(Set<String> done) => _run().copyWith(
-          completions: {
-            _monday.dayKey: Completion(date: _monday.dayKey, steps: done),
-          },
-        );
+      completions: {
+        _monday.dayKey: Completion(date: _monday.dayKey, steps: done),
+      },
+    );
 
     test('a step unchecked on the other device is unchecked here', () async {
       final dir = await _syncing();
-      await LocalStore.quietly(() => LocalStore.writeHabit(steps({'s1', 's2'})));
+      await LocalStore.quietly(
+        () => LocalStore.writeHabit(steps({'s1', 's2'})),
+      );
       await _drop(
         dir,
-        [steps({'s1'})],
+        [
+          steps({'s1'}),
+        ],
         at: DateTime(2026, 3, 3, 10),
         days: {'run|${_monday.dayKey}': _ago(Duration.zero)},
         device: 'phone',
@@ -607,15 +704,22 @@ void main() {
 
       await FolderSync.pull();
 
-      expect(LocalStore.readHabits()['run']!.completions[_monday.dayKey]!.steps, {'s1'});
+      expect(
+        LocalStore.readHabits()['run']!.completions[_monday.dayKey]!.steps,
+        {'s1'},
+      );
     });
 
     test('a day unchecked on the other device is unchecked here', () async {
       final dir = await _syncing();
-      await LocalStore.quietly(() => LocalStore.writeHabit(_run(done: [_monday, _tuesday])));
+      await LocalStore.quietly(
+        () => LocalStore.writeHabit(_run(done: [_monday, _tuesday])),
+      );
       await _drop(
         dir,
-        [_run(done: [_tuesday])],
+        [
+          _run(done: [_tuesday]),
+        ],
         at: DateTime(2026, 3, 3, 10),
         days: {'run|${_monday.dayKey}': _ago(Duration.zero)},
         device: 'phone',
@@ -623,39 +727,62 @@ void main() {
 
       await FolderSync.pull();
 
-      expect(LocalStore.readHabits()['run']!.completions.keys, [_tuesday.dayKey]);
+      expect(LocalStore.readHabits()['run']!.completions.keys, [
+        _tuesday.dayKey,
+      ]);
     });
 
-    test('a step checked here after the other device unchecked it stays', () async {
+    test(
+      'a step checked here after the other device unchecked it stays',
+      () async {
+        final dir = await _syncing();
+        await LocalStore.writeHabit(steps({'s1', 's2'}));
+        await _drop(
+          dir,
+          [
+            steps({'s1'}),
+          ],
+          at: DateTime(2026, 3, 3, 10),
+          days: {'run|${_monday.dayKey}': _ago(const Duration(hours: 1))},
+          device: 'phone',
+        );
+
+        await FolderSync.pull();
+
+        expect(
+          LocalStore.readHabits()['run']!.completions[_monday.dayKey]!.steps,
+          {'s1', 's2'},
+        );
+      },
+    );
+
+    test('a copy without day marks still only adds days', () async {
       final dir = await _syncing();
-      await LocalStore.writeHabit(steps({'s1', 's2'}));
+      await LocalStore.quietly(
+        () => LocalStore.writeHabit(_run(done: [_monday])),
+      );
       await _drop(
         dir,
-        [steps({'s1'})],
+        [
+          _run(done: [_tuesday]),
+        ],
         at: DateTime(2026, 3, 3, 10),
-        days: {'run|${_monday.dayKey}': _ago(const Duration(hours: 1))},
         device: 'phone',
       );
 
       await FolderSync.pull();
 
-      expect(LocalStore.readHabits()['run']!.completions[_monday.dayKey]!.steps, {'s1', 's2'});
-    });
-
-    test('a copy without day marks still only adds days', () async {
-      final dir = await _syncing();
-      await LocalStore.quietly(() => LocalStore.writeHabit(_run(done: [_monday])));
-      await _drop(dir, [_run(done: [_tuesday])], at: DateTime(2026, 3, 3, 10), device: 'phone');
-
-      await FolderSync.pull();
-
-      expect(LocalStore.readHabits()['run']!.completions.keys,
-          containsAll([_monday.dayKey, _tuesday.dayKey]));
+      expect(
+        LocalStore.readHabits()['run']!.completions.keys,
+        containsAll([_monday.dayKey, _tuesday.dayKey]),
+      );
     });
 
     test('with keep in sync off an uncheck does not travel', () async {
       final dir = await _folder();
-      await LocalStore.quietly(() => LocalStore.writeHabit(_run(done: [_monday])));
+      await LocalStore.quietly(
+        () => LocalStore.writeHabit(_run(done: [_monday])),
+      );
       await _drop(
         dir,
         [_run()],
@@ -666,12 +793,16 @@ void main() {
 
       await FolderSync.pull();
 
-      expect(LocalStore.readHabits()['run']!.completions.keys, [_monday.dayKey]);
+      expect(LocalStore.readHabits()['run']!.completions.keys, [
+        _monday.dayKey,
+      ]);
     });
 
     test('unchecking here marks that day', () async {
       await _folder();
-      await LocalStore.quietly(() => LocalStore.writeHabit(_run(done: [_monday])));
+      await LocalStore.quietly(
+        () => LocalStore.writeHabit(_run(done: [_monday])),
+      );
       await LocalStore.writeHabit(_run());
 
       expect(LocalStore.days.keys, ['run|${_monday.dayKey}']);

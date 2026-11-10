@@ -31,7 +31,10 @@ void main() {
     final done = _with(run, Uri.parse(HabitLinks.done(run)));
     final undone = _with(done, Uri.parse(HabitLinks.undo(done)));
     expect(undone.completions.containsKey(today.dayKey), isFalse);
-    expect(HabitLinks.apply(undone, Uri.parse(HabitLinks.undo(undone))), isNull);
+    expect(
+      HabitLinks.apply(undone, Uri.parse(HabitLinks.undo(undone))),
+      isNull,
+    );
   });
 
   test('add sums the amount of the link, or the habit step without one', () {
@@ -49,7 +52,10 @@ void main() {
   });
 
   test('relapse only works on habits to avoid, and adds up', () {
-    expect(HabitLinks.apply(run, Uri.parse('streak://relapse?habit=run')), isNull);
+    expect(
+      HabitLinks.apply(run, Uri.parse('streak://relapse?habit=run')),
+      isNull,
+    );
     final once = _with(smoke, Uri.parse(HabitLinks.relapse(smoke)));
     final twice = _with(once, Uri.parse(HabitLinks.relapse(once)));
     expect(twice.completions[today.dayKey]?.count, 2);
@@ -58,18 +64,32 @@ void main() {
 
   test('a past day can be marked, a future or broken one cannot', () {
     final past = today.addDays(-3);
-    final marked =
-        _with(run, Uri.parse('${HabitLinks.done(run)}&day=${_iso(past)}'));
+    final marked = _with(
+      run,
+      Uri.parse('${HabitLinks.done(run)}&day=${_iso(past)}'),
+    );
     expect(marked.isCompletedOn(past), isTrue);
     final ahead = _iso(today.addDays(2));
-    expect(HabitLinks.apply(run, Uri.parse('${HabitLinks.done(run)}&day=$ahead')), isNull);
-    expect(HabitLinks.apply(run, Uri.parse('${HabitLinks.done(run)}&day=31-10-2026')), isNull);
+    expect(
+      HabitLinks.apply(run, Uri.parse('${HabitLinks.done(run)}&day=$ahead')),
+      isNull,
+    );
+    expect(
+      HabitLinks.apply(
+        run,
+        Uri.parse('${HabitLinks.done(run)}&day=31-10-2026'),
+      ),
+      isNull,
+    );
   });
 
   test('habits that need a focus session or are archived are left alone', () {
     final focus = testHabit(id: 'read', name: 'Read', focusOnly: true);
     expect(HabitLinks.apply(focus, Uri.parse(HabitLinks.done(focus))), isNull);
     final archived = run.copyWith(archivedAt: DateTime.now());
-    expect(HabitLinks.apply(archived, Uri.parse(HabitLinks.done(archived))), isNull);
+    expect(
+      HabitLinks.apply(archived, Uri.parse(HabitLinks.done(archived))),
+      isNull,
+    );
   });
 }

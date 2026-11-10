@@ -6,11 +6,11 @@ import 'package:flow_tracker/features/habits/data/category.dart';
 import 'support/app_harness.dart';
 
 Category _category(String id, String name, {int order = 0}) => Category(
-      id: id,
-      name: name,
-      color: const Color(0xFF34C759),
-      order: order,
-    );
+  id: id,
+  name: name,
+  color: const Color(0xFF34C759),
+  order: order,
+);
 
 void main() {
   useEmptyStore();
