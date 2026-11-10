@@ -25,6 +25,7 @@ import 'package:flow_tracker/features/settings/widgets/settings_rows.dart';
 import 'package:flow_tracker/features/settings/widgets/import_apps_card.dart';
 import 'package:flow_tracker/features/settings/widgets/minimal_settings_widgets.dart';
 import 'package:flow_tracker/features/settings/widgets/color_theme_sheet.dart';
+import 'package:flow_tracker/features/settings/widgets/accent_sheet.dart';
 import 'package:flow_tracker/features/settings/widgets/settings_sheets.dart';
 import 'package:flow_tracker/features/settings/widgets/widget_style_list.dart';
 
@@ -85,7 +86,7 @@ class ClassicSettingsPage extends StatelessWidget {
                 children: [
                   NavRow(
                     icon: LucideIcons.palette,
-                    title: context.l10n.appearance,
+                    title: context.l10n.appearance_personalization,
                     subtitle: context.l10n.appearance_sub,
                     onTap: () =>
                         AppNavigator.push(const _ClassicAppearancePage()),
@@ -180,7 +181,7 @@ class _ClassicAppearancePage extends StatelessWidget {
     ];
 
     return _ClassicSection(
-      title: context.l10n.appearance,
+      title: context.l10n.appearance_personalization,
       label: context.l10n.appearance_sub,
       children: [
         SettingRow(

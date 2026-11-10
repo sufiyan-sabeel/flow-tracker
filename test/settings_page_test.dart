@@ -39,7 +39,7 @@ void main() {
 
     expect(find.byType(ClassicSettingsPage), findsOneWidget);
     expect(find.text('Settings'), findsOneWidget);
-    expect(find.text('Appearance'), findsOneWidget);
+    expect(find.text('Appearance & Personalization'), findsOneWidget);
     expect(find.text('Preferences'), findsOneWidget);
     expect(find.text('Data'), findsOneWidget);
     expect(find.text('Support'), findsOneWidget);

@@ -3,6 +3,40 @@
 All notable changes to Flow-tracker are recorded here. Versions follow
 [Semantic Versioning](https://semver.org/), and each release is tagged `vX.Y.Z`.
 
+## 1.1.0 — colour customisation
+
+### Added
+
+- **Ten accent presets** — Flow Teal, Ocean Blue, Royal Purple, Emerald Green,
+  Sunset Orange, Rose Pink, Crimson Red, Amber Gold, Slate Gray and Indigo, each
+  selectable in one tap.
+- **Custom colour picker** with a colour wheel and a hex field that accepts
+  `#RRGGBB`, `RRGGBB`, `#RGB` and `0xRRGGBB`. Invalid input is rejected with a
+  message instead of being guessed at.
+- **Live preview** in the picker: a button, a progress bar, a switch and a habit
+  card are painted in the candidate colour before it is applied. Apply saves it,
+  Cancel leaves the previous colour untouched, and Reset returns to the shipped
+  violet.
+- The accent is applied app-wide from the single theme source, so navigation,
+  buttons, progress, habit completion, charts, heatmaps, the focus timer,
+  switches and highlights all follow the choice, in light, dark and AMOLED.
+- 21 automated tests for presets, hex validation, persistence, restoration,
+  light/dark/AMOLED compatibility, contrast and app-wide propagation.
+
+### Changed
+
+- The Appearance section is now called **Appearance & Personalization**.
+- `AppTheme.adaptAccent` now keeps the accent readable instead of only guarding
+  the extremes: an accent that falls below the 3:1 contrast WCAG asks of
+  non-text elements is walked towards black (light mode) or white (dark mode)
+  until it reads. This fixes faint accents such as Amber Gold and Flow Teal on
+  light surfaces.
+
+### Fixed
+
+- The accent sheet's action row overflowed on narrow phones; Reset now sits on
+  its own line above Cancel and Apply.
+
 ## 1.0.0 — first independent release
 
 Flow-tracker starts here as its own product, forked from Streak 2.8.0 by InlitX.

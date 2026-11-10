@@ -13,8 +13,10 @@ class AppStylePage extends StatelessWidget {
       appBar: AppBar(toolbarHeight: 52),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          final width =
-              ((constraints.maxWidth - 44 - 32) / 3).clamp(80.0, 150.0);
+          final width = ((constraints.maxWidth - 44 - 32) / 3).clamp(
+            80.0,
+            150.0,
+          );
           return ListView(
             padding: context.pagePadding(22, 0, 22, 40),
             children: [

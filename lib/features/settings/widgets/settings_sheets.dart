@@ -8,8 +8,6 @@ import 'package:flow_tracker/app/theme/app_tokens.dart';
 import 'package:flow_tracker/core/i18n/l10n.dart';
 import 'package:flow_tracker/core/utils/responsive.dart';
 import 'package:flow_tracker/core/widgets/sheet_type.dart';
-import 'package:flow_tracker/services/app_icon_service.dart';
-import 'package:flow_tracker/features/habits/widgets/color_picker.dart';
 import 'package:flow_tracker/features/settings/settings_actions.dart';
 import 'package:flow_tracker/features/settings/state/settings_controller.dart';
 
@@ -24,36 +22,6 @@ Future<void> showSheet(BuildContext context, WidgetBuilder builder) {
       maxHeight: MediaQuery.sizeOf(context).height * 0.8,
     ),
     builder: builder,
-  );
-}
-
-Future<void> showAccentSheet(BuildContext context) {
-  return showSheet(
-    context,
-    (_) => SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SheetTitle(context.l10n.accent_color),
-            const SizedBox(height: 16),
-            FutureBuilder<Color?>(
-              future: AppIconService.systemAccent(),
-              builder: (_, snapshot) => Consumer<SettingsController>(
-                builder: (_, s, __) => ColorPicker(
-                  selected: s.accentColor,
-                  onSelected: s.setAccentColor,
-                  system: snapshot.data,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
   );
 }
 
@@ -257,8 +225,8 @@ class _BackgroundOption extends StatelessWidget {
     final outline = themed
         ? context.colors.outlineVariant
         : isDark
-            ? const Color(0xFF2C2C2E)
-            : const Color(0xFFD8D8E0);
+        ? const Color(0xFF2C2C2E)
+        : const Color(0xFFD8D8E0);
     final dotColor = isDark
         ? Colors.white.withValues(alpha: 0.12)
         : Colors.black.withValues(alpha: 0.1);
@@ -271,16 +239,15 @@ class _BackgroundOption extends StatelessWidget {
             AspectRatio(
               aspectRatio: 1,
               child: Container(
-                decoration: (themed
-                        ? _themed(context.colors)
-                        : _preview(isDark))
-                    .copyWith(
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: selected ? accent : outline,
-                    width: selected ? 2 : 1,
-                  ),
-                ),
+                decoration:
+                    (themed ? _themed(context.colors) : _preview(isDark))
+                        .copyWith(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: selected ? accent : outline,
+                            width: selected ? 2 : 1,
+                          ),
+                        ),
                 child: index == 2
                     ? CustomPaint(painter: _MiniDotsPainter(dotColor))
                     : null,
@@ -332,8 +299,9 @@ class _CustomBackgroundOption extends StatelessWidget {
               aspectRatio: 1,
               child: Container(
                 decoration: BoxDecoration(
-                  color:
-                      isDark ? const Color(0xFF161616) : const Color(0xFFEDEDF3),
+                  color: isDark
+                      ? const Color(0xFF161616)
+                      : const Color(0xFFEDEDF3),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: selected ? accent : outline,
@@ -348,8 +316,11 @@ class _CustomBackgroundOption extends StatelessWidget {
                 ),
                 child: hasImage
                     ? null
-                    : Icon(LucideIcons.imagePlus,
-                        size: 20, color: context.tokens.muted),
+                    : Icon(
+                        LucideIcons.imagePlus,
+                        size: 20,
+                        color: context.tokens.muted,
+                      ),
               ),
             ),
             const SizedBox(height: 6),
@@ -386,5 +357,6 @@ class _MiniDotsPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_MiniDotsPainter oldDelegate) => oldDelegate.color != color;
+  bool shouldRepaint(_MiniDotsPainter oldDelegate) =>
+      oldDelegate.color != color;
 }

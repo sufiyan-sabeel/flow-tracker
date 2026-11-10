@@ -6,6 +6,7 @@ import 'package:flow_tracker/app/theme/app_palette.dart';
 import 'package:flow_tracker/app/theme/app_tokens.dart';
 import 'package:flow_tracker/app/theme/color_themes.dart';
 import 'package:flow_tracker/core/express/express_type.dart';
+import 'package:flow_tracker/core/utils/hex_color.dart';
 import 'package:flow_tracker/core/minimal/minimal_type.dart';
 import 'package:flow_tracker/core/utils/responsive.dart';
 
@@ -93,12 +94,25 @@ class AppTheme {
         : Colors.black.withValues(alpha: 0.05),
   );
 
+  /// Keeps the accent readable against the surface it is drawn on.
+  ///
+  /// A colour that is too faint for the current mode is walked towards the ink
+  /// that reads there (black on light, white on dark) until it clears the 3:1
+  /// contrast that WCAG asks of non-text interface elements.
   static Color adaptAccent(Color accent, bool isDark) {
-    final luminance = accent.computeLuminance();
-    if (isDark && luminance < 0.06) return const Color(0xFFF2F2F2);
-    if (!isDark && luminance > 0.82) return const Color(0xFF1C1C1E);
-    return accent;
+    final surface = isDark ? AppPalette.darkSurface : const Color(0xFFFAFAFC);
+    if (contrastRatio(accent, surface) >= _minAccentContrast) return accent;
+    final ink = isDark ? Colors.white : Colors.black;
+    for (var step = 1; step <= 9; step++) {
+      final candidate = Color.lerp(accent, ink, step / 10)!;
+      if (contrastRatio(candidate, surface) >= _minAccentContrast) {
+        return candidate;
+      }
+    }
+    return ink;
   }
+
+  static const _minAccentContrast = 3.0;
 
   static SystemUiOverlayStyle systemBars(Brightness brightness) {
     final icons = brightness == Brightness.dark

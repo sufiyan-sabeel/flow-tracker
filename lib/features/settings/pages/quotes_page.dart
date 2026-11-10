@@ -20,11 +20,11 @@ class QuotesPage extends StatelessWidget {
   const QuotesPage({super.key});
 
   List<String> _sourceLabels(BuildContext context) => [
-        context.l10n.quotes_app,
-        context.l10n.quotes_mine,
-        context.l10n.quotes_both,
-        context.l10n.quotes_off,
-      ];
+    context.l10n.quotes_app,
+    context.l10n.quotes_mine,
+    context.l10n.quotes_both,
+    context.l10n.quotes_off,
+  ];
 
   Future<void> _add(BuildContext context) async {
     final text = await _askQuote(context, title: context.l10n.quotes_add);
@@ -46,11 +46,10 @@ class QuotesPage extends StatelessWidget {
     BuildContext context, {
     required String title,
     String initial = '',
-  }) =>
-      showDialog<String>(
-        context: context,
-        builder: (_) => _QuoteDialog(title: title, initial: initial),
-      );
+  }) => showDialog<String>(
+    context: context,
+    builder: (_) => _QuoteDialog(title: title, initial: initial),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -87,42 +86,42 @@ class QuotesPage extends StatelessWidget {
         express,
         minimal,
         ListView(
-        padding: context.pagePadding(16, 12, 16, 96),
-        children: [
-          Card(
-            child: NavRow(
-              icon: LucideIcons.sparkles,
-              title: context.l10n.quotes_which,
-              subtitle: _sourceLabels(context)[settings.quoteSource],
-              onTap: () => showOptionSheet(
-                context,
+          padding: context.pagePadding(16, 12, 16, 96),
+          children: [
+            Card(
+              child: NavRow(
+                icon: LucideIcons.sparkles,
                 title: context.l10n.quotes_which,
-                options: _sourceLabels(context),
-                index: settings.quoteSource,
-                onSelected: settings.setQuoteSource,
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          SectionLabel(context.l10n.quotes_my_list),
-          if (quotes.isEmpty)
-            AppEmptyState(
-              icon: LucideIcons.quote,
-              title: context.l10n.quotes_empty,
-              message: context.l10n.quotes_empty_sub,
-            )
-          else
-            for (var i = 0; i < quotes.length; i++)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: _QuoteTile(
-                  text: quotes[i],
-                  onEdit: () => _edit(context, i, quotes[i]),
-                  onDelete: () =>
-                      context.read<SettingsController>().removeCustomQuote(i),
+                subtitle: _sourceLabels(context)[settings.quoteSource],
+                onTap: () => showOptionSheet(
+                  context,
+                  title: context.l10n.quotes_which,
+                  options: _sourceLabels(context),
+                  index: settings.quoteSource,
+                  onSelected: settings.setQuoteSource,
                 ),
               ),
-        ],
+            ),
+            const SizedBox(height: 24),
+            SectionLabel(context.l10n.quotes_my_list),
+            if (quotes.isEmpty)
+              AppEmptyState(
+                icon: LucideIcons.quote,
+                title: context.l10n.quotes_empty,
+                message: context.l10n.quotes_empty_sub,
+              )
+            else
+              for (var i = 0; i < quotes.length; i++)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: _QuoteTile(
+                    text: quotes[i],
+                    onEdit: () => _edit(context, i, quotes[i]),
+                    onDelete: () =>
+                        context.read<SettingsController>().removeCustomQuote(i),
+                  ),
+                ),
+          ],
         ),
       ),
     );
@@ -213,8 +212,9 @@ class _QuoteDialog extends StatefulWidget {
 }
 
 class _QuoteDialogState extends State<_QuoteDialog> {
-  late final TextEditingController _controller =
-      TextEditingController(text: widget.initial);
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.initial,
+  );
 
   @override
   void dispose() {

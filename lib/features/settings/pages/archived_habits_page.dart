@@ -50,46 +50,51 @@ class ArchivedHabitsPage extends StatelessWidget {
     final express = style.isExpressStyle;
     final minimal = style.isMinimalStyle;
     final body = archived.isEmpty
-          ? AppEmptyState(
-              icon: LucideIcons.archive,
-              title: context.l10n.archived_empty,
-              message: context.l10n.archived_empty_sub,
-            )
-          : ListView.separated(
-              padding: context.pagePadding(16, 12, 16, 28),
-              itemCount: archived.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 10),
-              itemBuilder: (_, index) {
-                final habit = archived[index];
-                return Container(
-                  padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
-                  decoration: BoxDecoration(
-                    color: express
-                        ? expressSurface(context)
-                        : context.colors.surfaceContainerHighest
-                              .withValues(alpha: 0.6),
-                    borderRadius: BorderRadius.circular(express ? 24 : 18),
-                    border: express ? expressHairline(context) : null,
-                  ),
-                  child: Row(
-                    children: [
-                      if (express)
-                        ExpressBlob(
-                          size: 42,
-                          color: habit.color.shownIn(context).withValues(alpha: 0.16),
-                          shape: ExpressShape.squircle,
-                          child: HabitGlyph(
-                            glyph: habit.icon,
-                            color: habit.color.shownIn(context),
-                            size: 19,
-                          ),
-                        )
-                      else
-                        Container(
+        ? AppEmptyState(
+            icon: LucideIcons.archive,
+            title: context.l10n.archived_empty,
+            message: context.l10n.archived_empty_sub,
+          )
+        : ListView.separated(
+            padding: context.pagePadding(16, 12, 16, 28),
+            itemCount: archived.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 10),
+            itemBuilder: (_, index) {
+              final habit = archived[index];
+              return Container(
+                padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
+                decoration: BoxDecoration(
+                  color: express
+                      ? expressSurface(context)
+                      : context.colors.surfaceContainerHighest.withValues(
+                          alpha: 0.6,
+                        ),
+                  borderRadius: BorderRadius.circular(express ? 24 : 18),
+                  border: express ? expressHairline(context) : null,
+                ),
+                child: Row(
+                  children: [
+                    if (express)
+                      ExpressBlob(
+                        size: 42,
+                        color: habit.color
+                            .shownIn(context)
+                            .withValues(alpha: 0.16),
+                        shape: ExpressShape.squircle,
+                        child: HabitGlyph(
+                          glyph: habit.icon,
+                          color: habit.color.shownIn(context),
+                          size: 19,
+                        ),
+                      )
+                    else
+                      Container(
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: habit.color.shownIn(context).withValues(alpha: 0.16),
+                          color: habit.color
+                              .shownIn(context)
+                              .withValues(alpha: 0.16),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: HabitGlyph(
@@ -98,70 +103,70 @@ class ArchivedHabitsPage extends StatelessWidget {
                           size: 19,
                         ),
                       ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              habit.name,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: express
-                                  ? ExpressType.headline.at(
-                                      15.5,
-                                      weight: 800,
-                                      color: context.colors.onSurface,
-                                    )
-                                  : TextStyle(
-                                      fontSize: 15.5,
-                                      fontWeight: FontWeight.w700,
-                                      color: context.colors.onSurface,
-                                    ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              DateFormat.yMMMd(locale).format(habit.archivedAt!),
-                              style: express
-                                  ? ExpressType.body.at(
-                                      12.5,
-                                      weight: 600,
-                                      color: context.tokens.muted,
-                                    )
-                                  : TextStyle(
-                                      fontSize: 12.5,
-                                      color: context.tokens.muted,
-                                    ),
-                            ),
-                          ],
-                        ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            habit.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: express
+                                ? ExpressType.headline.at(
+                                    15.5,
+                                    weight: 800,
+                                    color: context.colors.onSurface,
+                                  )
+                                : TextStyle(
+                                    fontSize: 15.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: context.colors.onSurface,
+                                  ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            DateFormat.yMMMd(locale).format(habit.archivedAt!),
+                            style: express
+                                ? ExpressType.body.at(
+                                    12.5,
+                                    weight: 600,
+                                    color: context.tokens.muted,
+                                  )
+                                : TextStyle(
+                                    fontSize: 12.5,
+                                    color: context.tokens.muted,
+                                  ),
+                          ),
+                        ],
                       ),
-                      IconButton(
-                        tooltip: context.l10n.restore,
-                        icon: Icon(
-                          LucideIcons.rotateCcw,
-                          size: 19,
-                          color: context.colors.primary,
-                        ),
-                        onPressed: () {
-                          context.read<HabitsController>().restore(habit.id);
-                          AppSnackbar.success(context, context.l10n.restored);
-                        },
+                    ),
+                    IconButton(
+                      tooltip: context.l10n.restore,
+                      icon: Icon(
+                        LucideIcons.rotateCcw,
+                        size: 19,
+                        color: context.colors.primary,
                       ),
-                      IconButton(
-                        tooltip: context.l10n.delete_forever,
-                        icon: Icon(
-                          LucideIcons.trash2,
-                          size: 19,
-                          color: context.tokens.danger,
-                        ),
-                        onPressed: () => _deleteForever(context, habit),
+                      onPressed: () {
+                        context.read<HabitsController>().restore(habit.id);
+                        AppSnackbar.success(context, context.l10n.restored);
+                      },
+                    ),
+                    IconButton(
+                      tooltip: context.l10n.delete_forever,
+                      icon: Icon(
+                        LucideIcons.trash2,
+                        size: 19,
+                        color: context.tokens.danger,
                       ),
-                    ],
-                  ),
-                );
-              },
-            );
+                      onPressed: () => _deleteForever(context, habit),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
 
     return Scaffold(
       appBar: express

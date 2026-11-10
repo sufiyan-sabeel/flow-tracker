@@ -2192,5 +2192,14 @@
   "todo_sort_time": "By date and time",
   "todo_sort_name": "A to Z",
   "amoled": "True black",
-  "amoled_sub": "Pure black background in dark mode, for AMOLED screens"
+  "amoled_sub": "Pure black background in dark mode, for AMOLED screens",
+  "appearance_personalization": "Appearance & Personalization",
+  "color_presets": "Presets",
+  "hex_code": "Hex code",
+  "invalid_hex": "Use a hex colour such as #14B8A6",
+  "reset_color": "Reset",
+  "apply": "Apply",
+  "preview": "Preview",
+  "sample_button": "Sample",
+  "sample_habit": "Sample habit"
 }

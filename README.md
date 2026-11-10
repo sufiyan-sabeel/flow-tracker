@@ -60,12 +60,16 @@ the same app rather than a stranger wearing its clothes.
 - Widgets for today, stats, the heatmap, focus, to-dos and a focus board
 - Configurable background, opacity, border and card style
 
-**Making it yours**
+**Making it yours** — Settings → Appearance & Personalization
 
 - Three interface styles (classic, minimal, express) over the same data
-- Light, dark and system themes
-- A true-black AMOLED mode for dark themes
-- Colour themes, custom accent colours and a full custom palette
+- Light, dark, system and true-black AMOLED themes
+- Ten accent presets: Flow Teal, Ocean Blue, Royal Purple, Emerald Green,
+  Sunset Orange, Rose Pink, Crimson Red, Amber Gold, Slate Gray, Indigo
+- Any other colour through a colour wheel or a typed hex code, with a live
+  preview of buttons, progress, switches and a habit card before you commit
+- Reset to the shipped colour in one tap
+- Full colour themes and a custom per-surface palette for people who want more
 - 28 languages, adjustable text size, and animation controls
 
 **Your data**
@@ -136,7 +140,7 @@ lib/
   services/     notifications, backup, import/export, widgets, folder sync
   l10n/         ARB sources and generated localisations
 android/        Flutter Android host, Kotlin/Glance home-screen widgets
-test/           68 test files covering logic, widgets and storage
+test/           70 test files covering logic, widgets and storage
 ```
 
 - **State**: `provider` with `ChangeNotifier` controllers per feature.

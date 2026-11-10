@@ -29,6 +29,7 @@ import 'package:flow_tracker/features/settings/state/settings_controller.dart';
 import 'package:flow_tracker/features/settings/widgets/import_apps_card.dart';
 import 'package:flow_tracker/features/settings/widgets/minimal_settings_widgets.dart';
 import 'package:flow_tracker/features/settings/widgets/color_theme_sheet.dart';
+import 'package:flow_tracker/features/settings/widgets/accent_sheet.dart';
 import 'package:flow_tracker/features/settings/widgets/settings_sheets.dart';
 import 'package:flow_tracker/features/settings/widgets/widget_style_list.dart';
 
@@ -65,7 +66,7 @@ class ExpressSettingsPage extends StatelessWidget {
           children: [
             ExpressTile(
               icon: LucideIcons.palette,
-              title: context.l10n.appearance,
+              title: context.l10n.appearance_personalization,
               subtitle: context.l10n.appearance_sub,
               onTap: () => AppNavigator.push(const _AppearancePage()),
             ),
@@ -89,55 +90,57 @@ class ExpressSettingsPage extends StatelessWidget {
             ),
           ],
         ),
-      if (!listed) IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              child: _SectionTile(
-                icon: LucideIcons.palette,
-                title: context.l10n.appearance,
-                subtitle: context.l10n.appearance_sub,
-                onTap: () => AppNavigator.push(const _AppearancePage()),
+      if (!listed)
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: _SectionTile(
+                  icon: LucideIcons.palette,
+                  title: context.l10n.appearance_personalization,
+                  subtitle: context.l10n.appearance_sub,
+                  onTap: () => AppNavigator.push(const _AppearancePage()),
+                ),
               ),
-            ),
-            const SizedBox(width: Express.groupGap),
-            Expanded(
-              child: _SectionTile(
-                icon: LucideIcons.slidersHorizontal,
-                title: context.l10n.preferences,
-                subtitle: context.l10n.preferences_sub,
-                onTap: () => AppNavigator.push(const _PreferencesPage()),
+              const SizedBox(width: Express.groupGap),
+              Expanded(
+                child: _SectionTile(
+                  icon: LucideIcons.slidersHorizontal,
+                  title: context.l10n.preferences,
+                  subtitle: context.l10n.preferences_sub,
+                  onTap: () => AppNavigator.push(const _PreferencesPage()),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
       if (!listed) const SizedBox(height: Express.groupGap),
-      if (!listed) IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              child: _SectionTile(
-                icon: LucideIcons.database,
-                title: context.l10n.data,
-                subtitle: context.l10n.data_sub,
-                onTap: () => AppNavigator.push(const _DataPage()),
+      if (!listed)
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: _SectionTile(
+                  icon: LucideIcons.database,
+                  title: context.l10n.data,
+                  subtitle: context.l10n.data_sub,
+                  onTap: () => AppNavigator.push(const _DataPage()),
+                ),
               ),
-            ),
-            const SizedBox(width: Express.groupGap),
-            Expanded(
-              child: _SectionTile(
-                icon: LucideIcons.heartHandshake,
-                title: context.l10n.support,
-                subtitle: context.l10n.support_sub,
-                onTap: () => AppNavigator.push(const _SupportPage()),
+              const SizedBox(width: Express.groupGap),
+              Expanded(
+                child: _SectionTile(
+                  icon: LucideIcons.heartHandshake,
+                  title: context.l10n.support,
+                  subtitle: context.l10n.support_sub,
+                  onTap: () => AppNavigator.push(const _SupportPage()),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
       const SizedBox(height: 22),
       ExpressGroup(
         children: [
@@ -240,7 +243,7 @@ class _AppearancePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ExpressScaffold(
-    title: context.l10n.appearance,
+    title: context.l10n.appearance_personalization,
     subtitle: context.l10n.appearance_sub,
     children: _appearanceTiles(context),
   );
@@ -437,17 +440,17 @@ List<Widget> _appearanceTiles(BuildContext context) {
           onTap: () => showColorThemeSheet(context),
         ),
         if (settings.colorTheme == null)
-        ExpressTile(
-          icon: LucideIcons.palette,
-          title: context.l10n.accent_color,
-          subtitle: context.l10n.accent_color_sub,
-          trailing: ExpressBlob(
-            size: 26,
-            color: settings.accentColor,
-            shape: ExpressShape.cookie,
+          ExpressTile(
+            icon: LucideIcons.palette,
+            title: context.l10n.accent_color,
+            subtitle: context.l10n.accent_color_sub,
+            trailing: ExpressBlob(
+              size: 26,
+              color: settings.accentColor,
+              shape: ExpressShape.cookie,
+            ),
+            onTap: () => showAccentSheet(context),
           ),
-          onTap: () => showAccentSheet(context),
-        ),
         ExpressTile(
           icon: LucideIcons.image,
           title: context.l10n.app_background,
@@ -579,7 +582,7 @@ List<Widget> _preferenceTiles(BuildContext context) {
             options: weekDays,
             index: weekIndex,
             onSelected: (i) => SettingsActions.setWeekStart(
-                context,
+              context,
               switch (i) {
                 1 => 6,
                 2 => 7,
@@ -759,8 +762,9 @@ List<Widget> _preferenceTiles(BuildContext context) {
             icon: LucideIcons.stickyNote,
             title: context.l10n.todo_style,
             subtitle: context.l10n.todo_style_sub,
-            value: SettingsActions.todoStyles(context)[
-                settings.todoPapers ? 1 : 0],
+            value: SettingsActions.todoStyles(
+              context,
+            )[settings.todoPapers ? 1 : 0],
             onTap: () => SettingsActions.pickTodoStyle(context),
           ),
         _Toggle(
