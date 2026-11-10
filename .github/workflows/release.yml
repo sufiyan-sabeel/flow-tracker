@@ -290,13 +290,40 @@ jobs:
       - name: Build MSI installer
         run: |
           $version = "${{ needs.validate.outputs.version }}"
-          $src = "$PWD\build\windows\x64\runner\Release"
+          $src = Join-Path $PWD 'build\windows\x64\runner\Release'
+          if (-not (Test-Path $src)) { Write-Error "no release folder at $src"; exit 1 }
           New-Item -ItemType Directory -Force -Path out, msi | Out-Null
-          # no -var: heat writes absolute source paths, which is exactly what we
-          # want for a one-shot build and avoids a preprocessor round trip
-          heat dir "$src" -cg AppFiles -dr INSTALLDIR -gg -scom -sreg -sfrag -srd `
-            -out msi\files.wxs
-          @"
+
+          # WiX source is generated here rather than harvested with heat: heat's
+          # output depends on how the path is passed and kept producing sources
+          # light could not resolve. This walks the release folder itself.
+          $script:counter = 0
+          $script:ids = @()
+          function New-DirXml {
+            param([string]$Path, [string]$Id, [int]$Depth)
+            $pad = ' ' * ($Depth * 2)
+            $sb = New-Object System.Text.StringBuilder
+            [void]$sb.AppendLine("$pad<Directory Id=`"$Id`" Name=`"$(Split-Path $Path -Leaf)`">")
+            foreach ($f in Get-ChildItem -Path $Path -File) {
+              $script:counter++
+              $cid = "c$($script:counter)"
+              $script:ids += $cid
+              [void]$sb.AppendLine("$pad  <Component Id=`"$cid`" Guid=`"*`">")
+              [void]$sb.AppendLine("$pad    <File Id=`"f$($script:counter)`" Source=`"$($f.FullName)`" KeyPath=`"yes`" />")
+              [void]$sb.AppendLine("$pad  </Component>")
+            }
+            $i = 0
+            foreach ($d in Get-ChildItem -Path $Path -Directory) {
+              $i++
+              [void]$sb.Append((New-DirXml -Path $d.FullName -Id "${Id}_$i" -Depth ($Depth + 1)))
+            }
+            [void]$sb.AppendLine("$pad</Directory>")
+            return $sb.ToString()
+          }
+
+          $tree = New-DirXml -Path $src -Id 'INSTALLDIR' -Depth 6
+          $refs = ($script:ids | ForEach-Object { "      <ComponentRef Id=`"$_`" />" }) -join "`n"
+          $wxs = @"
           <?xml version="1.0" encoding="UTF-8"?>
           <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
             <Product Id="*" Name="Flow-tracker" Language="1033" Version="$version"
@@ -306,14 +333,14 @@ jobs:
               <MediaTemplate EmbedCab="yes" />
               <Directory Id="TARGETDIR" Name="SourceDir">
                 <Directory Id="ProgramFiles64Folder">
-                  <Directory Id="INSTALLDIR" Name="Flow-tracker" />
+          $tree
                 </Directory>
                 <Directory Id="ProgramMenuFolder">
                   <Directory Id="AppShortcutDir" Name="Flow-tracker" />
                 </Directory>
               </Directory>
               <Feature Id="Main" Title="Flow-tracker" Level="1">
-                <ComponentGroupRef Id="AppFiles" />
+          $refs
                 <ComponentRef Id="ApplicationShortcut" />
               </Feature>
               <DirectoryRef Id="AppShortcutDir">
@@ -327,10 +354,10 @@ jobs:
               </DirectoryRef>
             </Product>
           </Wix>
-          "@ | Set-Content -Encoding UTF8 msi\product.wxs
+          "@
+          Set-Content -Encoding UTF8 msi\product.wxs $wxs
           candle -arch x64 -out msi\product.wixobj msi\product.wxs
-          candle -arch x64 -out msi\files.wixobj msi\files.wxs
-          light -ext WixUIExtension -out "out\Flow-Tracker-$version-Windows-x64.msi" msi\product.wixobj msi\files.wixobj
+          light -out "out\Flow-Tracker-$version-Windows-x64.msi" msi\product.wixobj
 
       - name: Verify installers
         run: |
@@ -418,7 +445,10 @@ jobs:
            Flow-tracker keeps habits, to-dos and focus sessions on your device and
            exports PDF reports without any account or network connection.
           EOF
-          dpkg-deb --build --root-owner-group "$root" "out/Flow-Tracker-${version}-Linux-amd64.deb"
+          # gzip rather than the default xz: the xz pipe fails on this runner
+          # with "tar: stdout: write error" before the package is finished
+          dpkg-deb -Zgzip --build --root-owner-group "$root" \
+            "out/Flow-Tracker-${version}-Linux-amd64.deb"
           dpkg-deb --info "out/Flow-Tracker-${version}-Linux-amd64.deb" | head -20
           dpkg-deb --contents "out/Flow-Tracker-${version}-Linux-amd64.deb" | grep -q 'opt/flow-tracker/flow-tracker' \
             || { echo "::error::DEB is missing the app binary"; exit 1; }
