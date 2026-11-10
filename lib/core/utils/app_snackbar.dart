@@ -17,15 +17,14 @@ class AppSnackbar {
     required String label,
     required VoidCallback onPressed,
     Duration? duration,
-  }) =>
-      _show(
-        context,
-        message,
-        _Kind.info,
-        label: label,
-        onPressed: onPressed,
-        duration: duration,
-      );
+  }) => _show(
+    context,
+    message,
+    _Kind.info,
+    label: label,
+    onPressed: onPressed,
+    duration: duration,
+  );
 
   static void error(BuildContext context, String message) =>
       _show(context, message, _Kind.error);
@@ -66,20 +65,20 @@ class AppSnackbar {
               }
             },
             child: Row(
-            children: [
-              Icon(icon, color: Colors.white, size: 20),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  message,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
+              children: [
+                Icon(icon, color: Colors.white, size: 20),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    message,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
           ),
           backgroundColor: color,
           behavior: SnackBarBehavior.floating,
@@ -88,7 +87,8 @@ class AppSnackbar {
           ),
           width: wide ? paneWidth : null,
           margin: wide ? null : const EdgeInsets.all(16),
-          duration: duration ?? Duration(milliseconds: label == null ? 3000 : 2500),
+          duration:
+              duration ?? Duration(milliseconds: label == null ? 3000 : 2500),
           persist: false,
           action: label == null
               ? null

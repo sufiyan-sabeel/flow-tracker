@@ -3,7 +3,18 @@ import 'dart:ui';
 import 'package:flow_tracker/l10n/app_localizations.dart';
 
 const shippedLanguages = {
-  'ca', 'de', 'en', 'es', 'fr', 'ko', 'pt', 'ro', 'ru', 'tr', 'uk', 'zh',
+  'ca',
+  'de',
+  'en',
+  'es',
+  'fr',
+  'ko',
+  'pt',
+  'ro',
+  'ru',
+  'tr',
+  'uk',
+  'zh',
 };
 
 List<Locale> get shippedLocales => AppLocalizations.supportedLocales

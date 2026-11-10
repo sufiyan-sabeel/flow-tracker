@@ -201,15 +201,16 @@ class ExpressTile extends StatelessWidget {
         padding: EdgeInsets.fromLTRB(16, dense ? 14 : 18, 20, dense ? 14 : 18),
         child: Row(
           children: [
-            if (!bare) Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: accent.withValues(alpha: 0.16),
-                shape: BoxShape.circle,
+            if (!bare)
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: 0.16),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, size: 19, color: accent),
               ),
-              child: Icon(icon, size: 19, color: accent),
-            ),
             if (!bare) const SizedBox(width: 14),
             Expanded(
               child: Column(

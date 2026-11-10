@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum Shared {
-  static let group = "group.com.streak.app"
+  static let group = "group.com.flowtracker.app"
   static let habitsKey = "habits_data"
   static let todosKey = "todos_data"
   static let stringsKey = "widget_strings"

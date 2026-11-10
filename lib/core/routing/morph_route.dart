@@ -39,8 +39,7 @@ class MorphRoute<T> extends PageRoute<T> {
     BuildContext context,
     Animation<double> animation,
     Animation<double> secondaryAnimation,
-  ) =>
-      AppBackground(child: page);
+  ) => AppBackground(child: page);
 
   static double _span(double t, double from, double to) =>
       ((t - from) / (to - from)).clamp(0.0, 1.0);
@@ -130,6 +129,5 @@ class _RectClip extends CustomClipper<RRect> {
       RRect.fromRectAndRadius(rect, Radius.circular(radius));
 
   @override
-  bool shouldReclip(_RectClip old) =>
-      old.rect != rect || old.radius != radius;
+  bool shouldReclip(_RectClip old) => old.rect != rect || old.radius != radius;
 }

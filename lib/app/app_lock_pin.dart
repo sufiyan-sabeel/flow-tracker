@@ -72,7 +72,10 @@ class AppLockPin {
     final salt = base64Url.encode(
       List<int>.generate(16, (_) => random.nextInt(256)),
     );
-    final code = List.generate(recoveryLength, (_) => random.nextInt(10)).join();
+    final code = List.generate(
+      recoveryLength,
+      (_) => random.nextInt(10),
+    ).join();
     await LocalStore.writeSetting(_saltKey, salt);
     await LocalStore.writeSetting(_pinKey, _hash(pin, salt: salt));
     await LocalStore.writeSetting(_lengthKey, pin.length);

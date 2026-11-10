@@ -63,21 +63,24 @@ Future<bool?> showAppConfirmDialog(
                 builder: (context, box) {
                   final cancelText = cancelLabel ?? dialogContext.l10n.cancel;
                   double wide(String text) => (TextPainter(
-                        text: TextSpan(
-                          text: text,
-                          style: sheetActionStyle(dialogContext),
-                        ),
-                        maxLines: 1,
-                        textDirection: Directionality.of(dialogContext),
-                        textScaler: MediaQuery.textScalerOf(dialogContext),
-                      )..layout())
-                          .width;
-                  final stacked = wide(cancelText) > (box.maxWidth - 12) / 2 - 24 ||
+                    text: TextSpan(
+                      text: text,
+                      style: sheetActionStyle(dialogContext),
+                    ),
+                    maxLines: 1,
+                    textDirection: Directionality.of(dialogContext),
+                    textScaler: MediaQuery.textScalerOf(dialogContext),
+                  )..layout()).width;
+                  final stacked =
+                      wide(cancelText) > (box.maxWidth - 12) / 2 - 24 ||
                       wide(confirmLabel) > (box.maxWidth - 12) / 2 - 24;
                   final cancel = TextButton(
                     onPressed: () => Navigator.of(dialogContext).pop(false),
                     style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 14,
+                      ),
                       backgroundColor: scheme.surfaceContainerHighest,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
@@ -97,7 +100,10 @@ Future<bool?> showAppConfirmDialog(
                     style: FilledButton.styleFrom(
                       backgroundColor: accent,
                       foregroundColor: accent.ink,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 14,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),

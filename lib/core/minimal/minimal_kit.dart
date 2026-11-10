@@ -14,8 +14,7 @@ Widget minimalBody({required String title, required Widget child}) => Column(
   ],
 );
 
-Color minimalSurface(BuildContext context) =>
-    context.colors.surfaceContainer;
+Color minimalSurface(BuildContext context) => context.colors.surfaceContainer;
 
 Color minimalRaised(BuildContext context) =>
     context.colors.surfaceContainerHighest;
@@ -632,13 +631,13 @@ class MinimalSegmented extends StatelessWidget {
                       child: AnimatedDefaultTextStyle(
                         duration: const Duration(milliseconds: 200),
                         style: DefaultTextStyle.of(context).style.merge(
-                              MinimalType.label(
-                                size: 13,
-                                color: i == index
-                                    ? scheme.surface
-                                    : context.tokens.muted,
-                              ),
-                            ),
+                          MinimalType.label(
+                            size: 13,
+                            color: i == index
+                                ? scheme.surface
+                                : context.tokens.muted,
+                          ),
+                        ),
                         child: Text(
                           options[i],
                           maxLines: 1,

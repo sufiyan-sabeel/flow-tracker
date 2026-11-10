@@ -161,7 +161,12 @@ class ExpressNavRail extends StatelessWidget {
       child: SafeArea(
         right: false,
         child: Padding(
-          padding: EdgeInsets.fromLTRB(compact ? 12 : 16, 24, compact ? 12 : 16, 18),
+          padding: EdgeInsets.fromLTRB(
+            compact ? 12 : 16,
+            24,
+            compact ? 12 : 16,
+            18,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -222,57 +227,61 @@ class _RailPillState extends State<_RailPill> {
         onEnter: (_) => setState(() => _hover = true),
         onExit: (_) => setState(() => _hover = false),
         child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {
-          widget.onTap();
-        },
-        child: AnimatedContainer(
-          duration: Express.normal,
-          curve: Express.bouncy,
-          padding: EdgeInsets.all(widget.compact ? 8 : 12),
-          decoration: BoxDecoration(
-            color: selected
-                ? scheme.primary
-                : scheme.primary.withValues(alpha: _hover ? 0.16 : 0.06),
-            borderRadius: BorderRadius.circular(selected ? 24 : 14),
-          ),
-          child: Tooltip(
-            message: widget.compact ? item.label : '',
-            child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AnimatedContainer(
-                duration: Express.normal,
-                curve: Express.bouncy,
-                width: 30,
-                height: 30,
-                decoration: ShapeDecoration(
-                  color: selected
-                      ? Colors.white.withValues(alpha: 0.22)
-                      : Colors.transparent,
-                  shape: ExpressBorder(
-                    shape: selected
-                        ? ExpressShape.cookie
-                        : ExpressShape.squircle,
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            widget.onTap();
+          },
+          child: AnimatedContainer(
+            duration: Express.normal,
+            curve: Express.bouncy,
+            padding: EdgeInsets.all(widget.compact ? 8 : 12),
+            decoration: BoxDecoration(
+              color: selected
+                  ? scheme.primary
+                  : scheme.primary.withValues(alpha: _hover ? 0.16 : 0.06),
+              borderRadius: BorderRadius.circular(selected ? 24 : 14),
+            ),
+            child: Tooltip(
+              message: widget.compact ? item.label : '',
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AnimatedContainer(
+                    duration: Express.normal,
+                    curve: Express.bouncy,
+                    width: 30,
+                    height: 30,
+                    decoration: ShapeDecoration(
+                      color: selected
+                          ? Colors.white.withValues(alpha: 0.22)
+                          : Colors.transparent,
+                      shape: ExpressBorder(
+                        shape: selected
+                            ? ExpressShape.cookie
+                            : ExpressShape.squircle,
+                      ),
+                    ),
+                    child: Icon(item.icon, size: 17, color: tint),
                   ),
-                ),
-                child: Icon(item.icon, size: 17, color: tint),
+                  if (!widget.compact) ...[
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        item.label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: ExpressType.headline.at(
+                          14,
+                          weight: 800,
+                          color: tint,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
               ),
-              if (!widget.compact) ...[
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    item.label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: ExpressType.headline.at(14, weight: 800, color: tint),
-                  ),
-                ),
-              ],
-            ],
+            ),
           ),
-          ),
-        ),
         ),
       ),
     );

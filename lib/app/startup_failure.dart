@@ -24,7 +24,11 @@ class StartupFailure extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.error_outline, color: Colors.white70, size: 48),
+                const Icon(
+                  Icons.error_outline,
+                  color: Colors.white70,
+                  size: 48,
+                ),
                 const SizedBox(height: 16),
                 Text(
                   blocked
@@ -41,12 +45,12 @@ class StartupFailure extends StatelessWidget {
                 Text(
                   blocked
                       ? 'Nothing has been lost. This is usually Controlled folder '
-                          'access. Open Windows Security > Virus & threat '
-                          'protection > Manage ransomware protection > Allow an app '
-                          'through Controlled folder access, add Streak.exe and '
-                          'open Streak again.'
+                            'access. Open Windows Security > Virus & threat '
+                            'protection > Manage ransomware protection > Allow an app '
+                            'through Controlled folder access, add Streak.exe and '
+                            'open Streak again.'
                       : 'Nothing has been lost. Please send this message to '
-                          'github.com/sufiyan-sabeel/flow-tracker/issues so it can be fixed.',
+                            'github.com/sufiyan-sabeel/flow-tracker/issues so it can be fixed.',
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: Colors.white70, fontSize: 14),
                 ),

@@ -95,8 +95,9 @@ class _PinSetupPageState extends State<PinSetupPage> {
                             title: first == null
                                 ? context.l10n.pin_choose
                                 : context.l10n.pin_repeat,
-                            subtitle:
-                                first == null ? context.l10n.pin_choose_sub : '',
+                            subtitle: first == null
+                                ? context.l10n.pin_choose_sub
+                                : '',
                             length: first?.length,
                             onSubmit: _submit,
                           ),
@@ -184,15 +185,15 @@ class _PinCheckPageState extends State<PinCheckPage> {
                 const LockMark(icon: LucideIcons.lock, size: 64),
                 const SizedBox(height: 18),
                 PinPad(
-              title: context.l10n.pin_enter,
-              subtitle: wait > 0
-                  ? context.l10n.pin_wait('$wait')
-                  : _wrong
+                  title: context.l10n.pin_enter,
+                  subtitle: wait > 0
+                      ? context.l10n.pin_wait('$wait')
+                      : _wrong
                       ? context.l10n.pin_wrong
                       : '',
-              length: AppLockPin.length,
-              enabled: wait == 0,
-              onSubmit: _submit,
+                  length: AppLockPin.length,
+                  enabled: wait == 0,
+                  onSubmit: _submit,
                 ),
               ],
             ),
@@ -241,12 +242,17 @@ class _RecoveryCode extends StatelessWidget {
             height: 48,
             child: FilledButton.tonalIcon(
               onPressed: () {
-                Clipboard.setData(ClipboardData(text: code.replaceAll(' ', '')));
+                Clipboard.setData(
+                  ClipboardData(text: code.replaceAll(' ', '')),
+                );
                 AppSnackbar.success(context, context.l10n.pin_copied);
               },
               style: FilledButton.styleFrom(shape: const StadiumBorder()),
               icon: const Icon(LucideIcons.copy, size: 17),
-              label: Text(context.l10n.pin_copy, style: sheetActionStyle(context)),
+              label: Text(
+                context.l10n.pin_copy,
+                style: sheetActionStyle(context),
+              ),
             ),
           ),
           const SizedBox(height: 10),

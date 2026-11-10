@@ -10,13 +10,13 @@ extension L10nExtension on BuildContext {
   String categoryLabel(String name) {
     if (CategoriesController.ownNames.contains(name)) return name;
     return switch (name) {
-        'Health' => l10n.category_health,
-        'Fitness' => l10n.category_fitness,
-        'Mindfulness' => l10n.category_mindfulness,
-        'Productivity' => l10n.category_productivity,
-        'Learning' => l10n.category_learning,
-        'Finance' => l10n.category_finance,
-        _ => name,
-      };
+      'Health' => l10n.category_health,
+      'Fitness' => l10n.category_fitness,
+      'Mindfulness' => l10n.category_mindfulness,
+      'Productivity' => l10n.category_productivity,
+      'Learning' => l10n.category_learning,
+      'Finance' => l10n.category_finance,
+      _ => name,
+    };
   }
 }

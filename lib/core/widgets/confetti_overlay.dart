@@ -46,17 +46,19 @@ class _ConfettiOverlayState extends State<ConfettiOverlay>
   void _spawn(Brightness brightness) {
     _particles
       ..clear()
-      ..addAll(List.generate(90, (_) {
-        final angle = _random.nextDouble() * 2 * math.pi;
-        return _Particle(
-          angle: angle,
-          speed: 160 + _random.nextDouble() * 320,
-          color: celebrationColor(_random, brightness),
-          size: 6 + _random.nextDouble() * 8,
-          rotation: _random.nextDouble() * 2 * math.pi,
-          spin: (_random.nextDouble() - 0.5) * 12,
-        );
-      }));
+      ..addAll(
+        List.generate(90, (_) {
+          final angle = _random.nextDouble() * 2 * math.pi;
+          return _Particle(
+            angle: angle,
+            speed: 160 + _random.nextDouble() * 320,
+            color: celebrationColor(_random, brightness),
+            size: 6 + _random.nextDouble() * 8,
+            rotation: _random.nextDouble() * 2 * math.pi,
+            spin: (_random.nextDouble() - 0.5) * 12,
+          );
+        }),
+      );
   }
 
   @override
@@ -119,7 +121,8 @@ class _ConfettiPainter extends CustomPainter {
 
     for (final p in particles) {
       final dx = origin.dx + math.cos(p.angle) * p.speed * progress;
-      final dy = origin.dy +
+      final dy =
+          origin.dy +
           math.sin(p.angle) * p.speed * progress +
           gravity * progress * progress;
       if (dx < -margin ||
@@ -135,7 +138,11 @@ class _ConfettiPainter extends CustomPainter {
       canvas.rotate(p.rotation + p.spin * progress);
       canvas.drawRRect(
         RRect.fromRectAndRadius(
-          Rect.fromCenter(center: Offset.zero, width: p.size, height: p.size * 0.6),
+          Rect.fromCenter(
+            center: Offset.zero,
+            width: p.size,
+            height: p.size * 0.6,
+          ),
           const Radius.circular(2),
         ),
         paint,

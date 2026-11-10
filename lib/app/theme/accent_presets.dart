@@ -25,7 +25,11 @@ class AccentPresets {
   /// The ten shipped presets, in menu order.
   static const all = <AccentPreset>[
     AccentPreset(id: 'flow_teal', name: 'Flow Teal', color: Color(0xFF14B8A6)),
-    AccentPreset(id: 'ocean_blue', name: 'Ocean Blue', color: Color(0xFF3B82F6)),
+    AccentPreset(
+      id: 'ocean_blue',
+      name: 'Ocean Blue',
+      color: Color(0xFF3B82F6),
+    ),
     AccentPreset(
       id: 'royal_purple',
       name: 'Royal Purple',
@@ -47,8 +51,16 @@ class AccentPresets {
       name: 'Crimson Red',
       color: Color(0xFFEF4444),
     ),
-    AccentPreset(id: 'amber_gold', name: 'Amber Gold', color: Color(0xFFF59E0B)),
-    AccentPreset(id: 'slate_gray', name: 'Slate Gray', color: Color(0xFF64748B)),
+    AccentPreset(
+      id: 'amber_gold',
+      name: 'Amber Gold',
+      color: Color(0xFFF59E0B),
+    ),
+    AccentPreset(
+      id: 'slate_gray',
+      name: 'Slate Gray',
+      color: Color(0xFF64748B),
+    ),
     AccentPreset(id: 'indigo', name: 'Indigo', color: Color(0xFF6366F1)),
   ];
 

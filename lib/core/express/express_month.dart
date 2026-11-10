@@ -270,7 +270,9 @@ class _MonthCell extends StatelessWidget {
     final relapse = state == ExpressDayState.relapse;
     final future = state == ExpressDayState.future;
     final ink = done
-        ? (habit.color.shownIn(context).computeLuminance() > 0.55 ? Colors.black : Colors.white)
+        ? (habit.color.shownIn(context).computeLuminance() > 0.55
+              ? Colors.black
+              : Colors.white)
         : relapse
         ? Colors.white
         : future

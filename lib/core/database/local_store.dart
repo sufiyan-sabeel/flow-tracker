@@ -54,13 +54,14 @@ class LocalStore {
   static Completer<void>? _idle;
 
   static Map<String, int> _stamps(String key) => {
-        for (final entry in settingMap(key).entries)
-          if (entry.value is int) entry.key: entry.value as int,
-      };
+    for (final entry in settingMap(key).entries)
+      if (entry.value is int) entry.key: entry.value as int,
+  };
 
   static Map<String, int> get changes => _changes ??= _stamps(_changesKey);
 
-  static Map<String, int> get deleted => _deleted ??= _forgetOld(_stamps(_deletedKey));
+  static Map<String, int> get deleted =>
+      _deleted ??= _forgetOld(_stamps(_deletedKey));
 
   static Map<String, int> get cleared => _cleared ??= _stamps(_clearedKey);
 
@@ -131,7 +132,9 @@ class LocalStore {
         revived = deleted.remove(id) != null || revived;
       }
       await _settings.put(_changesKey, Map<String, int>.of(changes));
-      if (revived) await _settings.put(_deletedKey, Map<String, int>.of(deleted));
+      if (revived) {
+        await _settings.put(_deletedKey, Map<String, int>.of(deleted));
+      }
     }
     onChanged?.call();
   }
@@ -162,7 +165,10 @@ class LocalStore {
     final saved = setting(_deviceKey, '');
     if (saved.isNotEmpty) return saved;
     final random = Random.secure();
-    final made = List.generate(8, (_) => random.nextInt(16).toRadixString(16)).join();
+    final made = List.generate(
+      8,
+      (_) => random.nextInt(16).toRadixString(16),
+    ).join();
     _settings.put(_deviceKey, made);
     return made;
   }
@@ -325,7 +331,9 @@ class LocalStore {
   static FocusSession? focusSession(String id) {
     try {
       final raw = _focus.get(id);
-      return raw is Map ? FocusSession.fromMap(Map<String, dynamic>.from(raw)) : null;
+      return raw is Map
+          ? FocusSession.fromMap(Map<String, dynamic>.from(raw))
+          : null;
     } catch (_) {
       return null;
     }
@@ -365,7 +373,9 @@ class LocalStore {
   static HabitNote? note(String id) {
     try {
       final raw = _notes.get(id);
-      return raw is Map ? HabitNote.fromMap(Map<String, dynamic>.from(raw)) : null;
+      return raw is Map
+          ? HabitNote.fromMap(Map<String, dynamic>.from(raw))
+          : null;
     } catch (_) {
       return null;
     }
@@ -467,8 +477,9 @@ class LocalStore {
 
   static Future<void> mergeCategory(Category category) async {
     final key = categoryKey(category.name);
-    final taken = readCategories()
-        .any((c) => c.id != category.id && categoryKey(c.name) == key);
+    final taken = readCategories().any(
+      (c) => c.id != category.id && categoryKey(c.name) == key,
+    );
     if (!taken) await writeCategory(category);
   }
 
@@ -499,7 +510,9 @@ class LocalStore {
 
   static Map<String, dynamic> settingMap(String key) {
     final value = _settings.get(key);
-    return value is Map ? Map<String, dynamic>.from(value) : <String, dynamic>{};
+    return value is Map
+        ? Map<String, dynamic>.from(value)
+        : <String, dynamic>{};
   }
 
   static Future<void> writeSetting(String key, Object value) =>

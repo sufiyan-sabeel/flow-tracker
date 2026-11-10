@@ -114,7 +114,9 @@ class _PinPadState extends State<PinPad> with SingleTickerProviderStateMixin {
                     height: dense ? 10 : 13,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: i < _pin.length ? scheme.primary : Colors.transparent,
+                      color: i < _pin.length
+                          ? scheme.primary
+                          : Colors.transparent,
                       border: Border.all(
                         color: i < _pin.length
                             ? scheme.primary
@@ -152,7 +154,9 @@ class _PinPadState extends State<PinPad> with SingleTickerProviderStateMixin {
                       child: Icon(
                         LucideIcons.check,
                         size: 24,
-                        color: _canConfirm ? scheme.primary : Colors.transparent,
+                        color: _canConfirm
+                            ? scheme.primary
+                            : Colors.transparent,
                       ),
                     ),
                     _Key(onTap: () => _type('0'), child: _digit('0')),
@@ -175,9 +179,9 @@ class _PinPadState extends State<PinPad> with SingleTickerProviderStateMixin {
   }
 
   Widget _digit(String digit) => Text(
-        digit,
-        style: sheetFigureStyle(context, size: 26),
-      );
+    digit,
+    style: sheetFigureStyle(context, size: 26),
+  );
 }
 
 class _Key extends StatelessWidget {

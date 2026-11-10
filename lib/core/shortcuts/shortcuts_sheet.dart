@@ -96,7 +96,8 @@ class _ShortcutsDialog extends StatelessWidget {
     return Focus(
       autofocus: true,
       onKeyEvent: (_, event) {
-        if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
+        if (event is KeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.escape) {
           Navigator.of(context).pop();
           return KeyEventResult.handled;
         }
@@ -170,8 +171,9 @@ class _ShortcutsDialog extends StatelessWidget {
                           ),
                           Container(
                             decoration: BoxDecoration(
-                              color: scheme.surfaceContainerHighest
-                                  .withValues(alpha: 0.5),
+                              color: scheme.surfaceContainerHighest.withValues(
+                                alpha: 0.5,
+                              ),
                               borderRadius: BorderRadius.circular(18),
                             ),
                             padding: const EdgeInsets.symmetric(
@@ -186,8 +188,9 @@ class _ShortcutsDialog extends StatelessWidget {
                                     Divider(
                                       height: 1,
                                       thickness: 1,
-                                      color: scheme.outlineVariant
-                                          .withValues(alpha: 0.35),
+                                      color: scheme.outlineVariant.withValues(
+                                        alpha: 0.35,
+                                      ),
                                     ),
                                   _Row(item: item),
                                 ],
@@ -242,7 +245,8 @@ class _Row extends StatelessWidget {
       runSpacing: 4,
       children: [
         for (final (index, combo) in item.combos.indexed) ...[
-          if (index > 0) Text('·', style: TextStyle(fontSize: 20, height: 1, color: muted)),
+          if (index > 0)
+            Text('·', style: TextStyle(fontSize: 20, height: 1, color: muted)),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [

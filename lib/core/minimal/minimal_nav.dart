@@ -37,7 +37,12 @@ class MinimalNavRail extends StatelessWidget {
       child: SafeArea(
         right: false,
         child: Padding(
-          padding: EdgeInsets.fromLTRB(compact ? 12 : 14, 24, compact ? 12 : 14, 16),
+          padding: EdgeInsets.fromLTRB(
+            compact ? 12 : 14,
+            24,
+            compact ? 12 : 14,
+            16,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -120,19 +125,19 @@ class _RailTileState extends State<_RailTile> {
                     child: Icon(item.icon, size: 18, color: tint),
                   )
                 : Row(
-              children: [
-                Icon(item.icon, size: 18, color: tint),
-                const SizedBox(width: 11),
-                Expanded(
-                  child: Text(
-                    item.label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: MinimalType.label(size: 13.5, color: tint),
+                    children: [
+                      Icon(item.icon, size: 18, color: tint),
+                      const SizedBox(width: 11),
+                      Expanded(
+                        child: Text(
+                          item.label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: MinimalType.label(size: 13.5, color: tint),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
           ),
         ),
       ),

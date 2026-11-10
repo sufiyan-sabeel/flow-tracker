@@ -41,19 +41,19 @@ class ThemeColors {
   ];
 
   Color operator [](String key) => switch (key) {
-        'background' => background,
-        'card' => card,
-        'text' => text,
-        'accent' => accent,
-        'success' => success,
-        'warning' => warning,
-        'danger' => danger,
-        _ => info,
-      };
+    'background' => background,
+    'card' => card,
+    'text' => text,
+    'accent' => accent,
+    'success' => success,
+    'warning' => warning,
+    'danger' => danger,
+    _ => info,
+  };
 
   Map<String, int> toMap() => {
-        for (final key in keys) key: this[key].toARGB32(),
-      };
+    for (final key in keys) key: this[key].toARGB32(),
+  };
 
   factory ThemeColors.fromMap(Map<String, dynamic> map, ThemeColors base) {
     Color pick(String key) =>
@@ -105,11 +105,11 @@ class ColorTheme {
   static ColorTheme? custom(Map<String, dynamic> saved) {
     if (saved.isEmpty) return null;
     ThemeColors side(String key, ThemeColors base) => ThemeColors.fromMap(
-          saved[key] is Map
-              ? Map<String, dynamic>.from(saved[key] as Map)
-              : const {},
-          base,
-        );
+      saved[key] is Map
+          ? Map<String, dynamic>.from(saved[key] as Map)
+          : const {},
+      base,
+    );
     return ColorTheme(
       id: customId,
       name: '',

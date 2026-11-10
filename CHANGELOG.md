@@ -3,6 +3,39 @@
 All notable changes to Flow-tracker are recorded here. Versions follow
 [Semantic Versioning](https://semver.org/), and each release is tagged `vX.Y.Z`.
 
+## 1.8.0 — multi-platform releases
+
+### Added
+
+- **Five-platform release pipeline.** Tagging `vX.Y.Z` now builds Android (APK per
+  ABI plus an AAB), iOS (unsigned IPA), Windows (EXE and MSI installers), Linux
+  (AppImage and DEB) and macOS (DMG and PKG), verifies each artifact, and attaches
+  the verified set to a single GitHub release with `SHA256SUMS.txt`.
+- **A separate CI workflow** runs formatting, analysis and the full test suite on
+  every push and pull request, so the release pipeline is not the first place a
+  broken build is discovered.
+- **macOS support**, which the project did not have: the platform project is now
+  generated and configured with the Flow-tracker identity.
+- Windows installers: an Inno Setup script for the EXE and a WiX definition for
+  the MSI, both packaging the complete Flutter runtime rather than a lone binary.
+
+### Fixed
+
+- The iOS bundle identifier was still the upstream `com.streak.app`, and the App
+  Group shared with the widget extension still carried it. Both are now
+  `com.flowtracker.app`, matching Android.
+- The Windows executable's file properties credited the previous author; the
+  publisher is now Umaiz Sufiyan with the upstream notice retained in the
+  copyright string.
+- The Linux launcher entry still said "Streak" in its name, comment and Exec
+  line. It now says Flow-tracker and launches `flow-tracker`.
+
+### Notes
+
+- iOS and macOS artifacts are unsigned: no signing credentials are configured in
+  CI, and the release notes say so rather than implying they are installable.
+- Release notes list signing status per platform and mark what is not notarized.
+
 ## 1.7.0 — brand identity and report corrections
 
 ### Fixed

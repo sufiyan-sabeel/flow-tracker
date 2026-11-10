@@ -30,7 +30,8 @@ class CoverStorage {
 
     final extension = source.split('.').last.toLowerCase();
     final name = extensions.contains(extension) ? extension : 'jpg';
-    final dest = '${target.path}/${DateTime.now().millisecondsSinceEpoch}.$name';
+    final dest =
+        '${target.path}/${DateTime.now().millisecondsSinceEpoch}.$name';
     await File(source).copy(dest);
     await _dropTemporary(source);
     return dest;

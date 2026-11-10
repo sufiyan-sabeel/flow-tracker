@@ -1,9 +1,14 @@
-name: Android release
+name: Release
 
-# Builds the release APKs, runs the checks, and publishes them with checksums.
-#   * push a tag like v1.0.0  -> full release
-#   * workflow_dispatch       -> release for the tag you type
-#   * pull_request            -> build + checks only, no release
+# Multi-platform release. Triggered by a version tag (v1.7.0) or manually.
+#
+# Honesty rules baked into this file:
+#   * a platform job that fails fails the run, and its artifacts are never
+#     attached to the release;
+#   * the release notes list, per platform, what was actually built and whether
+#     it is signed;
+#   * nothing here invents signing credentials. Without the secrets, iOS and
+#     macOS artifacts are unsigned and are named as such.
 
 on:
   push:
@@ -11,27 +16,56 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Release tag, e.g. v1.0.0'
+        description: 'Release tag, e.g. v1.7.0'
         required: true
         type: string
-  pull_request:
-    branches: [main]
 
 permissions:
   contents: write
 
-# Pinned tool versions keep the build reproducible from one release to the next.
 env:
   FLUTTER_VERSION: '3.41.9'
   JAVA_VERSION: '17'
+  APP_ID: com.flowtracker.app
 
 jobs:
-  build:
-    name: Build, test and publish
+  # ---------------------------------------------------------------- validate
+  validate:
+    name: Validate version and code
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      build: ${{ steps.version.outputs.build }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+
+      - name: Read the version from pubspec
+        id: version
+        run: |
+          set -euo pipefail
+          line=$(grep -E '^version:' pubspec.yaml | head -1 | sed 's/version:[[:space:]]*//')
+          version=${line%%+*}
+          build=${line##*+}
+          if [ -z "$version" ] || [ -z "$build" ]; then
+            echo "::error::pubspec.yaml has no usable version: $line"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "build=$build" >> "$GITHUB_OUTPUT"
+          echo "pubspec version: $version+$build"
+
+      - name: Tag must match pubspec
+        env:
+          TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+        run: |
+          set -euo pipefail
+          want="v${{ steps.version.outputs.version }}"
+          if [ "$TAG" != "$want" ]; then
+            echo "::error::tag $TAG does not match pubspec version $want"
+            exit 1
+          fi
+          echo "tag and pubspec agree: $TAG"
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -42,103 +76,557 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: stable
           flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
           cache: true
 
-      - name: Show versions
-        run: flutter --version
-
-      - name: Install dependencies
+      - name: Resolve dependencies
         run: flutter pub get
+
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed lib test
 
       - name: Analyze
         run: flutter analyze --no-fatal-infos
 
       - name: Test
-        run: flutter test
+        run: flutter test --reporter=compact
 
-      # Signing keys never live in the repository. When the four secrets are
-      # present the APKs are signed with the release key; otherwise Gradle falls
-      # back to the debug key so the artifact is still installable for testing.
-      - name: Configure signing
+  # ----------------------------------------------------------------- android
+  android:
+    name: Android
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Configure signing when secrets exist
+        id: signing
         env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
           set -euo pipefail
           if [ -n "${KEYSTORE_BASE64:-}" ]; then
-            echo "$KEYSTORE_BASE64" | base64 -d > android/app/flow-tracker-release.jks
+            echo "$KEYSTORE_BASE64" | base64 -d > android/app/release.jks
             cat > android/key.properties <<EOF
+          storeFile=release.jks
           storePassword=$KEYSTORE_PASSWORD
           keyPassword=$KEY_PASSWORD
           keyAlias=$KEY_ALIAS
-          storeFile=flow-tracker-release.jks
           EOF
-            echo "Signing with the release keystore." >> "$GITHUB_STEP_SUMMARY"
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+            echo "Signing with the release keystore from secrets."
           else
-            echo "::warning::No signing secrets configured — the APK is signed with the debug key and is for testing only."
-            echo "Signed with the **debug** key (no release secrets configured)." >> "$GITHUB_STEP_SUMMARY"
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::No Android keystore secrets; the APK is signed with the debug key and is NOT store-ready."
           fi
 
-      # ABI splits keep each APK small (~15-20 MB) instead of one fat ~58 MB APK.
-      - name: Build release APKs
+      - name: Build release APK
         run: flutter build apk --release --split-per-abi
 
+      - name: Build release AAB
+        run: flutter build appbundle --release
+
       - name: Collect and verify artifacts
+        id: collect
         run: |
           set -euo pipefail
-          cd build/app/outputs/flutter-apk
-          mv app-arm64-v8a-release.apk    Flow-tracker-arm64-v8a.apk
-          mv app-armeabi-v7a-release.apk  Flow-tracker-armeabi-v7a.apk
-          mv app-x86_64-release.apk       Flow-tracker-x86_64.apk
-          for f in Flow-tracker-*.apk; do
-            size=$(stat -c%s "$f")
-            if [ "$size" -lt 1000000 ]; then
-              echo "::error::$f is only $size bytes — the build did not produce a usable APK."
-              exit 1
-            fi
-            echo "$f — $((size / 1024 / 1024)) MB"
+          version="${{ needs.validate.outputs.version }}"
+          mkdir -p out
+          shopt -s nullglob
+          apks=(build/app/outputs/flutter-apk/app-*-release.apk)
+          if [ ${#apks[@]} -eq 0 ]; then
+            echo "::error::no split APKs were produced"
+            exit 1
+          fi
+          for apk in "${apks[@]}"; do
+            abi=$(basename "$apk" | sed -E 's/app-(.*)-release\.apk/\1/')
+            name="Flow-Tracker-${version}-Android-${abi}.apk"
+            cp "$apk" "out/$name"
+            # structural checks: real APK, has a dex and the app's native lib
+            unzip -l "out/$name" | grep -q 'classes.dex' || { echo "::error::$name has no classes.dex"; exit 1; }
+            unzip -l "out/$name" | grep -q "lib/${abi}/libapp.so" || { echo "::error::$name has no libapp.so for ${abi}"; exit 1; }
+            # identity: the package id must be the one we ship
+            unzip -p "out/$name" AndroidManifest.xml > /tmp/manifest.bin
+            strings -e l /tmp/manifest.bin | grep -qx "${APP_ID}" || { echo "::error::$name is not ${APP_ID}"; exit 1; }
+            test -s "out/$name" || { echo "::error::$name is empty"; exit 1; }
+            echo "verified $name ($(stat -c%s "out/$name") bytes)"
           done
-          sha256sum Flow-tracker-*.apk | tee SHA256SUMS.txt
 
-      - name: Upload APK artifacts
-        uses: actions/upload-artifact@v4
+          aab=build/app/outputs/bundle/release/app-release.aab
+          test -f "$aab" || { echo "::error::no AAB produced"; exit 1; }
+          cp "$aab" "out/Flow-Tracker-${version}-Android.aab"
+          unzip -l "out/Flow-Tracker-${version}-Android.aab" | grep -q 'base/manifest/AndroidManifest.xml' \
+            || { echo "::error::AAB structure is wrong"; exit 1; }
+          echo "verified AAB ($(stat -c%s "out/Flow-Tracker-${version}-Android.aab") bytes)"
+
+          echo "signed=${{ steps.signing.outputs.signed }}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
         with:
-          name: flow-tracker-apks
-          path: |
-            build/app/outputs/flutter-apk/Flow-tracker-*.apk
-            build/app/outputs/flutter-apk/SHA256SUMS.txt
+          name: android
+          path: out/*
           if-no-files-found: error
+          retention-days: 14
 
-      - name: Publish GitHub release
-        if: github.event_name != 'pull_request'
+  # --------------------------------------------------------------------- ios
+  ios:
+    name: iOS
+    needs: validate
+    runs-on: macos-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Install CocoaPods
+        run: |
+          cd ios
+          pod install --repo-update
+
+      - name: Show toolchain
+        run: |
+          xcodebuild -version
+          pod --version
+
+      - name: Build unsigned iOS app
+        run: flutter build ios --release --no-codesign
+
+      - name: Package unsigned IPA
+        id: package
+        run: |
+          set -euo pipefail
+          version="${{ needs.validate.outputs.version }}"
+          mkdir -p out Payload
+          cp -R build/ios/iphoneos/Runner.app Payload/
+          name="Flow-Tracker-${version}-iOS-unsigned.ipa"
+          zip -qry "out/$name" Payload
+          rm -rf Payload
+
+          # verify: the bundle is real and carries the right identity
+          unzip -l "out/$name" | grep -q 'Payload/Runner.app/Runner$' \
+            || { echo "::error::IPA has no Runner executable"; exit 1; }
+          unzip -q -o "out/$name" 'Payload/Runner.app/Info.plist' -d /tmp/ipa
+          id=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' /tmp/ipa/Payload/Runner.app/Info.plist)
+          ver=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' /tmp/ipa/Payload/Runner.app/Info.plist)
+          echo "IPA bundle id: $id, version: $ver"
+          [ "$id" = "${APP_ID}" ] || { echo "::error::IPA bundle id $id is not ${APP_ID}"; exit 1; }
+          [ "$ver" = "$version" ] || { echo "::error::IPA version $ver is not $version"; exit 1; }
+          test -s "out/$name" || { echo "::error::IPA is empty"; exit 1; }
+          echo "verified $name ($(stat -f%z "out/$name") bytes) — UNSIGNED"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios
+          path: out/*
+          if-no-files-found: error
+          retention-days: 14
+
+  # ----------------------------------------------------------------- windows
+  windows:
+    name: Windows
+    needs: validate
+    runs-on: windows-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Build Windows release
+        run: flutter build windows --release
+
+      - name: Install packaging tools
+        run: |
+          choco install innosetup wixtoolset --no-progress -y
+          echo "C:\Program Files (x86)\Inno Setup 6" | Out-File -FilePath $env:GITHUB_PATH -Append
+
+      - name: Build EXE installer
+        run: |
+          $version = "${{ needs.validate.outputs.version }}"
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" `
+            "/DAppVersion=$version" `
+            "/DSourceDir=$PWD\build\windows\x64\runner\Release" `
+            "/DOutputDir=$PWD\out" `
+            "windows\installer\flow_tracker.iss"
+
+      - name: Build MSI installer
+        run: |
+          $version = "${{ needs.validate.outputs.version }}"
+          $src = "$PWD\build\windows\x64\runner\Release"
+          New-Item -ItemType Directory -Force -Path out, msi | Out-Null
+          heat dir $src -cg AppFiles -dr INSTALLDIR -gg -scom -sreg -sfrag -srd `
+            -var var.SourceDir -out msi\files.wxs
+          @"
+          <?xml version="1.0" encoding="UTF-8"?>
+          <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+            <Product Id="*" Name="Flow-tracker" Language="1033" Version="$version"
+                     Manufacturer="Umaiz Sufiyan" UpgradeCode="7C1D2A6E-9B34-4C7A-9F2E-6E0B1D5A8C11">
+              <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" />
+              <MajorUpgrade DowngradeErrorMessage="A newer version of Flow-tracker is already installed." />
+              <MediaTemplate EmbedCab="yes" />
+              <Directory Id="TARGETDIR" Name="SourceDir">
+                <Directory Id="ProgramFiles64Folder">
+                  <Directory Id="INSTALLDIR" Name="Flow-tracker" />
+                </Directory>
+                <Directory Id="ProgramMenuFolder">
+                  <Directory Id="AppShortcutDir" Name="Flow-tracker" />
+                </Directory>
+              </Directory>
+              <Feature Id="Main" Title="Flow-tracker" Level="1">
+                <ComponentGroupRef Id="AppFiles" />
+                <ComponentRef Id="ApplicationShortcut" />
+              </Feature>
+              <DirectoryRef Id="AppShortcutDir">
+                <Component Id="ApplicationShortcut" Guid="A2B4C6D8-1234-4E5F-9A0B-3C5D7E9F1A2B">
+                  <Shortcut Id="AppShortcut" Name="Flow-tracker" Target="[INSTALLDIR]Flow-tracker.exe"
+                            WorkingDirectory="INSTALLDIR" />
+                  <RemoveFolder Id="AppShortcutDir" On="uninstall" />
+                  <RegistryValue Root="HKCU" Key="Software\UmaizSufiyan\Flow-tracker" Name="installed"
+                                 Type="integer" Value="1" KeyPath="yes" />
+                </Component>
+              </DirectoryRef>
+            </Product>
+          </Wix>
+          "@ | Set-Content -Encoding UTF8 msi\product.wxs
+          candle -arch x64 -dSourceDir=$src -out msi\product.wixobj msi\product.wxs
+          candle -arch x64 -dSourceDir=$src -out msi\files.wixobj msi\files.wxs
+          light -ext WixUIExtension -out "out\Flow-Tracker-$version-Windows-x64.msi" msi\product.wixobj msi\files.wixobj
+
+      - name: Verify installers
+        run: |
+          $version = "${{ needs.validate.outputs.version }}"
+          $exe = "out\Flow-Tracker-$version-Windows-x64.exe"
+          $msi = "out\Flow-Tracker-$version-Windows-x64.msi"
+          foreach ($f in @($exe, $msi)) {
+            if (-not (Test-Path $f)) { Write-Error "missing $f"; exit 1 }
+            if ((Get-Item $f).Length -lt 1MB) { Write-Error "$f is suspiciously small"; exit 1 }
+            Write-Host "verified $f ($((Get-Item $f).Length) bytes)"
+          }
+          # the installer must actually carry the app binary
+          $bytes = [System.IO.File]::ReadAllBytes($msi)
+          $text = [System.Text.Encoding]::ASCII.GetString($bytes)
+          if (-not $text.Contains("Flow-tracker.exe")) { Write-Error "MSI does not reference the app binary"; exit 1 }
+          $appExe = "build\windows\x64\runner\Release\Flow-tracker.exe"
+          if (-not (Test-Path $appExe)) { Write-Error "the built exe is missing"; exit 1 }
+          Write-Host "verified the release exe exists"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: out/*
+          if-no-files-found: error
+          retention-days: 14
+
+  # ------------------------------------------------------------------- linux
+  linux:
+    name: Linux
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev \
+            libstdc++-12-dev libfuse2 file
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Build Linux release
+        run: flutter build linux --release
+
+      - name: Package DEB
+        run: |
+          set -euo pipefail
+          version="${{ needs.validate.outputs.version }}"
+          bundle=build/linux/x64/release/bundle
+          test -x "$bundle/flow-tracker" || { echo "::error::no Linux executable"; exit 1; }
+          root=pkg/flow-tracker
+          mkdir -p "$root/opt/flow-tracker" "$root/usr/bin" "$root/usr/share/applications" \
+                   "$root/usr/share/icons/hicolor/256x256/apps"
+          cp -r "$bundle"/* "$root/opt/flow-tracker/"
+          ln -s /opt/flow-tracker/flow-tracker "$root/usr/bin/flow-tracker"
+          cp linux/com.flowtracker.app.desktop "$root/usr/share/applications/"
+          cp assets/icon.png "$root/usr/share/icons/hicolor/256x256/apps/com.flowtracker.app.png"
+          mkdir -p "$root/DEBIAN"
+          size=$(du -sk "$root/opt" | cut -f1)
+          cat > "$root/DEBIAN/control" <<EOF
+          Package: flow-tracker
+          Version: ${version}
+          Section: utils
+          Priority: optional
+          Architecture: amd64
+          Maintainer: Umaiz Sufiyan
+          Installed-Size: ${size}
+          Description: Private, offline habit tracking with reports
+           Flow-tracker keeps habits, to-dos and focus sessions on your device and
+           exports PDF reports without any account or network connection.
+          EOF
+          dpkg-deb --build --root-owner-group "$root" "out/Flow-Tracker-${version}-Linux-amd64.deb"
+          dpkg-deb --info "out/Flow-Tracker-${version}-Linux-amd64.deb" | head -20
+          dpkg-deb --contents "out/Flow-Tracker-${version}-Linux-amd64.deb" | grep -q 'opt/flow-tracker/flow-tracker' \
+            || { echo "::error::DEB is missing the app binary"; exit 1; }
+
+      - name: Package AppImage
+        run: |
+          set -euo pipefail
+          version="${{ needs.validate.outputs.version }}"
+          bundle=build/linux/x64/release/bundle
+          appdir=AppDir
+          rm -rf "$appdir"
+          mkdir -p "$appdir/usr/bin"
+          cp -r "$bundle"/* "$appdir/usr/bin/"
+          cp assets/icon.png "$appdir/flow-tracker.png"
+          cp assets/icon.png "$appdir/.DirIcon"
+          cat > "$appdir/flow-tracker.desktop" <<'EOF'
+          [Desktop Entry]
+          Type=Application
+          Name=Flow-tracker
+          Comment=Private, offline habit tracking with reports
+          Exec=flow-tracker
+          Icon=flow-tracker
+          Categories=Utility;Office;
+          Terminal=false
+          EOF
+          cat > "$appdir/AppRun" <<'EOF'
+          #!/bin/sh
+          HERE="$(dirname "$(readlink -f "$0")")"
+          exec "$HERE/usr/bin/flow-tracker" "$@"
+          EOF
+          chmod +x "$appdir/AppRun"
+
+          tool=appimagetool-x86_64.AppImage
+          curl -fsSL -o "$tool" \
+            https://github.com/AppImage/appimagetool/releases/download/1.9.0/appimagetool-x86_64.AppImage
+          chmod +x "$tool"
+          ARCH=x86_64 ./"$tool" --appimage-extract-and-run "$appdir" \
+            "out/Flow-Tracker-${version}-Linux-x86_64.AppImage"
+          rm -f "$tool"
+
+      - name: Verify Linux packages
+        run: |
+          set -euo pipefail
+          version="${{ needs.validate.outputs.version }}"
+          deb="out/Flow-Tracker-${version}-Linux-amd64.deb"
+          appimg="out/Flow-Tracker-${version}-Linux-x86_64.AppImage"
+          for f in "$deb" "$appimg"; do
+            test -s "$f" || { echo "::error::$f is empty"; exit 1; }
+            echo "verified $f ($(stat -c%s "$f") bytes)"
+          done
+          dpkg-deb --field "$deb" Package Version Architecture
+          file "$appimg" | grep -qi 'ELF' || { echo "::error::AppImage is not an ELF binary"; exit 1; }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: out/*
+          if-no-files-found: error
+          retention-days: 14
+
+  # ------------------------------------------------------------------- macos
+  macos:
+    name: macOS
+    needs: validate
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Install CocoaPods
+        run: |
+          cd macos
+          pod install
+
+      - name: Build macOS release
+        run: flutter build macos --release
+
+      - name: Package DMG and PKG
+        run: |
+          set -euo pipefail
+          version="${{ needs.validate.outputs.version }}"
+          app=build/macos/Build/Products/Release/Flow-tracker.app
+          test -d "$app" || { echo "::error::no macOS app bundle"; exit 1; }
+          mkdir -p out
+
+          hdiutil create -volname "Flow-tracker" -srcfolder "$app" -ov -format UDZO \
+            "out/Flow-Tracker-${version}-macOS-universal.dmg"
+
+          pkgbuild --component "$app" --install-location /Applications \
+            --identifier "${APP_ID}" --version "$version" \
+            "out/Flow-Tracker-${version}-macOS-universal.pkg"
+
+      - name: Verify macOS packages
+        run: |
+          set -euo pipefail
+          version="${{ needs.validate.outputs.version }}"
+          dmg="out/Flow-Tracker-${version}-macOS-universal.dmg"
+          pkg="out/Flow-Tracker-${version}-macOS-universal.pkg"
+          for f in "$dmg" "$pkg"; do
+            test -s "$f" || { echo "::error::$f is empty"; exit 1; }
+            echo "verified $f ($(stat -f%z "$f") bytes)"
+          done
+          hdiutil verify "$dmg"
+          pkgutil --payload-files "$pkg" | grep -q 'Flow-tracker.app/Contents/MacOS/Flow-tracker' \
+            || { echo "::error::PKG payload is missing the app binary"; exit 1; }
+          codesign -dv "build/macos/Build/Products/Release/Flow-tracker.app" 2>&1 | head -3 || true
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: out/*
+          if-no-files-found: error
+          retention-days: 14
+
+  # ----------------------------------------------------------------- release
+  publish:
+    name: Publish release
+    needs: [validate, android, ios, windows, linux, macos]
+    # Only publish when every platform built and verified. A failed platform
+    # fails the run and nothing is attached on its behalf.
+    if: success()
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all platform artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Checksums
+        run: |
+          set -euo pipefail
+          cd dist
+          ls -la
+          count=$(ls -1 | wc -l)
+          if [ "$count" -lt 5 ]; then
+            echo "::error::expected at least 5 artifacts, found $count"
+            exit 1
+          fi
+          sha256sum * > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Publish
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
-          name: Flow-tracker ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
-          generate_release_notes: true
+          name: Flow-tracker ${{ needs.validate.outputs.version }}
+          files: dist/*
+          fail_on_unmatched_files: true
           body: |
-            **Flow-tracker — habit tracking that stays on your phone.**
+            ## Flow-tracker ${{ needs.validate.outputs.version }}
 
-            Created by Umaiz Sufiyan. Based on [Streak](https://github.com/InlitX/streak) by InlitX,
-            released under the GNU GPLv3 with the additional terms of its section 7.
+            Built from `${{ github.sha }}` on ${{ github.event.repository.default_branch }}.
+            Android · iOS · Windows · Linux · macOS. Everything is generated offline
+            from your own data.
 
-            ### Install
-            1. Download the APK for your device (`arm64-v8a` covers almost every phone from 2017 on).
-            2. Allow installing from this source when Android asks.
-            3. Open the file and install.
+            ### Downloads
 
-            Verify the download against `SHA256SUMS.txt`:
+            | Platform | File | Notes |
+            | --- | --- | --- |
+            | Android | `Flow-Tracker-${{ needs.validate.outputs.version }}-Android-arm64-v8a.apk` | phone / tablet, most devices |
+            | Android | `Flow-Tracker-${{ needs.validate.outputs.version }}-Android-armeabi-v7a.apk` | older 32-bit devices |
+            | Android | `Flow-Tracker-${{ needs.validate.outputs.version }}-Android-x86_64.apk` | emulators |
+            | Android | `Flow-Tracker-${{ needs.validate.outputs.version }}-Android.aab` | for store upload |
+            | iOS | `Flow-Tracker-${{ needs.validate.outputs.version }}-iOS-unsigned.ipa` | **unsigned**, CI validation only |
+            | Windows | `Flow-Tracker-${{ needs.validate.outputs.version }}-Windows-x64.exe` | installer |
+            | Windows | `Flow-Tracker-${{ needs.validate.outputs.version }}-Windows-x64.msi` | installer |
+            | Linux | `Flow-Tracker-${{ needs.validate.outputs.version }}-Linux-x86_64.AppImage` | portable |
+            | Linux | `Flow-Tracker-${{ needs.validate.outputs.version }}-Linux-amd64.deb` | Debian / Ubuntu |
+            | macOS | `Flow-Tracker-${{ needs.validate.outputs.version }}-macOS-universal.dmg` | disk image |
+            | macOS | `Flow-Tracker-${{ needs.validate.outputs.version }}-macOS-universal.pkg` | installer |
+
+            ### Signing status
+
+            - Android: signed with the project keystore when `ANDROID_KEYSTORE_BASE64`
+              is configured, otherwise the debug key. Check the CI log for the warning.
+            - iOS: **unsigned**. No provisioning profile is configured in CI, so this
+              IPA cannot be installed on a device as-is.
+            - macOS: **unsigned and not notarized**. Gatekeeper will ask for a
+              right-click → Open on first launch.
+            - Windows: **unsigned**. SmartScreen may warn; the installer is otherwise
+              a normal Inno Setup / MSI package.
+            - Linux: unsigned is normal for AppImage and DEB.
+
+            ### Verify
+
             ```
             sha256sum -c SHA256SUMS.txt
             ```
 
-            Source code is available under the *Source code* archives below.
-          files: |
-            build/app/outputs/flutter-apk/Flow-tracker-arm64-v8a.apk
-            build/app/outputs/flutter-apk/Flow-tracker-armeabi-v7a.apk
-            build/app/outputs/flutter-apk/Flow-tracker-x86_64.apk
-            build/app/outputs/flutter-apk/SHA256SUMS.txt
+            ### Install
+
+            - **Android**: open the APK on the device, allow install from this source.
+            - **iOS**: requires signing with your own team before installing.
+            - **Windows**: run the `.exe` or `.msi`.
+            - **Linux**: `chmod +x *.AppImage` and run, or `sudo apt install ./Flow-Tracker-*.deb`.
+            - **macOS**: open the DMG and drag the app to Applications, or run the PKG.
+
+            ### Known limitations
+
+            - The iOS and macOS builds are unsigned; notarization is not configured.
+            - Widgets and background reminders are Android/iOS features; the desktop
+              builds run without them.
+            - iOS and macOS binaries are built and packaged in CI but have not been
+              installed on a physical device from this pipeline.

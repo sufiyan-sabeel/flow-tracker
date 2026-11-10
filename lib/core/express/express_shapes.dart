@@ -32,8 +32,7 @@ class ExpressShape {
 
   static const family = [cookie, clover, burst, gem, flower, sunny, pebble];
 
-  static ExpressShape pick(int index) =>
-      family[index.abs() % family.length];
+  static ExpressShape pick(int index) => family[index.abs() % family.length];
 
   final double exponent;
   final double sides;

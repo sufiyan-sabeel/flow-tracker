@@ -23,7 +23,6 @@ class AppPalette {
   static const textSecondary = Color(0xFF8E8E93);
 
   static const List<Color> habitColors = [
-
     Color(0xFFFF3B30),
     Color(0xFFFF6B6B),
     Color(0xFFC0392B),

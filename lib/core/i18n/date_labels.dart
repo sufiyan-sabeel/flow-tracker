@@ -8,8 +8,9 @@ class WeekdayLabels {
     return [s[1], s[2], s[3], s[4], s[5], s[6], s[0]];
   }
 
-  static List<String> shortSunFirst(String locale) =>
-      List<String>.from(DateFormat('', _resolve(locale)).dateSymbols.SHORTWEEKDAYS);
+  static List<String> shortSunFirst(String locale) => List<String>.from(
+    DateFormat('', _resolve(locale)).dateSymbols.SHORTWEEKDAYS,
+  );
 
   static List<String> narrowFrom(String locale, int weekStart) {
     final n = DateFormat('', _resolve(locale)).dateSymbols.NARROWWEEKDAYS;
@@ -34,12 +35,14 @@ class MonthLabels {
   const MonthLabels._();
 
   static List<String> short(String locale) => [
-        for (final month
-            in DateFormat('', WeekdayLabels._resolve(locale)).dateSymbols.SHORTMONTHS)
-          month.replaceAll('.', ''),
-      ];
+    for (final month in DateFormat(
+      '',
+      WeekdayLabels._resolve(locale),
+    ).dateSymbols.SHORTMONTHS)
+      month.replaceAll('.', ''),
+  ];
 
   static List<String> full(String locale) => List<String>.from(
-        DateFormat('', WeekdayLabels._resolve(locale)).dateSymbols.MONTHS,
-      );
+    DateFormat('', WeekdayLabels._resolve(locale)).dateSymbols.MONTHS,
+  );
 }

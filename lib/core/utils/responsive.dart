@@ -39,9 +39,9 @@ bool stackedValue(BuildContext context, String? value) {
   final painter = TextPainter(
     text: TextSpan(
       text: value,
-      style: DefaultTextStyle.of(context)
-          .style
-          .copyWith(fontSize: 15, fontWeight: FontWeight.w600),
+      style: DefaultTextStyle.of(
+        context,
+      ).style.copyWith(fontSize: 15, fontWeight: FontWeight.w600),
     ),
     textScaler: MediaQuery.textScalerOf(context),
     textDirection: Directionality.of(context),

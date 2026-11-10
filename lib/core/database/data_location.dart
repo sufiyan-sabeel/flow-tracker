@@ -34,11 +34,10 @@ class DataLocation {
 
   static String? get rewriteFrom => _rewriteFrom;
 
-  static Directory get portableDir =>
-      Directory(
-        '${File(Platform.resolvedExecutable).parent.path}'
-        '${Platform.pathSeparator}StreakData',
-      );
+  static Directory get portableDir => Directory(
+    '${File(Platform.resolvedExecutable).parent.path}'
+    '${Platform.pathSeparator}StreakData',
+  );
 
   static bool holdsData(Directory dir) =>
       File('${dir.path}/habits.hive').existsSync();
@@ -163,8 +162,9 @@ class DataLocation {
     if (value is String) return _rewritePath(value, from, to);
     if (value is List) {
       final items = [for (final item in value) rewrite(item, from, to)];
-      final same = Iterable.generate(value.length)
-          .every((i) => identical(items[i], value[i]));
+      final same = Iterable.generate(
+        value.length,
+      ).every((i) => identical(items[i], value[i]));
       return same ? value : items;
     }
     if (value is Map) {

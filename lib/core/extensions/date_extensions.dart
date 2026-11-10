@@ -21,13 +21,13 @@ class AppClock {
 
   static DateTime today() {
     final cached = _today;
-    if (cached != null &&
-        DateTime.now().millisecondsSinceEpoch < _todayUntil) {
+    if (cached != null && DateTime.now().millisecondsSinceEpoch < _todayUntil) {
       return cached;
     }
     final midnight = now().atMidnight;
     _today = midnight;
-    _todayUntil = midnight.addDays(1).millisecondsSinceEpoch +
+    _todayUntil =
+        midnight.addDays(1).millisecondsSinceEpoch +
         _cutoffHour * Duration.millisecondsPerHour;
     return midnight;
   }

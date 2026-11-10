@@ -190,7 +190,10 @@ class _LockScreen extends StatelessWidget {
                 icon: const Icon(LucideIcons.lockOpen, size: 18),
                 label: Text(
                   context.l10n.app_lock_unlock,
-                  style: sheetActionStyle(context, color: context.colors.onPrimary),
+                  style: sheetActionStyle(
+                    context,
+                    color: context.colors.onPrimary,
+                  ),
                 ),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -282,9 +285,9 @@ class _PinLockScreenState extends State<_PinLockScreen> {
   }
 
   void _switchMode() => setState(() {
-        _recovering = !_recovering;
-        _wrong = false;
-      });
+    _recovering = !_recovering;
+    _wrong = false;
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -293,10 +296,10 @@ class _PinLockScreenState extends State<_PinLockScreen> {
     final subtitle = wait > 0
         ? l10n.pin_wait('$wait')
         : !_wrong
-            ? ''
-            : _recovering
-                ? l10n.pin_recovery_wrong
-                : l10n.pin_wrong;
+        ? ''
+        : _recovering
+        ? l10n.pin_recovery_wrong
+        : l10n.pin_wrong;
 
     return Material(
       color: context.colors.surface,

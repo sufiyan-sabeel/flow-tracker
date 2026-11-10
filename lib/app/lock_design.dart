@@ -48,7 +48,9 @@ class LockSteps extends StatelessWidget {
             height: 6,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(3),
-              color: i <= step ? tone : context.tokens.muted.withValues(alpha: 0.3),
+              color: i <= step
+                  ? tone
+                  : context.tokens.muted.withValues(alpha: 0.3),
             ),
           ),
       ],
