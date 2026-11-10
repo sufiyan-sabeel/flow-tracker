@@ -40,8 +40,9 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('picking an icon or a color puts the keyboard away',
-      (tester) async {
+  testWidgets('picking an icon or a color puts the keyboard away', (
+    tester,
+  ) async {
     await open(tester);
     await tester.enterText(find.byType(TextField), 'Errands');
     await tester.pumpAndSettle();
@@ -63,8 +64,9 @@ void main() {
     expect(result?.name, 'Errands');
   });
 
-  testWidgets('swiping away an empty or cleared new tag creates nothing',
-      (tester) async {
+  testWidgets('swiping away an empty or cleared new tag creates nothing', (
+    tester,
+  ) async {
     await open(tester);
     await swipeAway(tester);
     expect(closed, isTrue);
@@ -79,8 +81,9 @@ void main() {
     expect(result, isNull);
   });
 
-  testWidgets('swiping away while editing leaves the tag as it was',
-      (tester) async {
+  testWidgets('swiping away while editing leaves the tag as it was', (
+    tester,
+  ) async {
     await open(
       tester,
       initial: const TodoTag(

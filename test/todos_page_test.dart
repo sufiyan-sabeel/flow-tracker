@@ -18,21 +18,25 @@ void main() {
   final today = AppClock.now();
 
   Future<void> seedFour(WidgetTester tester) => seedTodos(tester, [
-        testTodo(id: 'a', text: 'Call the plumber', due: today),
-        testTodo(
-          id: 'b',
-          text: 'Pay the bill',
-          due: today.subtract(const Duration(days: 3)),
-        ),
-        testTodo(id: 'c', text: 'Buy a lamp'),
-        testTodo(id: 'd', text: 'Water the plants', done: true),
-      ]);
+    testTodo(id: 'a', text: 'Call the plumber', due: today),
+    testTodo(
+      id: 'b',
+      text: 'Pay the bill',
+      due: today.subtract(const Duration(days: 3)),
+    ),
+    testTodo(id: 'c', text: 'Buy a lamp'),
+    testTodo(id: 'd', text: 'Water the plants', done: true),
+  ]);
 
-  testWidgets('the list splits into the groups their dates ask for',
-      (tester) async {
+  testWidgets('the list splits into the groups their dates ask for', (
+    tester,
+  ) async {
     await seedFour(tester);
-    await pumpScreen(tester, const TodosPage(),
-        settings: {'todoPapers': false});
+    await pumpScreen(
+      tester,
+      const TodosPage(),
+      settings: {'todoPapers': false},
+    );
 
     expect(find.text('OVERDUE'), findsOneWidget);
     expect(find.text('TODAY'), findsOneWidget);
@@ -41,8 +45,9 @@ void main() {
     expect(find.byType(TodoTile), findsNWidgets(3));
   });
 
-  testWidgets('completed to-dos stay folded until you open them',
-      (tester) async {
+  testWidgets('completed to-dos stay folded until you open them', (
+    tester,
+  ) async {
     await seedFour(tester);
     await pumpScreen(tester, const TodosPage());
 
@@ -76,8 +81,9 @@ void main() {
     handle.dispose();
   });
 
-  testWidgets('choosing a date opens the calendar and leaves it open',
-      (tester) async {
+  testWidgets('choosing a date opens the calendar and leaves it open', (
+    tester,
+  ) async {
     await pumpScreen(tester, const TodosPage());
 
     await tester.tap(find.widgetWithIcon(FilledButton, LucideIcons.plus));
@@ -101,8 +107,11 @@ void main() {
   });
 
   testWidgets('writing a to-do adds it to the list', (tester) async {
-    await pumpScreen(tester, const TodosPage(),
-        settings: {'todoPapers': false});
+    await pumpScreen(
+      tester,
+      const TodosPage(),
+      settings: {'todoPapers': false},
+    );
 
     expect(find.text('Nothing on the list'), findsOneWidget);
 
@@ -120,8 +129,9 @@ void main() {
     expect(find.text('Book the flight'), findsOneWidget);
   });
 
-  testWidgets('the search box keeps only what matches, done ones included',
-      (tester) async {
+  testWidgets('the search box keeps only what matches, done ones included', (
+    tester,
+  ) async {
     await seedTodos(tester, [
       testTodo(id: 'a', text: 'Call the plumber', due: today),
       testTodo(id: 'b', text: 'Buy new running shoes'),
@@ -145,19 +155,19 @@ void main() {
   });
 
   Future<void> seedProjects(WidgetTester tester) => tester.runAsync(() async {
-        const names = ['One', 'Two', 'Three', 'Four'];
-        for (final (index, name) in names.indexed) {
-          await LocalStore.writeTodoTag(
-            TodoTag(
-              id: 'p$index',
-              name: name,
-              color: const Color(0xFF7C5CFC),
-              order: index,
-              kind: TodoTagKind.project,
-            ),
-          );
-        }
-      });
+    const names = ['One', 'Two', 'Three', 'Four'];
+    for (final (index, name) in names.indexed) {
+      await LocalStore.writeTodoTag(
+        TodoTag(
+          id: 'p$index',
+          name: name,
+          color: const Color(0xFF7C5CFC),
+          order: index,
+          kind: TodoTagKind.project,
+        ),
+      );
+    }
+  });
 
   List<String> onScreen(WidgetTester tester) {
     final found = <(Offset, String)>[
@@ -171,8 +181,9 @@ void main() {
     return [for (final entry in found) entry.$2];
   }
 
-  testWidgets('the menu opens the arranging mode and the drag sticks',
-      (tester) async {
+  testWidgets('the menu opens the arranging mode and the drag sticks', (
+    tester,
+  ) async {
     await seedProjects(tester);
     await pumpScreen(tester, const TodosPage());
 
@@ -203,24 +214,44 @@ void main() {
     expect(find.text('Done'), findsNothing);
   });
 
-  testWidgets('inside a project the bar only offers that project tags',
-      (tester) async {
+  testWidgets('inside a project the bar only offers that project tags', (
+    tester,
+  ) async {
     await tester.runAsync(() async {
       for (final tag in const [
-        TodoTag(id: 'p1', name: 'School', color: Color(0xFF7C5CFC),
-            kind: TodoTagKind.project),
-        TodoTag(id: 'p2', name: 'Work', color: Color(0xFF34C759), order: 1,
-            kind: TodoTagKind.project),
+        TodoTag(
+          id: 'p1',
+          name: 'School',
+          color: Color(0xFF7C5CFC),
+          kind: TodoTagKind.project,
+        ),
+        TodoTag(
+          id: 'p2',
+          name: 'Work',
+          color: Color(0xFF34C759),
+          order: 1,
+          kind: TodoTagKind.project,
+        ),
         TodoTag(id: 't1', name: 'urgent', color: Color(0xFFFF3B30)),
         TodoTag(id: 't2', name: 'later', color: Color(0xFF5AC8FA), order: 1),
       ]) {
         await LocalStore.writeTodoTag(tag);
       }
       for (final todo in [
-        Todo(id: 'a', text: 'Maths homework', project: 'p1',
-            tags: const ['t1'], createdAt: AppClock.now()),
-        Todo(id: 'b', text: 'Send the invoice', project: 'p2',
-            tags: const ['t2'], createdAt: AppClock.now()),
+        Todo(
+          id: 'a',
+          text: 'Maths homework',
+          project: 'p1',
+          tags: const ['t1'],
+          createdAt: AppClock.now(),
+        ),
+        Todo(
+          id: 'b',
+          text: 'Send the invoice',
+          project: 'p2',
+          tags: const ['t2'],
+          createdAt: AppClock.now(),
+        ),
       ]) {
         await LocalStore.writeTodo(todo);
       }

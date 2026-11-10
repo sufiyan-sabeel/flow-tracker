@@ -10,16 +10,16 @@ import 'package:flow_tracker/features/statistics/widgets/year_heatmap.dart';
 import 'support/app_harness.dart';
 
 Future<void> _seedTwo(WidgetTester tester) => seedHabits(tester, [
-      testHabit(id: 'a', name: 'Read', order: 0, done: lastDays(9)),
-      testHabit(
-        id: 'b',
-        name: 'Water',
-        order: 1,
-        kind: HabitKind.quantitative,
-        perDayTarget: 8,
-        done: lastDays(4),
-      ),
-    ]);
+  testHabit(id: 'a', name: 'Read', order: 0, done: lastDays(9)),
+  testHabit(
+    id: 'b',
+    name: 'Water',
+    order: 1,
+    kind: HabitKind.quantitative,
+    perDayTarget: 8,
+    done: lastDays(4),
+  ),
+]);
 
 void main() {
   useEmptyStore();
@@ -31,8 +31,9 @@ void main() {
     expect(find.byType(YearHeatmap), findsNothing);
   });
 
-  testWidgets('classic shows the year and the headline numbers',
-      (tester) async {
+  testWidgets('classic shows the year and the headline numbers', (
+    tester,
+  ) async {
     await _seedTwo(tester);
     await pumpScreen(tester, const StatisticsPage());
 
@@ -55,8 +56,9 @@ void main() {
     expect(find.byType(HabitDonut), findsOneWidget);
   });
 
-  testWidgets('minimal keeps the heatmap and drops the extra charts',
-      (tester) async {
+  testWidgets('minimal keeps the heatmap and drops the extra charts', (
+    tester,
+  ) async {
     await _seedTwo(tester);
     await pumpScreen(tester, const StatisticsPage(), minimal: true);
 

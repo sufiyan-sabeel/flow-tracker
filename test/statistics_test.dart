@@ -9,16 +9,15 @@ Habit _habit({
   required HabitKind kind,
   required DateTime createdAt,
   Map<String, Completion> completions = const {},
-}) =>
-    Habit(
-      id: 'h',
-      name: 'Test',
-      color: const Color(0xFF00FF00),
-      order: 0,
-      kind: kind,
-      completions: completions,
-      createdAt: createdAt,
-    );
+}) => Habit(
+  id: 'h',
+  name: 'Test',
+  color: const Color(0xFF00FF00),
+  order: 0,
+  kind: kind,
+  completions: completions,
+  createdAt: createdAt,
+);
 
 int _expectedCleanDays(Habit habit, int year) {
   final today = DateTime.now().atMidnight;
@@ -215,26 +214,25 @@ void main() {
   group('HabitStats streak series', () {
     final day0 = AppClock.today().addDays(-60);
 
-    Habit scheduled(HabitInterval interval, bool Function(int) doneOn) =>
-        Habit(
-          id: 'h',
-          name: 'Test',
-          color: const Color(0xFF00FF00),
-          order: 0,
-          interval: interval,
-          scheduleEvery: 5,
-          targetFrequency: 2,
-          createdAt: day0,
-          completions: {
-            for (var i = 0; i <= 60; i++)
-              if (doneOn(i))
-                day0.addDays(i).dayKey: Completion(
-                  date: day0.addDays(i).dayKey,
-                  hour: 9,
-                  count: 1,
-                ),
-          },
-        );
+    Habit scheduled(HabitInterval interval, bool Function(int) doneOn) => Habit(
+      id: 'h',
+      name: 'Test',
+      color: const Color(0xFF00FF00),
+      order: 0,
+      interval: interval,
+      scheduleEvery: 5,
+      targetFrequency: 2,
+      createdAt: day0,
+      completions: {
+        for (var i = 0; i <= 60; i++)
+          if (doneOn(i))
+            day0.addDays(i).dayKey: Completion(
+              date: day0.addDays(i).dayKey,
+              hour: 9,
+              count: 1,
+            ),
+      },
+    );
 
     void expectSteady(Habit habit) {
       final series = HabitStats.compute([habit], year).streakSeries;

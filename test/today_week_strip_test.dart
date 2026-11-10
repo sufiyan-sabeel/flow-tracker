@@ -12,9 +12,13 @@ void main() {
   final today = AppClock.today();
 
   Future<void> seed(WidgetTester tester) => seedHabits(tester, [
-        testHabit(id: 'a', name: 'Read', done: [today.subtract(const Duration(days: 1))]),
-        testHabit(id: 'b', name: 'Stretch'),
-      ]);
+    testHabit(
+      id: 'a',
+      name: 'Read',
+      done: [today.subtract(const Duration(days: 1))],
+    ),
+    testHabit(id: 'b', name: 'Stretch'),
+  ]);
 
   testWidgets('the week strip is off until it is turned on', (tester) async {
     await seed(tester);
@@ -22,8 +26,9 @@ void main() {
     expect(find.byType(TodayWeekStrip), findsNothing);
   });
 
-  testWidgets('it shows the seven days of the week with today first-class',
-      (tester) async {
+  testWidgets('it shows the seven days of the week with today first-class', (
+    tester,
+  ) async {
     await seed(tester);
     await pumpScreen(
       tester,
@@ -44,8 +49,9 @@ void main() {
     }
   });
 
-  testWidgets('tapping today lists its habits and checking one counts it',
-      (tester) async {
+  testWidgets('tapping today lists its habits and checking one counts it', (
+    tester,
+  ) async {
     await seed(tester);
     await pumpScreen(
       tester,

@@ -36,7 +36,10 @@ void useEmptyStore() {
   setUp(() async {
     _storeDir = await Directory.systemTemp.createTemp('streak_test');
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(_pathProvider, (call) async => _storeDir.path);
+        .setMockMethodCallHandler(
+          _pathProvider,
+          (call) async => _storeDir.path,
+        );
     forgetAppDataDir();
     await LocalStore.init();
   });
@@ -77,33 +80,32 @@ Habit testHabit({
   int durationMinutes = 0,
   bool focusOnly = false,
   List<Substep> substeps = const [],
-}) =>
-    Habit(
-      id: id,
-      name: name,
-      color: color,
-      order: order,
-      kind: kind,
-      perDayTarget: perDayTarget,
-      unitLabel: unitLabel,
-      category: category,
-      interval: interval,
-      scheduleWeekdays: scheduleWeekdays,
-      restDays: restDays,
-      startMinute: startMinute,
-      durationMinutes: durationMinutes,
-      focusOnly: focusOnly,
-      substeps: substeps,
-      createdAt: AppClock.now().subtract(Duration(days: daysOld)),
-      completions: {
-        for (final day in done)
-          day.dayKey: Completion(
-            date: day.dayKey,
-            hour: 9,
-            count: kind == HabitKind.quantitative ? perDayTarget : 1,
-          ),
-      },
-    );
+}) => Habit(
+  id: id,
+  name: name,
+  color: color,
+  order: order,
+  kind: kind,
+  perDayTarget: perDayTarget,
+  unitLabel: unitLabel,
+  category: category,
+  interval: interval,
+  scheduleWeekdays: scheduleWeekdays,
+  restDays: restDays,
+  startMinute: startMinute,
+  durationMinutes: durationMinutes,
+  focusOnly: focusOnly,
+  substeps: substeps,
+  createdAt: AppClock.now().subtract(Duration(days: daysOld)),
+  completions: {
+    for (final day in done)
+      day.dayKey: Completion(
+        date: day.dayKey,
+        hour: 9,
+        count: kind == HabitKind.quantitative ? perDayTarget : 1,
+      ),
+  },
+);
 
 List<DateTime> lastDays(int count) {
   final today = AppClock.now();
@@ -116,15 +118,14 @@ HabitNote testNote({
   required DateTime day,
   required String text,
   NoteType type = NoteType.note,
-}) =>
-    HabitNote(
-      id: id,
-      habitId: habitId,
-      date: day.dayKey,
-      type: type,
-      text: text,
-      createdAt: day,
-    );
+}) => HabitNote(
+  id: id,
+  habitId: habitId,
+  date: day.dayKey,
+  type: type,
+  text: text,
+  createdAt: day,
+);
 
 Future<void> seedNotes(WidgetTester tester, List<HabitNote> notes) =>
     tester.runAsync(() async {
@@ -141,17 +142,16 @@ Todo testTodo({
   TodoPriority priority = TodoPriority.none,
   bool done = false,
   DateTime? createdAt,
-}) =>
-    Todo(
-      id: id,
-      text: text,
-      done: done,
-      date: due?.dayKey ?? '',
-      minutes: minutes,
-      priority: priority,
-      createdAt: createdAt ?? AppClock.now(),
-      doneAt: done ? (createdAt ?? AppClock.now()) : null,
-    );
+}) => Todo(
+  id: id,
+  text: text,
+  done: done,
+  date: due?.dayKey ?? '',
+  minutes: minutes,
+  priority: priority,
+  createdAt: createdAt ?? AppClock.now(),
+  doneAt: done ? (createdAt ?? AppClock.now()) : null,
+);
 
 Future<void> seedTodos(WidgetTester tester, List<Todo> todos) =>
     tester.runAsync(() async {

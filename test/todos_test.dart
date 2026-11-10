@@ -10,19 +10,18 @@ Todo _todo(
   TodoPriority priority = TodoPriority.none,
   bool done = false,
   int createdMinutesAgo = 0,
-}) =>
-    Todo(
-      id: id,
-      text: id,
-      done: done,
-      date: due?.dayKey ?? '',
-      minutes: minutes,
-      priority: priority,
-      createdAt: DateTime(2026, 8, 10, 12).subtract(
-        Duration(minutes: createdMinutesAgo),
-      ),
-      doneAt: done ? DateTime(2026, 8, 10, 12) : null,
-    );
+}) => Todo(
+  id: id,
+  text: id,
+  done: done,
+  date: due?.dayKey ?? '',
+  minutes: minutes,
+  priority: priority,
+  createdAt: DateTime(2026, 8, 10, 12).subtract(
+    Duration(minutes: createdMinutesAgo),
+  ),
+  doneAt: done ? DateTime(2026, 8, 10, 12) : null,
+);
 
 void main() {
   final today = DateTime(2026, 8, 10);
@@ -67,26 +66,28 @@ void main() {
     expect(sections.single.todos.map((t) => t.id), ['open']);
   });
 
-  test('inside a group the nearest date wins, then priority, then the newest',
-      () {
-    final sections = groupPending([
-      _todo('far', due: today.add(const Duration(days: 9))),
-      _todo('near', due: today.add(const Duration(days: 3))),
-    ], today);
+  test(
+    'inside a group the nearest date wins, then priority, then the newest',
+    () {
+      final sections = groupPending([
+        _todo('far', due: today.add(const Duration(days: 9))),
+        _todo('near', due: today.add(const Duration(days: 3))),
+      ], today);
 
-    expect(sections.single.todos.map((t) => t.id), ['near', 'far']);
+      expect(sections.single.todos.map((t) => t.id), ['near', 'far']);
 
-    final sameDay = groupPending([
-      _todo('plain', due: today, createdMinutesAgo: 30),
-      _todo('urgent', due: today, priority: TodoPriority.high),
-      _todo('older', due: today, createdMinutesAgo: 90),
-    ], today);
+      final sameDay = groupPending([
+        _todo('plain', due: today, createdMinutesAgo: 30),
+        _todo('urgent', due: today, priority: TodoPriority.high),
+        _todo('older', due: today, createdMinutesAgo: 90),
+      ], today);
 
-    expect(
-      sameDay.single.todos.map((t) => t.id),
-      ['urgent', 'plain', 'older'],
-    );
-  });
+      expect(
+        sameDay.single.todos.map((t) => t.id),
+        ['urgent', 'plain', 'older'],
+      );
+    },
+  );
 
   test('on the same day the hour decides, and the timed ones go first', () {
     final sections = groupPending([

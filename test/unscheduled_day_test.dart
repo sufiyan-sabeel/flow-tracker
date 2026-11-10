@@ -13,8 +13,8 @@ int get _today => AppClock.now().weekday;
 int get _otherWeekday => _today == 1 ? 2 : 1;
 
 Finder _button(String label) => find.byWidgetPredicate(
-      (widget) => widget is Semantics && widget.properties.label == label,
-    );
+  (widget) => widget is Semantics && widget.properties.label == label,
+);
 
 Future<void> _tapCheck(WidgetTester tester) async {
   await tester.tap(_button('Mark Read as done'));

@@ -14,12 +14,12 @@ Future<Map<String, dynamic>> _payloadOf(List<Habit> habits) async {
   String? saved;
   TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
       .setMockMethodCallHandler(_channel, (call) async {
-    if (call.method == 'saveWidgetData') {
-      final args = call.arguments as Map;
-      if (args['id'] == 'habits_data') saved = args['data'] as String?;
-    }
-    return true;
-  });
+        if (call.method == 'saveWidgetData') {
+          final args = call.arguments as Map;
+          if (args['id'] == 'habits_data') saved = args['data'] as String?;
+        }
+        return true;
+      });
   addTearDown(
     () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(_channel, null),
@@ -67,23 +67,25 @@ void main() {
     }
   });
 
-  test('a habit that is not due today says so for today and tomorrow',
-      () async {
-    final today = AppClock.now();
-    final payload = await _payloadOf([
-      testHabit(
-        id: 'a',
-        name: 'Only tomorrow',
-        interval: HabitInterval.weekdays,
-        scheduleWeekdays: [today.add(const Duration(days: 1)).weekday],
-      ),
-    ]);
-    final scheduled = (payload['habits'] as List).first['scheduled'] as List;
+  test(
+    'a habit that is not due today says so for today and tomorrow',
+    () async {
+      final today = AppClock.now();
+      final payload = await _payloadOf([
+        testHabit(
+          id: 'a',
+          name: 'Only tomorrow',
+          interval: HabitInterval.weekdays,
+          scheduleWeekdays: [today.add(const Duration(days: 1)).weekday],
+        ),
+      ]);
+      final scheduled = (payload['habits'] as List).first['scheduled'] as List;
 
-    expect(scheduled[6], isFalse);
-    expect(scheduled[7], isTrue);
-    expect((payload['summary'] as Map)['total'], 0);
-  });
+      expect(scheduled[6], isFalse);
+      expect(scheduled[7], isTrue);
+      expect((payload['summary'] as Map)['total'], 0);
+    },
+  );
 
   test('archived habits stay out of the widget', () async {
     final payload = await _payloadOf([

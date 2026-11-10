@@ -22,9 +22,9 @@ void main() {
   useEmptyStore();
 
   for (final minimal in [false, true]) {
-    testWidgets(
-        'swiping left completes and right undoes (minimal: $minimal)',
-        (tester) async {
+    testWidgets('swiping left completes and right undoes (minimal: $minimal)', (
+      tester,
+    ) async {
       await seedHabits(tester, [testHabit(id: 'a', name: 'Read', order: 0)]);
       await pumpScreen(
         tester,

@@ -62,9 +62,13 @@ void main() {
   });
 
   test('monthly on the 31st keeps the 31st after a short month', () {
-    final repeat = const TodoRepeat(unit: RepeatUnit.months)
-        .anchoredTo(DateTime(2027, 1, 31));
-    final feb = repeat.after(DateTime(2027, 1, 31), today: DateTime(2027, 1, 31));
+    final repeat = const TodoRepeat(
+      unit: RepeatUnit.months,
+    ).anchoredTo(DateTime(2027, 1, 31));
+    final feb = repeat.after(
+      DateTime(2027, 1, 31),
+      today: DateTime(2027, 1, 31),
+    );
     expect(feb, DateTime(2027, 2, 28));
     expect(repeat.after(feb, today: feb), DateTime(2027, 3, 31));
   });

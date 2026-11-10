@@ -11,11 +11,11 @@ void main() {
   useEmptyStore();
 
   Habit habit() => testHabit(
-        id: 'run',
-        name: 'Run',
-        color: const Color(0xFF34D399),
-        done: lastDays(12),
-      );
+    id: 'run',
+    name: 'Run',
+    color: const Color(0xFF34D399),
+    done: lastDays(12),
+  );
 
   testWidgets('the card and every control are laid out', (tester) async {
     await pumpScreen(tester, SharePage(habit: habit()));
