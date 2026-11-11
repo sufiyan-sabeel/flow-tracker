@@ -31,6 +31,21 @@ The first release built and published for all five platforms from one tag.
   scale, a metadata row, headline numbers, a contents strip and a note on how the
   figures are calculated. Tables alternate row shading and repeat their headers.
 
+### Added
+
+- **Production signing across all five platforms.** Android is signed with the
+  release keystore and checked with `apksigner` and `jarsigner`; iOS with an Apple
+  Distribution certificate and an App Store profile; Windows with Authenticode and
+  an RFC 3161 timestamp, verified with `signtool`; Linux with detached GPG
+  signatures and a published public key; macOS with Developer ID, notarized,
+  stapled and checked with `spctl`. A preflight job refuses to build anything if a
+  credential is missing, and the release notes state the signing status per
+  platform.
+- **An explicit unsigned test mode** for when the signing credentials are not yet
+  configured: a manual dispatch with `signing: unsigned` builds and publishes the
+  same five platforms, clearly labelled as unsigned. A tag push can never select
+  it, so a production release cannot silently downgrade.
+
 ### Fixed
 
 - **The Windows build no longer needs Media Foundation to start.** The

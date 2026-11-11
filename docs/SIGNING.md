@@ -140,6 +140,24 @@ installer.
    verified artifacts, the `.asc` signatures, the public key and
    `SHA256SUMS.txt`, and its notes carry the signing status per platform.
 
+
+## Two modes: signed and explicitly unsigned
+
+The workflow has a `signing` input with two values.
+
+- **`required`** (default, and the only mode a tag push can use) — every
+  credential must be present, every artifact is signed, every signature is
+  verified. If a credential is missing the run stops at preflight and nothing is
+  built.
+- **`unsigned`** — a manual dispatch only. It builds the same five platforms and
+  publishes them, but the release notes open with an **UNSIGNED BUILD — NOT A
+  PRODUCTION RELEASE** banner, the signing table says "Unsigned" per platform,
+  and the iOS artifact is named `-iOS-unsigned.ipa`. Nothing in this mode is
+  described as signed.
+
+An unsigned build is never produced by accident: it requires choosing it in the
+dispatch form, and a tag push cannot select it.
+
 ## Verifying a download yourself
 
 ```bash

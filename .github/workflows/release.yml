@@ -25,6 +25,12 @@ on:
         description: 'Release tag, e.g. v1.5.0'
         required: true
         type: string
+      signing:
+        description: 'required = production signing (fails without credentials); unsigned = explicit, labelled test build'
+        required: true
+        default: required
+        type: choice
+        options: [required, unsigned]
 
 permissions:
   contents: write
@@ -32,6 +38,10 @@ permissions:
 env:
   FLUTTER_VERSION: '3.41.9'
   JAVA_VERSION: '17'
+  # A tag push is always production: inputs.signing is empty there, so the
+  # default applies. Only a manual dispatch can ask for an unsigned build, and
+  # the release notes then say so in the first line.
+  SIGNING_MODE: ${{ github.event.inputs.signing || 'required' }}
   APP_ID: com.flowtracker.app
   # Only this tag may publish. Bump it for the next release.
   RELEASE_TAG: v1.5.0
@@ -81,6 +91,7 @@ jobs:
           echo "tag, pubspec and RELEASE_TAG agree: $TAG"
 
       - name: Every signing credential must be present
+        if: env.SIGNING_MODE == 'required'
         id: creds
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -171,6 +182,7 @@ jobs:
         run: flutter test --reporter=compact
 
       - name: Read the Android signing fingerprint
+        if: env.SIGNING_MODE == 'required'
         id: fingerprints
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -218,6 +230,7 @@ jobs:
         run: flutter pub get
 
       - name: Install the production keystore
+        if: env.SIGNING_MODE == 'required'
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -254,12 +267,19 @@ jobs:
 
           grep -q "Verified using v2 scheme (APK Signature Scheme v2): true" /tmp/apksigner.txt \
             || { echo "::error::$name is not v2-signed"; exit 1; }
-          if grep -qi "CN=Android Debug" /tmp/apksigner.txt; then
-            echo "::error::$name is signed with the debug key — refusing to publish"
-            exit 1
+
+          if [ "${SIGNING_MODE}" = "required" ]; then
+            if grep -qi "CN=Android Debug" /tmp/apksigner.txt; then
+              echo "::error::$name is signed with the debug key — refusing to publish"
+              exit 1
+            fi
+            grep -q "${{ needs.preflight.outputs.android_sha256 }}" /tmp/apksigner.txt \
+              || { echo "::error::$name is not signed by the expected certificate"; exit 1; }
+            echo "APK verified: signed by ${{ needs.preflight.outputs.android_sha256 }}"
+          else
+            echo "::warning::$name is DEBUG-signed because this is an unsigned test build"
+            echo "APK built and structurally verified; signature is not a publisher identity"
           fi
-          grep -q "${{ needs.preflight.outputs.android_sha256 }}" /tmp/apksigner.txt \
-            || { echo "::error::$name is not signed by the expected certificate"; exit 1; }
 
           for abi in arm64-v8a armeabi-v7a x86_64; do
             unzip -l "out/$name" | grep -q "lib/${abi}/libapp.so" \
@@ -283,7 +303,7 @@ jobs:
             || { cat /tmp/jarsigner.txt; echo "::error::AAB signature verification failed"; exit 1; }
           grep -q "jar verified" /tmp/jarsigner.txt \
             || { cat /tmp/jarsigner.txt; echo "::error::AAB is not signed"; exit 1; }
-          if grep -qi "CN=Android Debug" /tmp/jarsigner.txt; then
+          if [ "${SIGNING_MODE}" = "required" ] && grep -qi "CN=Android Debug" /tmp/jarsigner.txt; then
             echo "::error::AAB is signed with the debug key — refusing to publish"
             exit 1
           fi
@@ -324,6 +344,7 @@ jobs:
         run: flutter pub get
 
       - name: Import the Apple Distribution certificate and profile
+        if: env.SIGNING_MODE == 'required'
         env:
           IOS_CERT_P12_BASE64: ${{ secrets.IOS_CERT_P12_BASE64 }}
           IOS_CERT_PASSWORD: ${{ secrets.IOS_CERT_PASSWORD }}
@@ -350,6 +371,7 @@ jobs:
           security find-identity -v -p codesigning "$keychain"
 
       - name: Write the export options
+        if: env.SIGNING_MODE == 'required'
         env:
           IOS_TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
         run: |
@@ -371,9 +393,31 @@ jobs:
           plutil -lint ios/ExportOptions.plist
 
       - name: Build and export a signed IPA
+        if: env.SIGNING_MODE == 'required'
         run: flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
 
+      - name: Build an unsigned iOS app
+        if: env.SIGNING_MODE == 'unsigned'
+        run: |
+          echo "::warning::Building without signing — this IPA cannot be installed on a device"
+          flutter build ios --release --no-codesign
+
+      - name: Package an unsigned IPA
+        if: env.SIGNING_MODE == 'unsigned'
+        run: |
+          set -euo pipefail
+          version="${{ needs.preflight.outputs.version }}"
+          mkdir -p out Payload
+          cp -R build/ios/iphoneos/Runner.app Payload/
+          zip -qry "out/Flow-Tracker-${version}-iOS-unsigned.ipa" Payload
+          rm -rf Payload
+          unzip -l "out/Flow-Tracker-${version}-iOS-unsigned.ipa" > /tmp/ipa.txt
+          grep -q 'Payload/Runner.app/Runner$' /tmp/ipa.txt \
+            || { echo "::error::IPA has no Runner executable"; exit 1; }
+          echo "packaged unsigned IPA for structure checks only"
+
       - name: Verify the IPA signature and provisioning
+        if: env.SIGNING_MODE == 'required'
         env:
           IOS_TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
         run: |
@@ -414,7 +458,7 @@ jobs:
           echo "IPA verified: signed, provisioning profile embedded"
 
       - name: Remove the signing keychain
-        if: always()
+        if: always() && env.SIGNING_MODE == 'required'
         run: security delete-keychain "$RUNNER_TEMP/signing.keychain-db" || true
 
       - uses: actions/upload-artifact@v4
@@ -532,6 +576,7 @@ jobs:
           Remove-Item "out\*.wixpdb" -ErrorAction SilentlyContinue
 
       - name: Authenticode-sign the installers
+        if: env.SIGNING_MODE == 'required'
         env:
           WINDOWS_PFX_BASE64: ${{ secrets.WINDOWS_PFX_BASE64 }}
           WINDOWS_PFX_PASSWORD: ${{ secrets.WINDOWS_PFX_PASSWORD }}
@@ -554,6 +599,7 @@ jobs:
           Remove-Item $pfx -Force
 
       - name: Verify the Authenticode signatures
+        if: env.SIGNING_MODE == 'required'
         run: |
           $ErrorActionPreference = 'Stop'
           $signtool = (Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\signtool.exe" |
@@ -576,6 +622,20 @@ jobs:
             }
             Write-Host "thumbprint: $($sig.SignerCertificate.Thumbprint)"
           }
+
+      - name: Check the unsigned installers
+        if: env.SIGNING_MODE == 'unsigned'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $version = "${{ needs.preflight.outputs.version }}"
+          foreach ($f in @("out\Flow-Tracker-$version-Windows-x64.exe", "out\Flow-Tracker-$version-Windows-x64.msi")) {
+            if (-not (Test-Path $f)) { Write-Error "missing $f"; exit 1 }
+            if ((Get-Item $f).Length -lt 1MB) { Write-Error "$f is suspiciously small"; exit 1 }
+            $sig = Get-AuthenticodeSignature $f
+            Write-Host "$f signature status: $($sig.Status) (expected: NotSigned in unsigned mode)"
+            Write-Host "  size: $((Get-Item $f).Length) bytes"
+          }
+          Write-Warning "Installers are UNSIGNED: SmartScreen will report an unknown publisher"
 
       - uses: actions/upload-artifact@v4
         with:
@@ -704,6 +764,7 @@ jobs:
           rm -f "$tool"
 
       - name: Sign the packages with GPG
+        if: env.SIGNING_MODE == 'required'
         env:
           GPG_PRIVATE_KEY_BASE64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
@@ -735,15 +796,19 @@ jobs:
           appimg="out/Flow-Tracker-${version}-Linux-x86_64.AppImage"
           for f in "$deb" "$appimg"; do
             test -s "$f" || { echo "::error::$f is empty"; exit 1; }
-            test -s "$f.asc" || { echo "::error::$f has no detached signature"; exit 1; }
-            gpg --verify "$f.asc" "$f" || { echo "::error::signature check failed for $f"; exit 1; }
-            echo "verified $f ($(stat -c%s "$f") bytes) with $(basename "$f").asc"
+            if [ "${SIGNING_MODE}" = "required" ]; then
+              test -s "$f.asc" || { echo "::error::$f has no detached signature"; exit 1; }
+              gpg --verify "$f.asc" "$f" || { echo "::error::signature check failed for $f"; exit 1; }
+              echo "verified $f ($(stat -c%s "$f") bytes) with $(basename "$f").asc"
+            else
+              echo "verified structure of $f ($(stat -c%s "$f") bytes); no signature in unsigned mode"
+            fi
           done
           file "$appimg" > /tmp/appimage.txt
           grep -qi 'ELF' /tmp/appimage.txt || { echo "::error::AppImage is not an ELF binary"; exit 1; }
 
       - name: Remove the signing key from the runner
-        if: always()
+        if: always() && env.SIGNING_MODE == 'required'
         run: rm -rf "$RUNNER_TEMP/gnupg"
 
       - uses: actions/upload-artifact@v4
@@ -774,6 +839,7 @@ jobs:
         run: flutter pub get
 
       - name: Import the Developer ID certificates
+        if: env.SIGNING_MODE == 'required'
         env:
           MACOS_CERT_P12_BASE64: ${{ secrets.MACOS_CERT_P12_BASE64 }}
           MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
@@ -800,6 +866,7 @@ jobs:
         run: flutter build macos --release
 
       - name: Sign the app with Developer ID Application
+        if: env.SIGNING_MODE == 'required'
         run: |
           set -euo pipefail
           app=build/macos/Build/Products/Release/Flow-tracker.app
@@ -827,21 +894,28 @@ jobs:
           hdiutil create -volname "Flow-tracker" -srcfolder "$app" -ov -format UDZO \
             "out/Flow-Tracker-${version}-macOS-arm64.dmg"
 
-          installer_identity=$(security find-identity -v -p basic "$RUNNER_TEMP/macos-signing.keychain-db" \
-                                | grep "Developer ID Installer" | head -1 | sed -E 's/.*"(.*)"/\1/')
-          if [ -z "$installer_identity" ]; then
-            echo "::error::no Developer ID Installer identity in the keychain"; exit 1
+          if [ "${SIGNING_MODE}" = "required" ]; then
+            installer_identity=$(security find-identity -v -p basic "$RUNNER_TEMP/macos-signing.keychain-db" \
+                                  | grep "Developer ID Installer" | head -1 | sed -E 's/.*"(.*)"/\1/')
+            if [ -z "$installer_identity" ]; then
+              echo "::error::no Developer ID Installer identity in the keychain"; exit 1
+            fi
+            pkgbuild --component "$app" --install-location /Applications \
+              --identifier "${APP_ID}" --version "$version" \
+              --sign "$installer_identity" \
+              "out/Flow-Tracker-${version}-macOS-arm64.pkg"
+            # sign the disk image too, so the download itself carries a signature
+            codesign --force --timestamp --sign "$installer_identity" \
+              "out/Flow-Tracker-${version}-macOS-arm64.dmg"
+          else
+            echo "::warning::Packaging unsigned DMG and PKG"
+            pkgbuild --component "$app" --install-location /Applications \
+              --identifier "${APP_ID}" --version "$version" \
+              "out/Flow-Tracker-${version}-macOS-arm64.pkg"
           fi
-          pkgbuild --component "$app" --install-location /Applications \
-            --identifier "${APP_ID}" --version "$version" \
-            --sign "$installer_identity" \
-            "out/Flow-Tracker-${version}-macOS-arm64.pkg"
-
-          # sign the disk image too, so the download itself carries a signature
-          codesign --force --timestamp --sign "$installer_identity" \
-            "out/Flow-Tracker-${version}-macOS-arm64.dmg"
 
       - name: Notarize and staple
+        if: env.SIGNING_MODE == 'required'
         env:
           MACOS_NOTARY_APPLE_ID: ${{ secrets.MACOS_NOTARY_APPLE_ID }}
           MACOS_NOTARY_PASSWORD: ${{ secrets.MACOS_NOTARY_PASSWORD }}
@@ -869,20 +943,26 @@ jobs:
           pkg="out/Flow-Tracker-${version}-macOS-arm64.pkg"
           dmg="out/Flow-Tracker-${version}-macOS-arm64.dmg"
 
-          codesign --verify --deep --strict --verbose=2 "$app"
-          spctl --assess --type execute --verbose=4 "$app"
-          pkgutil --check-signature "$pkg" | tee /tmp/pkg-signature.txt
-          grep -q "Developer ID Installer" /tmp/pkg-signature.txt \
-            || { echo "::error::PKG is not signed by Developer ID Installer"; exit 1; }
-          spctl --assess --type install --verbose=4 "$pkg"
           hdiutil verify "$dmg"
           pkgutil --payload-files "$pkg" > /tmp/pkg.txt
           grep -q 'Flow-tracker.app/Contents/MacOS/Flow-tracker' /tmp/pkg.txt \
             || { echo "::error::PKG payload is missing the app binary"; exit 1; }
-          echo "macOS artifacts signed, notarized, stapled and accepted by Gatekeeper"
+
+          if [ "${SIGNING_MODE}" = "required" ]; then
+            codesign --verify --deep --strict --verbose=2 "$app"
+            spctl --assess --type execute --verbose=4 "$app"
+            pkgutil --check-signature "$pkg" | tee /tmp/pkg-signature.txt
+            grep -q "Developer ID Installer" /tmp/pkg-signature.txt \
+              || { echo "::error::PKG is not signed by Developer ID Installer"; exit 1; }
+            spctl --assess --type install --verbose=4 "$pkg"
+            echo "macOS artifacts signed, notarized, stapled and accepted by Gatekeeper"
+          else
+            echo "::warning::macOS artifacts are unsigned and not notarized (test build)"
+            echo "package structure verified; Gatekeeper will require right-click → Open"
+          fi
 
       - name: Remove the signing keychain
-        if: always()
+        if: always() && env.SIGNING_MODE == 'required'
         run: security delete-keychain "$RUNNER_TEMP/macos-signing.keychain-db" || true
 
       - uses: actions/upload-artifact@v4
@@ -896,11 +976,11 @@ jobs:
   publish:
     name: Publish release
     needs: [preflight, android, ios, windows, linux, macos]
-    # All five platforms must be signed and verified. There is no partial release.
+    # All five platforms must have built and passed their checks. There is no
+    # partial release, and in production mode every artifact must be signed.
     if: success()
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    environment: release
     steps:
       - uses: actions/checkout@v4
 
@@ -916,14 +996,16 @@ jobs:
           cd dist
           ls -la
           count=$(ls -1 | wc -l)
-          if [ "$count" -lt 10 ]; then
-            echo "::error::expected 9 artifacts plus signatures and checksums, found $count"
+          if [ "${SIGNING_MODE}" = "required" ]; then want=13; else want=10; fi
+          if [ "$count" -lt "$want" ]; then
+            echo "::error::expected at least $want files for ${SIGNING_MODE} signing, found $count"
             exit 1
           fi
           sha256sum * > SHA256SUMS.txt
           cat SHA256SUMS.txt
 
-      - name: Publish
+      - name: Publish the signed release
+        if: env.SIGNING_MODE == 'required'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
@@ -936,10 +1018,9 @@ jobs:
             Built from `${{ github.sha }}`. Private, offline habit tracking with PDF
             reports — no account, no upload, everything stays on your device.
 
-            ### Signing status
-
-            Every artifact below was signed with the project's production identity
-            and verified during the build. Nothing unsigned is published.
+            **Signing: production.** Every artifact was signed with the project's
+            publisher identity and verified during the build. Nothing unsigned is
+            attached.
 
             | Platform | Identity | Verification |
             | --- | --- | --- |
@@ -960,7 +1041,7 @@ jobs:
             | macOS | `Flow-Tracker-${{ needs.preflight.outputs.version }}-macOS-arm64.dmg`, `-macOS-arm64.pkg` |
 
             Signature files: `.asc` next to each Linux package, plus
-            `flow-tracker-signing-key.asc` (the public key) and `SHA256SUMS.txt`.
+            `flow-tracker-signing-key.asc` and `SHA256SUMS.txt`.
 
             ### Verify a download
 
@@ -971,17 +1052,16 @@ jobs:
                          Flow-Tracker-${{ needs.preflight.outputs.version }}-Linux-amd64.deb
             ```
 
-            The AppImage is covered by its own detached signature; it is not the same
-            signature as the DEB's, even though both use the project key.
+            The AppImage carries its own detached signature; it is a separate
+            signature over a separate file, not the DEB's reused.
 
             ### Installation
 
             - **Android**: open the APK on the device and allow install from this source.
             - **iOS**: signed for App Store distribution; install via TestFlight or a
-              provisioning profile that includes your device.
-            - **Windows**: run the `.exe` or `.msi`. The installers are signed, so
-              SmartScreen no longer reports an unknown publisher — reputation is
-              earned over time and is not guaranteed.
+              profile that includes your device.
+            - **Windows**: run the `.exe` or `.msi`. SmartScreen reputation builds over
+              time and is not guaranteed.
             - **Linux**: `sudo apt install ./Flow-Tracker-*.deb`, or
               `chmod +x Flow-Tracker-*.AppImage && ./Flow-Tracker-*.AppImage`.
             - **macOS**: open the DMG and drag the app to Applications, or run the PKG.
@@ -989,9 +1069,70 @@ jobs:
 
             ### Known limitations
 
-            - SmartScreen reputation builds over time; a freshly issued certificate
-              still shows a warning on some machines until downloads accumulate.
-            - No physical iPhone, Mac or Windows machine was used to test these
-              builds; they are compiled, signed and verified on GitHub runners.
+            - SmartScreen reputation is earned over time, not granted by signing.
+            - No physical iPhone, Mac or Windows machine was used to test these builds.
+            - Home-screen widgets and scheduled reminders are Android/iOS features;
+              the desktop builds run without them.
+
+      - name: Publish the unsigned test build
+        if: env.SIGNING_MODE == 'unsigned'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+          name: Flow Tracker v${{ needs.preflight.outputs.version }}
+          files: dist/*
+          fail_on_unmatched_files: true
+          body: |
+            ## Flow Tracker v${{ needs.preflight.outputs.version }}
+
+            > **UNSIGNED BUILD — NOT A PRODUCTION RELEASE.**
+            > These files were built and structurally verified, but no publisher
+            > identity was used. Android is debug-signed, the iOS IPA cannot be
+            > installed on a device, Windows and macOS will warn about an unknown
+            > publisher, and the Linux packages carry no GPG signature. Use them for
+            > testing. The production release is built with `signing: required` once
+            > the credentials in `docs/SIGNING.md` are configured.
+
+            Built from `${{ github.sha }}`. Private, offline habit tracking with PDF
+            reports — no account, no upload, everything stays on your device.
+
+            ### Signing status
+
+            | Platform | Status | What was actually verified |
+            | --- | --- | --- |
+            | Android | **Unsigned** (debug key) | `apksigner` v2 scheme present, package id and version, all three ABIs |
+            | iOS | **Unsigned** | IPA payload and `Runner` executable present |
+            | Windows | **Unsigned** | installers exist, exceed 1 MB, contain the app binary |
+            | Linux | **Unsigned** | DEB control metadata, AppImage is an ELF, payload present |
+            | macOS | **Unsigned, not notarized** | DMG verified with `hdiutil`, PKG payload contains the app |
+
+            ### Downloads
+
+            | Platform | File |
+            | --- | --- |
+            | Android | `Flow-Tracker-${{ needs.preflight.outputs.version }}-Android.apk`, `-Android.aab` |
+            | iOS | `Flow-Tracker-${{ needs.preflight.outputs.version }}-iOS-unsigned.ipa` |
+            | Windows | `Flow-Tracker-${{ needs.preflight.outputs.version }}-Windows-x64.exe`, `-Windows-x64.msi` |
+            | Linux | `Flow-Tracker-${{ needs.preflight.outputs.version }}-Linux-x86_64.AppImage`, `-Linux-amd64.deb` |
+            | macOS | `Flow-Tracker-${{ needs.preflight.outputs.version }}-macOS-arm64.dmg`, `-macOS-arm64.pkg` |
+
+            `SHA256SUMS.txt` covers every file. There are no `.asc` signatures in this
+            build because no GPG key was used.
+
+            ### Installation
+
+            - **Android**: open the APK and allow install from this source. Because it is
+              debug-signed, uninstall any previous copy first if the signature differs.
+            - **iOS**: unsigned — re-sign with your own Apple team to install.
+            - **Windows**: run the `.exe` or `.msi`; SmartScreen will warn.
+            - **Linux**: `sudo apt install ./Flow-Tracker-*.deb`, or
+              `chmod +x Flow-Tracker-*.AppImage && ./Flow-Tracker-*.AppImage`.
+            - **macOS**: open the DMG and drag the app across; right-click → Open the
+              first time, because it is not notarized.
+
+            ### Known limitations
+
+            - Nothing here is signed by a publisher identity.
+            - No physical iPhone, Mac or Windows machine was used to test these builds.
             - Home-screen widgets and scheduled reminders are Android/iOS features;
               the desktop builds run without them.
