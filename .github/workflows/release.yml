@@ -563,7 +563,7 @@ jobs:
                   <Shortcut Id="AppShortcut" Name="Flow-tracker" Target="[INSTALLDIR]Flow-tracker.exe"
                             WorkingDirectory="INSTALLDIR" />
                   <RemoveFolder Id="AppShortcutDir" On="uninstall" />
-                  <RegistryValue Root="HKCU" Key="Software\\UmaizSufiyan\\Flow-tracker" Name="installed"
+                  <RegistryValue Root="HKCU" Key="Software\UmaizSufiyan\Flow-tracker" Name="installed"
                                  Type="integer" Value="1" KeyPath="yes" />
                 </Component>
               </DirectoryRef>
