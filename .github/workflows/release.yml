@@ -194,7 +194,8 @@ jobs:
           sha=$(keytool -list -v -keystore /tmp/release.jks \
                   -storepass "$ANDROID_KEYSTORE_PASSWORD" \
                   -alias "$ANDROID_KEY_ALIAS" 2>/dev/null \
-                | grep -m1 'SHA256:' | sed 's/.*SHA256: //')
+                | grep -m1 'SHA256:' | sed 's/.*SHA256: //' \
+                | tr -d ':' | tr 'A-F' 'a-f')
           if [ -z "$sha" ]; then
             echo "::error::could not read a SHA-256 fingerprint from the keystore"
             exit 1
@@ -299,13 +300,29 @@ jobs:
           name="Flow-Tracker-${version}-Android.aab"
           cp "$aab" "out/$name"
 
-          jarsigner -verify -strict -verbose -certs "out/$name" > /tmp/jarsigner.txt 2>&1 \
-            || { cat /tmp/jarsigner.txt; echo "::error::AAB signature verification failed"; exit 1; }
+          # -strict is deliberately not used: Android signing certificates are
+          # self-signed, so PKIX validation always reports "signer errors" even
+          # for a correct production signature.
+          jarsigner -verify -verbose -certs "out/$name" > /tmp/jarsigner.txt 2>&1 || true
           grep -q "jar verified" /tmp/jarsigner.txt \
             || { cat /tmp/jarsigner.txt; echo "::error::AAB is not signed"; exit 1; }
-          if [ "${SIGNING_MODE}" = "required" ] && grep -qi "CN=Android Debug" /tmp/jarsigner.txt; then
-            echo "::error::AAB is signed with the debug key — refusing to publish"
-            exit 1
+
+          keytool -printcert -jarfile "out/$name" > /tmp/aabcert.txt 2>&1 \
+            || { cat /tmp/aabcert.txt; echo "::error::could not read the AAB signer"; exit 1; }
+          aab_sha=$(grep -m1 'SHA256:' /tmp/aabcert.txt | sed 's/.*SHA256: //' \
+                    | tr -d ':' | tr 'A-F' 'a-f')
+          echo "AAB signer SHA-256: $aab_sha"
+
+          if [ "${SIGNING_MODE}" = "required" ]; then
+            [ "$aab_sha" = "${{ needs.preflight.outputs.android_sha256 }}" ] \
+              || { echo "::error::AAB is not signed by the expected certificate"; exit 1; }
+            if grep -qi "CN=Android Debug" /tmp/aabcert.txt; then
+              echo "::error::AAB is signed with the debug key — refusing to publish"
+              exit 1
+            fi
+            echo "AAB verified: signed by $aab_sha"
+          else
+            echo "::warning::AAB is debug-signed (unsigned test build)"
           fi
           unzip -l "out/$name" > /tmp/aab.txt
           grep -q 'base/manifest/AndroidManifest.xml' /tmp/aab.txt \
