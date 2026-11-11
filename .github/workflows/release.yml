@@ -1036,15 +1036,17 @@ jobs:
           set -euo pipefail
           cd dist
           ls -la
+          # Counted before SHA256SUMS.txt is written, so the manifest is not in
+          # the number. Production: 9 artifacts + 2 .asc + public key = 12.
+          # Unsigned: two files per platform except iOS, which is one.
           count=$(ls -1 | wc -l)
           if [ "${SIGNING_MODE}" = "required" ]; then
-            want=13
+            want=12
           else
-            # 2 files per built platform, plus the checksum manifest itself
             platforms=$(echo "${{ steps.platforms.outputs.built }}" | wc -w)
-            want=$(( platforms * 2 ))
-            [ "$platforms" -eq 1 ] && want=2
+            want=$(( platforms * 2 - 1 ))
           fi
+          echo "found $count files, expecting at least $want"
           if [ "$count" -lt "$want" ]; then
             echo "::error::expected at least $want files, found $count"
             exit 1
