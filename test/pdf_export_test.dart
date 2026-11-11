@@ -36,8 +36,8 @@ void main() {
 
   // Everything below is relative to the real clock: the fixtures seed data from
   // AppClock.now(), so a fixed date here would make the suite fail the next day.
-  final _now = DateTime.now();
-  final today = DateTime(_now.year, _now.month, _now.day);
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
   DateTime daysAgo(int n) => today.subtract(Duration(days: n));
   String two(int v) => v.toString().padLeft(2, '0');
   String key(DateTime d) => '${d.year}-${two(d.month)}-${two(d.day)}';
