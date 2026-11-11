@@ -34,7 +34,13 @@ void expectRealPdf(Uint8List bytes, {String? reason}) {
 void main() {
   useEmptyStore();
 
-  final today = DateTime(2026, 11, 10);
+  // Everything below is relative to the real clock: the fixtures seed data from
+  // AppClock.now(), so a fixed date here would make the suite fail the next day.
+  final _now = DateTime.now();
+  final today = DateTime(_now.year, _now.month, _now.day);
+  DateTime daysAgo(int n) => today.subtract(Duration(days: n));
+  String two(int v) => v.toString().padLeft(2, '0');
+  String key(DateTime d) => '${d.year}-${two(d.month)}-${two(d.day)}';
 
   PdfExportOptions optionsFor(
     PdfExportType type, {
@@ -158,28 +164,33 @@ void main() {
     test('resolve to the days they say they do', () {
       final o = optionsFor(PdfExportType.complete);
       expect(o.copyWith(range: PdfDateRange.today).resolve(today), (
-        from: DateTime(2026, 11, 10),
-        to: DateTime(2026, 11, 10),
+        from: today,
+        to: today,
       ));
       expect(o.copyWith(range: PdfDateRange.last7).resolve(today), (
-        from: DateTime(2026, 11, 4),
-        to: DateTime(2026, 11, 10),
+        from: daysAgo(6),
+        to: today,
       ));
       expect(o.copyWith(range: PdfDateRange.last30).resolve(today), (
-        from: DateTime(2026, 10, 12),
-        to: DateTime(2026, 11, 10),
+        from: daysAgo(29),
+        to: today,
       ));
       expect(o.copyWith(range: PdfDateRange.thisMonth).resolve(today), (
-        from: DateTime(2026, 11, 1),
-        to: DateTime(2026, 11, 10),
+        from: DateTime(today.year, today.month, 1),
+        to: today,
       ));
+      final lastMonthEnd = DateTime(
+        today.year,
+        today.month,
+        1,
+      ).subtract(const Duration(days: 1));
       expect(o.copyWith(range: PdfDateRange.lastMonth).resolve(today), (
-        from: DateTime(2026, 10, 1),
-        to: DateTime(2026, 10, 31),
+        from: DateTime(lastMonthEnd.year, lastMonthEnd.month, 1),
+        to: lastMonthEnd,
       ));
       expect(o.copyWith(range: PdfDateRange.thisYear).resolve(today), (
-        from: DateTime(2026, 1, 1),
-        to: DateTime(2026, 11, 10),
+        from: DateTime(today.year, 1, 1),
+        to: today,
       ));
     });
 
@@ -188,21 +199,21 @@ void main() {
       final swapped = o
           .copyWith(
             range: PdfDateRange.custom,
-            from: DateTime(2026, 11, 8),
-            to: DateTime(2026, 11, 2),
+            from: daysAgo(2),
+            to: daysAgo(8),
           )
           .resolve(today);
-      expect(swapped.from, DateTime(2026, 11, 2));
-      expect(swapped.to, DateTime(2026, 11, 8));
+      expect(swapped.from, daysAgo(8));
+      expect(swapped.to, daysAgo(2));
 
       final future = o
           .copyWith(
             range: PdfDateRange.custom,
-            from: DateTime(2026, 11, 1),
-            to: DateTime(2026, 12, 31),
+            from: daysAgo(10),
+            to: today.add(const Duration(days: 30)),
           )
           .resolve(today);
-      expect(future.to, DateTime(2026, 11, 10));
+      expect(future.to, today);
     });
   });
 
@@ -212,17 +223,20 @@ void main() {
           PdfExportService.fileName(optionsFor(type), today: today);
       expect(
         name(PdfExportType.complete),
-        'FlowTracker_Complete_Report_2026-11-10.pdf',
+        'FlowTracker_Complete_Report_${key(today)}.pdf',
       );
       expect(
         name(PdfExportType.habitProgress),
-        'FlowTracker_Habit_Progress_2026-11-10.pdf',
+        'FlowTracker_Habit_Progress_${key(today)}.pdf',
       );
       expect(
         name(PdfExportType.monthly),
-        'FlowTracker_Monthly_Summary_2026-11.pdf',
+        'FlowTracker_Monthly_Summary_${today.year}-${two(today.month)}.pdf',
       );
-      expect(name(PdfExportType.yearly), 'FlowTracker_Yearly_Report_2026.pdf');
+      expect(
+        name(PdfExportType.yearly),
+        'FlowTracker_Yearly_Report_${today.year}.pdf',
+      );
       expect(name(PdfExportType.todos), endsWith('.pdf'));
       expect(name(PdfExportType.todos), contains('FlowTracker_'));
     });

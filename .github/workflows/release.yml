@@ -307,10 +307,11 @@ jobs:
           $script:counter = 0
           $script:ids = @()
           function New-DirXml {
-            param([string]$Path, [string]$Id, [int]$Depth)
+            param([string]$Path, [string]$Id, [int]$Depth, [string]$Name = '')
             $pad = ' ' * ($Depth * 2)
+            if ([string]::IsNullOrEmpty($Name)) { $Name = Split-Path $Path -Leaf }
             $sb = New-Object System.Text.StringBuilder
-            [void]$sb.AppendLine("$pad<Directory Id=`"$Id`" Name=`"$(Split-Path $Path -Leaf)`">")
+            [void]$sb.AppendLine("$pad<Directory Id=`"$Id`" Name=`"$Name`">")
             foreach ($f in Get-ChildItem -Path $Path -File) {
               $script:counter++
               $cid = "c$($script:counter)"
@@ -328,7 +329,7 @@ jobs:
             return $sb.ToString()
           }
 
-          $tree = New-DirXml -Path $src -Id 'INSTALLDIR' -Depth 6
+          $tree = New-DirXml -Path $src -Id 'INSTALLDIR' -Depth 6 -Name 'Flow-tracker'
           $refs = ($script:ids | ForEach-Object { "      <ComponentRef Id=`"$_`" />" }) -join "`n"
           $wxs = @"
           <?xml version="1.0" encoding="UTF-8"?>
