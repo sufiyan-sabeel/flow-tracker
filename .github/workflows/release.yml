@@ -167,23 +167,26 @@ jobs:
           cp "$apk" "out/$name"
 
           # structural checks: a real APK with a dex and every ABI we claim
-          unzip -l "out/$name" | grep -q 'classes.dex' || { echo "::error::$name has no classes.dex"; exit 1; }
+          unzip -l "out/$name" > /tmp/apk.txt
+          grep -q 'classes.dex' /tmp/apk.txt || { echo "::error::$name has no classes.dex"; exit 1; }
           for abi in arm64-v8a armeabi-v7a x86_64; do
-            unzip -l "out/$name" | grep -q "lib/${abi}/libapp.so" \
+            grep -q "lib/${abi}/libapp.so" /tmp/apk.txt \
               || { echo "::error::$name is missing libapp.so for ${abi}"; exit 1; }
             echo "  contains ${abi}"
           done
           # identity: the package id must be the one we ship
           unzip -p "out/$name" AndroidManifest.xml > /tmp/manifest.bin
-          strings -e l /tmp/manifest.bin | grep -qx "${APP_ID}" || { echo "::error::$name is not ${APP_ID}"; exit 1; }
-          strings -e l /tmp/manifest.bin | grep -qx "${version}" || { echo "::error::$name is not version ${version}"; exit 1; }
+          strings -e l /tmp/manifest.bin > /tmp/manifest.txt
+          grep -qx "${APP_ID}" /tmp/manifest.txt || { echo "::error::$name is not ${APP_ID}"; exit 1; }
+          grep -qx "${version}" /tmp/manifest.txt || { echo "::error::$name is not version ${version}"; exit 1; }
           test -s "out/$name" || { echo "::error::$name is empty"; exit 1; }
           echo "verified $name ($(stat -c%s "out/$name") bytes)"
 
           aab=build/app/outputs/bundle/release/app-release.aab
           test -f "$aab" || { echo "::error::no AAB produced"; exit 1; }
           cp "$aab" "out/Flow-Tracker-${version}-Android.aab"
-          unzip -l "out/Flow-Tracker-${version}-Android.aab" | grep -q 'base/manifest/AndroidManifest.xml' \
+          unzip -l "out/Flow-Tracker-${version}-Android.aab" > /tmp/aab.txt
+          grep -q 'base/manifest/AndroidManifest.xml' /tmp/aab.txt \
             || { echo "::error::AAB structure is wrong"; exit 1; }
           echo "verified AAB ($(stat -c%s "out/Flow-Tracker-${version}-Android.aab") bytes)"
 
@@ -240,7 +243,8 @@ jobs:
           rm -rf Payload
 
           # verify: the bundle is real and carries the right identity
-          unzip -l "out/$name" | grep -q 'Payload/Runner.app/Runner$' \
+          unzip -l "out/$name" > /tmp/ipa.txt
+          grep -q 'Payload/Runner.app/Runner$' /tmp/ipa.txt \
             || { echo "::error::IPA has no Runner executable"; exit 1; }
           unzip -q -o "out/$name" 'Payload/Runner.app/Info.plist' -d /tmp/ipa
           id=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' /tmp/ipa/Payload/Runner.app/Info.plist)
@@ -462,7 +466,8 @@ jobs:
           dpkg-deb --info "out/Flow-Tracker-${version}-Linux-amd64.deb" > /dev/null
           dpkg-deb --field "out/Flow-Tracker-${version}-Linux-amd64.deb" \
             Package Version Architecture
-          dpkg-deb --contents "out/Flow-Tracker-${version}-Linux-amd64.deb" | grep -q 'opt/flow-tracker/flow-tracker' \
+          dpkg-deb --contents "out/Flow-Tracker-${version}-Linux-amd64.deb" > /tmp/deb.txt
+          grep -q 'opt/flow-tracker/flow-tracker' /tmp/deb.txt \
             || { echo "::error::DEB is missing the app binary"; exit 1; }
 
       - name: Package AppImage
@@ -513,7 +518,8 @@ jobs:
             echo "verified $f ($(stat -c%s "$f") bytes)"
           done
           dpkg-deb --field "$deb" Package Version Architecture
-          file "$appimg" | grep -qi 'ELF' || { echo "::error::AppImage is not an ELF binary"; exit 1; }
+          file "$appimg" > /tmp/appimage.txt
+          grep -qi 'ELF' /tmp/appimage.txt || { echo "::error::AppImage is not an ELF binary"; exit 1; }
 
       - uses: actions/upload-artifact@v4
         with:
@@ -572,7 +578,8 @@ jobs:
             echo "verified $f ($(stat -f%z "$f") bytes)"
           done
           hdiutil verify "$dmg"
-          pkgutil --payload-files "$pkg" | grep -q 'Flow-tracker.app/Contents/MacOS/Flow-tracker' \
+          pkgutil --payload-files "$pkg" > /tmp/pkg.txt
+          grep -q 'Flow-tracker.app/Contents/MacOS/Flow-tracker' /tmp/pkg.txt \
             || { echo "::error::PKG payload is missing the app binary"; exit 1; }
           codesign -dv "build/macos/Build/Products/Release/Flow-tracker.app" 2>&1 | head -3 || true
 
