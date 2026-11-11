@@ -238,7 +238,7 @@ jobs:
           version="${{ needs.validate.outputs.version }}"
           mkdir -p out Payload
           cp -R build/ios/iphoneos/Runner.app Payload/
-          name="Flow-Tracker-${version}-iOS-unsigned.ipa"
+          name="Flow-Tracker-${version}-iOS.ipa"
           zip -qry "out/$name" Payload
           rm -rf Payload
 
@@ -385,6 +385,7 @@ jobs:
           $bytes = [System.IO.File]::ReadAllBytes($msi)
           $text = [System.Text.Encoding]::ASCII.GetString($bytes)
           if (-not $text.Contains("Flow-tracker.exe")) { Write-Error "MSI does not reference the app binary"; exit 1 }
+          Remove-Item "out\*.wixpdb" -ErrorAction SilentlyContinue
           $appExe = "build\windows\x64\runner\Release\Flow-tracker.exe"
           if (-not (Test-Path $appExe)) { Write-Error "the built exe is missing"; exit 1 }
           Write-Host "verified the release exe exists"
@@ -392,7 +393,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: windows
-          path: out/*
+          path: |
+            out/*
+            !out/*.wixpdb
           if-no-files-found: error
           retention-days: 14
 
