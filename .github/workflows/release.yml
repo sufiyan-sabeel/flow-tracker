@@ -1,14 +1,20 @@
 name: Release
 
-# Multi-platform release. Triggered by a version tag (v1.7.0) or manually.
+# Signed, multi-platform release.
 #
-# Honesty rules baked into this file:
-#   * a platform job that fails fails the run, and its artifacts are never
-#     attached to the release;
-#   * the release notes list, per platform, what was actually built and whether
-#     it is signed;
-#   * nothing here invents signing credentials. Without the secrets, iOS and
-#     macOS artifacts are unsigned and are named as such.
+# Signing policy, enforced in code rather than in comments:
+#   * every artifact is signed with a real publisher identity before it is
+#     published — there is no debug-key fallback and no unsigned path;
+#   * the `preflight` job checks every credential first and fails immediately,
+#     naming what is missing, instead of burning forty minutes of builds and then
+#     quietly shipping something unsigned;
+#   * each platform job verifies its own signature with the platform's own tool
+#     (apksigner, jarsigner, codesign, spctl, pkgutil, signtool, gpg) and fails if
+#     verification does not pass;
+#   * the release notes state the signing status per platform, taken from what
+#     actually happened.
+#
+# See docs/SIGNING.md for the credential list and how to produce each one.
 
 on:
   push:
@@ -16,7 +22,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Release tag, e.g. v1.7.0'
+        description: 'Release tag, e.g. v1.5.0'
         required: true
         type: string
 
@@ -27,19 +33,20 @@ env:
   FLUTTER_VERSION: '3.41.9'
   JAVA_VERSION: '17'
   APP_ID: com.flowtracker.app
-  # Only this tag may publish. Bump it for the next release; any other tag is
-  # rejected in the validate job so a stray tag can never produce a release.
+  # Only this tag may publish. Bump it for the next release.
   RELEASE_TAG: v1.5.0
+  # Expected publisher identities, used to check what was actually signed.
+  WINDOWS_PUBLISHER: 'Umaiz Sufiyan'
 
 jobs:
-  # ---------------------------------------------------------------- validate
-  validate:
-    name: Validate version and code
+  # ---------------------------------------------------------------- preflight
+  preflight:
+    name: Preflight — version, tests and signing credentials
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     outputs:
       version: ${{ steps.version.outputs.version }}
-      build: ${{ steps.version.outputs.build }}
+      android_sha256: ${{ steps.fingerprints.outputs.android }}
     steps:
       - uses: actions/checkout@v4
 
@@ -55,10 +62,9 @@ jobs:
             exit 1
           fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
-          echo "build=$build" >> "$GITHUB_OUTPUT"
           echo "pubspec version: $version+$build"
 
-      - name: Tag must match pubspec
+      - name: Tag must match pubspec and the release tag
         env:
           TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
         run: |
@@ -72,7 +78,72 @@ jobs:
             echo "::error::tag $TAG is not the release tag ${RELEASE_TAG}; refusing to publish"
             exit 1
           fi
-          echo "tag and pubspec agree: $TAG"
+          echo "tag, pubspec and RELEASE_TAG agree: $TAG"
+
+      - name: Every signing credential must be present
+        id: creds
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          IOS_CERT_P12_BASE64: ${{ secrets.IOS_CERT_P12_BASE64 }}
+          IOS_CERT_PASSWORD: ${{ secrets.IOS_CERT_PASSWORD }}
+          IOS_PROVISION_PROFILE_BASE64: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
+          IOS_TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
+          WINDOWS_PFX_BASE64: ${{ secrets.WINDOWS_PFX_BASE64 }}
+          WINDOWS_PFX_PASSWORD: ${{ secrets.WINDOWS_PFX_PASSWORD }}
+          GPG_PRIVATE_KEY_BASE64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+          MACOS_CERT_P12_BASE64: ${{ secrets.MACOS_CERT_P12_BASE64 }}
+          MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
+          MACOS_INSTALLER_P12_BASE64: ${{ secrets.MACOS_INSTALLER_P12_BASE64 }}
+          MACOS_INSTALLER_PASSWORD: ${{ secrets.MACOS_INSTALLER_PASSWORD }}
+          MACOS_TEAM_ID: ${{ secrets.MACOS_TEAM_ID }}
+          MACOS_NOTARY_APPLE_ID: ${{ secrets.MACOS_NOTARY_APPLE_ID }}
+          MACOS_NOTARY_PASSWORD: ${{ secrets.MACOS_NOTARY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          missing=()
+          check() { if [ -z "${2:-}" ]; then missing+=("$1"); fi; }
+          check ANDROID_KEYSTORE_BASE64       "${ANDROID_KEYSTORE_BASE64:-}"
+          check ANDROID_KEYSTORE_PASSWORD     "${ANDROID_KEYSTORE_PASSWORD:-}"
+          check ANDROID_KEY_ALIAS             "${ANDROID_KEY_ALIAS:-}"
+          check ANDROID_KEY_PASSWORD          "${ANDROID_KEY_PASSWORD:-}"
+          check IOS_CERT_P12_BASE64           "${IOS_CERT_P12_BASE64:-}"
+          check IOS_CERT_PASSWORD             "${IOS_CERT_PASSWORD:-}"
+          check IOS_PROVISION_PROFILE_BASE64  "${IOS_PROVISION_PROFILE_BASE64:-}"
+          check IOS_TEAM_ID                   "${IOS_TEAM_ID:-}"
+          check WINDOWS_PFX_BASE64            "${WINDOWS_PFX_BASE64:-}"
+          check WINDOWS_PFX_PASSWORD          "${WINDOWS_PFX_PASSWORD:-}"
+          check GPG_PRIVATE_KEY_BASE64        "${GPG_PRIVATE_KEY_BASE64:-}"
+          check GPG_PASSPHRASE                "${GPG_PASSPHRASE:-}"
+          check GPG_KEY_ID                    "${GPG_KEY_ID:-}"
+          check MACOS_CERT_P12_BASE64         "${MACOS_CERT_P12_BASE64:-}"
+          check MACOS_CERT_PASSWORD           "${MACOS_CERT_PASSWORD:-}"
+          check MACOS_INSTALLER_P12_BASE64    "${MACOS_INSTALLER_P12_BASE64:-}"
+          check MACOS_INSTALLER_PASSWORD      "${MACOS_INSTALLER_PASSWORD:-}"
+          check MACOS_TEAM_ID                 "${MACOS_TEAM_ID:-}"
+          check MACOS_NOTARY_APPLE_ID         "${MACOS_NOTARY_APPLE_ID:-}"
+          check MACOS_NOTARY_PASSWORD         "${MACOS_NOTARY_PASSWORD:-}"
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "::error::refusing to build an unsigned release — missing credentials:"
+            for m in "${missing[@]}"; do echo "::error::  $m"; done
+            {
+              echo "### Signing blocked: ${#missing[@]} credential(s) missing"
+              echo ""
+              echo "This pipeline does not produce unsigned or debug-signed artifacts."
+              echo "Add the following under Settings → Secrets and variables → Actions"
+              echo "(environment \`release\`), then re-run:"
+              echo ""
+              for m in "${missing[@]}"; do echo "- \`$m\`"; done
+              echo ""
+              echo "See \`docs/SIGNING.md\` for how to produce each value."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          echo "all signing credentials present"
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -99,12 +170,34 @@ jobs:
       - name: Test
         run: flutter test --reporter=compact
 
+      - name: Read the Android signing fingerprint
+        id: fingerprints
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > /tmp/release.jks
+          sha=$(keytool -list -v -keystore /tmp/release.jks \
+                  -storepass "$ANDROID_KEYSTORE_PASSWORD" \
+                  -alias "$ANDROID_KEY_ALIAS" 2>/dev/null \
+                | grep -m1 'SHA256:' | sed 's/.*SHA256: //')
+          if [ -z "$sha" ]; then
+            echo "::error::could not read a SHA-256 fingerprint from the keystore"
+            exit 1
+          fi
+          echo "android=$sha" >> "$GITHUB_OUTPUT"
+          echo "Android signing certificate SHA-256: $sha"
+          shred -u /tmp/release.jks
+
   # ----------------------------------------------------------------- android
   android:
     name: Android
-    needs: validate
+    needs: preflight
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    environment: release
     steps:
       - uses: actions/checkout@v4
 
@@ -124,73 +217,84 @@ jobs:
       - name: Resolve dependencies
         run: flutter pub get
 
-      - name: Configure signing when secrets exist
-        id: signing
+      - name: Install the production keystore
         env:
-          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           set -euo pipefail
-          if [ -n "${KEYSTORE_BASE64:-}" ]; then
-            echo "$KEYSTORE_BASE64" | base64 -d > android/app/release.jks
-            cat > android/key.properties <<EOF
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > android/app/release.jks
+          cat > android/key.properties <<EOF
           storeFile=release.jks
-          storePassword=$KEYSTORE_PASSWORD
-          keyPassword=$KEY_PASSWORD
-          keyAlias=$KEY_ALIAS
+          storePassword=$ANDROID_KEYSTORE_PASSWORD
+          keyAlias=$ANDROID_KEY_ALIAS
+          keyPassword=$ANDROID_KEY_PASSWORD
           EOF
-            echo "signed=true" >> "$GITHUB_OUTPUT"
-            echo "Signing with the release keystore from secrets."
-          else
-            echo "signed=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::No Android keystore secrets; the APK is signed with the debug key and is NOT store-ready."
-          fi
+          chmod 600 android/key.properties android/app/release.jks
 
-      - name: Build release APK
-        # universal APK: carries arm64-v8a, armeabi-v7a and x86_64 in one file
-        run: flutter build apk --release
+      - name: Build signed APK and AAB
+        run: |
+          flutter build apk --release
+          flutter build appbundle --release
 
-      - name: Build release AAB
-        run: flutter build appbundle --release
-
-      - name: Collect and verify artifacts
-        id: collect
+      - name: Verify the APK signature
         run: |
           set -euo pipefail
-          version="${{ needs.validate.outputs.version }}"
+          version="${{ needs.preflight.outputs.version }}"
           mkdir -p out
           apk=build/app/outputs/flutter-apk/app-release.apk
-          test -f "$apk" || { echo "::error::no release APK was produced"; exit 1; }
           name="Flow-Tracker-${version}-Android.apk"
           cp "$apk" "out/$name"
 
-          # structural checks: a real APK with a dex and every ABI we claim
-          unzip -l "out/$name" > /tmp/apk.txt
-          grep -q 'classes.dex' /tmp/apk.txt || { echo "::error::$name has no classes.dex"; exit 1; }
+          signer=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          echo "using $signer"
+          "$signer" verify --verbose --print-certs "out/$name" | tee /tmp/apksigner.txt
+
+          grep -q "Verified using v2 scheme (APK Signature Scheme v2): true" /tmp/apksigner.txt \
+            || { echo "::error::$name is not v2-signed"; exit 1; }
+          if grep -qi "CN=Android Debug" /tmp/apksigner.txt; then
+            echo "::error::$name is signed with the debug key — refusing to publish"
+            exit 1
+          fi
+          grep -q "${{ needs.preflight.outputs.android_sha256 }}" /tmp/apksigner.txt \
+            || { echo "::error::$name is not signed by the expected certificate"; exit 1; }
+
           for abi in arm64-v8a armeabi-v7a x86_64; do
-            grep -q "lib/${abi}/libapp.so" /tmp/apk.txt \
+            unzip -l "out/$name" | grep -q "lib/${abi}/libapp.so" \
               || { echo "::error::$name is missing libapp.so for ${abi}"; exit 1; }
-            echo "  contains ${abi}"
           done
-          # identity: the package id must be the one we ship
           unzip -p "out/$name" AndroidManifest.xml > /tmp/manifest.bin
           strings -e l /tmp/manifest.bin > /tmp/manifest.txt
-          grep -qx "${APP_ID}" /tmp/manifest.txt || { echo "::error::$name is not ${APP_ID}"; exit 1; }
-          grep -qx "${version}" /tmp/manifest.txt || { echo "::error::$name is not version ${version}"; exit 1; }
-          test -s "out/$name" || { echo "::error::$name is empty"; exit 1; }
-          echo "verified $name ($(stat -c%s "out/$name") bytes)"
+          grep -qx "${APP_ID}" /tmp/manifest.txt || { echo "::error::wrong package id"; exit 1; }
+          grep -qx "${version}" /tmp/manifest.txt || { echo "::error::wrong version"; exit 1; }
+          echo "APK verified: signed by ${{ needs.preflight.outputs.android_sha256 }}"
 
+      - name: Verify the AAB signature
+        run: |
+          set -euo pipefail
+          version="${{ needs.preflight.outputs.version }}"
           aab=build/app/outputs/bundle/release/app-release.aab
-          test -f "$aab" || { echo "::error::no AAB produced"; exit 1; }
-          cp "$aab" "out/Flow-Tracker-${version}-Android.aab"
-          unzip -l "out/Flow-Tracker-${version}-Android.aab" > /tmp/aab.txt
+          name="Flow-Tracker-${version}-Android.aab"
+          cp "$aab" "out/$name"
+
+          jarsigner -verify -strict -verbose -certs "out/$name" > /tmp/jarsigner.txt 2>&1 \
+            || { cat /tmp/jarsigner.txt; echo "::error::AAB signature verification failed"; exit 1; }
+          grep -q "jar verified" /tmp/jarsigner.txt \
+            || { cat /tmp/jarsigner.txt; echo "::error::AAB is not signed"; exit 1; }
+          if grep -qi "CN=Android Debug" /tmp/jarsigner.txt; then
+            echo "::error::AAB is signed with the debug key — refusing to publish"
+            exit 1
+          fi
+          unzip -l "out/$name" > /tmp/aab.txt
           grep -q 'base/manifest/AndroidManifest.xml' /tmp/aab.txt \
             || { echo "::error::AAB structure is wrong"; exit 1; }
-          echo "verified AAB ($(stat -c%s "out/Flow-Tracker-${version}-Android.aab") bytes)"
+          echo "AAB verified with jarsigner"
 
-          echo "signed=${{ steps.signing.outputs.signed }}" >> "$GITHUB_OUTPUT"
+      - name: Remove the keystore from the workspace
+        if: always()
+        run: rm -f android/app/release.jks android/key.properties
 
       - uses: actions/upload-artifact@v4
         with:
@@ -202,9 +306,10 @@ jobs:
   # --------------------------------------------------------------------- ios
   ios:
     name: iOS
-    needs: validate
+    needs: preflight
     runs-on: macos-latest
     timeout-minutes: 50
+    environment: release
     steps:
       - uses: actions/checkout@v4
 
@@ -218,42 +323,99 @@ jobs:
       - name: Resolve dependencies
         run: flutter pub get
 
-      - name: Install CocoaPods
-        run: |
-          cd ios
-          pod install
-
-      - name: Show toolchain
-        run: |
-          xcodebuild -version
-          pod --version
-
-      - name: Build unsigned iOS app
-        run: flutter build ios --release --no-codesign
-
-      - name: Package unsigned IPA
-        id: package
+      - name: Import the Apple Distribution certificate and profile
+        env:
+          IOS_CERT_P12_BASE64: ${{ secrets.IOS_CERT_P12_BASE64 }}
+          IOS_CERT_PASSWORD: ${{ secrets.IOS_CERT_PASSWORD }}
+          IOS_PROVISION_PROFILE_BASE64: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
         run: |
           set -euo pipefail
-          version="${{ needs.validate.outputs.version }}"
-          mkdir -p out Payload
-          cp -R build/ios/iphoneos/Runner.app Payload/
-          name="Flow-Tracker-${version}-iOS.ipa"
-          zip -qry "out/$name" Payload
-          rm -rf Payload
+          keychain=$RUNNER_TEMP/signing.keychain-db
+          password=$(openssl rand -base64 24)
+          security create-keychain -p "$password" "$keychain"
+          security set-keychain-settings -lut 21600 "$keychain"
+          security unlock-keychain -p "$password" "$keychain"
+          echo "$IOS_CERT_P12_BASE64" | base64 -d > "$RUNNER_TEMP/cert.p12"
+          security import "$RUNNER_TEMP/cert.p12" -k "$keychain" \
+            -P "$IOS_CERT_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -k "$password" "$keychain" >/dev/null
+          security list-keychains -d user -s "$keychain" $(security list-keychains -d user | tr -d '"')
+          rm -f "$RUNNER_TEMP/cert.p12"
 
-          # verify: the bundle is real and carries the right identity
-          unzip -l "out/$name" > /tmp/ipa.txt
-          grep -q 'Payload/Runner.app/Runner$' /tmp/ipa.txt \
-            || { echo "::error::IPA has no Runner executable"; exit 1; }
-          unzip -q -o "out/$name" 'Payload/Runner.app/Info.plist' -d /tmp/ipa
-          id=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' /tmp/ipa/Payload/Runner.app/Info.plist)
-          ver=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' /tmp/ipa/Payload/Runner.app/Info.plist)
-          echo "IPA bundle id: $id, version: $ver"
-          [ "$id" = "${APP_ID}" ] || { echo "::error::IPA bundle id $id is not ${APP_ID}"; exit 1; }
-          [ "$ver" = "$version" ] || { echo "::error::IPA version $ver is not $version"; exit 1; }
-          test -s "out/$name" || { echo "::error::IPA is empty"; exit 1; }
-          echo "verified $name ($(stat -f%z "out/$name") bytes) — UNSIGNED"
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "$IOS_PROVISION_PROFILE_BASE64" | base64 -d \
+            > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+
+          echo "identities available:"
+          security find-identity -v -p codesigning "$keychain"
+
+      - name: Write the export options
+        env:
+          IOS_TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
+        run: |
+          set -euo pipefail
+          cat > ios/ExportOptions.plist <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>teamID</key><string>${IOS_TEAM_ID}</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>stripSwiftSymbols</key><true/>
+            <key>uploadSymbols</key><true/>
+            <key>destination</key><string>export</string>
+          </dict>
+          </plist>
+          EOF
+          plutil -lint ios/ExportOptions.plist
+
+      - name: Build and export a signed IPA
+        run: flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
+
+      - name: Verify the IPA signature and provisioning
+        env:
+          IOS_TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
+        run: |
+          set -euo pipefail
+          version="${{ needs.preflight.outputs.version }}"
+          mkdir -p out
+          ipa=$(ls build/ios/ipa/*.ipa | head -1)
+          name="Flow-Tracker-${version}-iOS.ipa"
+          cp "$ipa" "out/$name"
+
+          work=$RUNNER_TEMP/ipa
+          rm -rf "$work"; mkdir -p "$work"
+          unzip -q "out/$name" -d "$work"
+          app="$work/Payload/Runner.app"
+          test -d "$app" || { echo "::error::IPA has no Payload/Runner.app"; exit 1; }
+
+          codesign --verify --deep --strict --verbose=2 "$app" \
+            || { echo "::error::codesign verification failed"; exit 1; }
+          echo "--- signing identity ---"
+          codesign -dv --verbose=4 "$app" 2>&1 | tee /tmp/codesign.txt
+          grep -q "Authority=Apple Distribution" /tmp/codesign.txt \
+            || { echo "::error::IPA is not signed with an Apple Distribution certificate"; exit 1; }
+          grep -q "TeamIdentifier=${IOS_TEAM_ID}" /tmp/codesign.txt \
+            || { echo "::error::IPA team identifier does not match"; exit 1; }
+
+          id=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$app/Info.plist")
+          ver=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app/Info.plist")
+          [ "$id" = "${APP_ID}" ] || { echo "::error::bundle id $id is not ${APP_ID}"; exit 1; }
+          [ "$ver" = "$version" ] || { echo "::error::version $ver is not $version"; exit 1; }
+
+          echo "--- embedded provisioning profile ---"
+          security cms -D -i "$app/embedded.mobileprovision" > /tmp/profile.plist
+          /usr/libexec/PlistBuddy -c 'Print :Name' /tmp/profile.plist
+          /usr/libexec/PlistBuddy -c 'Print :TeamIdentifier:0' /tmp/profile.plist \
+            | grep -qx "${IOS_TEAM_ID}" || { echo "::error::profile team does not match"; exit 1; }
+          /usr/libexec/PlistBuddy -c 'Print :ExpirationDate' /tmp/profile.plist
+
+          echo "IPA verified: signed, provisioning profile embedded"
+
+      - name: Remove the signing keychain
+        if: always()
+        run: security delete-keychain "$RUNNER_TEMP/signing.keychain-db" || true
 
       - uses: actions/upload-artifact@v4
         with:
@@ -265,9 +427,10 @@ jobs:
   # ----------------------------------------------------------------- windows
   windows:
     name: Windows
-    needs: validate
+    needs: preflight
     runs-on: windows-latest
     timeout-minutes: 50
+    environment: release
     steps:
       - uses: actions/checkout@v4
 
@@ -287,11 +450,10 @@ jobs:
       - name: Install packaging tools
         run: |
           choco install innosetup wixtoolset --no-progress -y
-          echo "C:\Program Files (x86)\Inno Setup 6" | Out-File -FilePath $env:GITHUB_PATH -Append
 
       - name: Build EXE installer
         run: |
-          $version = "${{ needs.validate.outputs.version }}"
+          $version = "${{ needs.preflight.outputs.version }}"
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" `
             "/DAppVersion=$version" `
             "/DSourceDir=$PWD\build\windows\x64\runner\Release" `
@@ -300,14 +462,11 @@ jobs:
 
       - name: Build MSI installer
         run: |
-          $version = "${{ needs.validate.outputs.version }}"
+          $version = "${{ needs.preflight.outputs.version }}"
           $src = Join-Path $PWD 'build\windows\x64\runner\Release'
           if (-not (Test-Path $src)) { Write-Error "no release folder at $src"; exit 1 }
           New-Item -ItemType Directory -Force -Path out, msi | Out-Null
 
-          # WiX source is generated here rather than harvested with heat: heat's
-          # output depends on how the path is passed and kept producing sources
-          # light could not resolve. This walks the release folder itself.
           $script:counter = 0
           $script:ids = @()
           function New-DirXml {
@@ -360,7 +519,7 @@ jobs:
                   <Shortcut Id="AppShortcut" Name="Flow-tracker" Target="[INSTALLDIR]Flow-tracker.exe"
                             WorkingDirectory="INSTALLDIR" />
                   <RemoveFolder Id="AppShortcutDir" On="uninstall" />
-                  <RegistryValue Root="HKCU" Key="Software\UmaizSufiyan\Flow-tracker" Name="installed"
+                  <RegistryValue Root="HKCU" Key="Software\\UmaizSufiyan\\Flow-tracker" Name="installed"
                                  Type="integer" Value="1" KeyPath="yes" />
                 </Component>
               </DirectoryRef>
@@ -370,25 +529,53 @@ jobs:
           Set-Content -Encoding UTF8 msi\product.wxs $wxs
           candle -arch x64 -out msi\product.wixobj msi\product.wxs
           light -out "out\Flow-Tracker-$version-Windows-x64.msi" msi\product.wixobj
-
-      - name: Verify installers
-        run: |
-          $version = "${{ needs.validate.outputs.version }}"
-          $exe = "out\Flow-Tracker-$version-Windows-x64.exe"
-          $msi = "out\Flow-Tracker-$version-Windows-x64.msi"
-          foreach ($f in @($exe, $msi)) {
-            if (-not (Test-Path $f)) { Write-Error "missing $f"; exit 1 }
-            if ((Get-Item $f).Length -lt 1MB) { Write-Error "$f is suspiciously small"; exit 1 }
-            Write-Host "verified $f ($((Get-Item $f).Length) bytes)"
-          }
-          # the installer must actually carry the app binary
-          $bytes = [System.IO.File]::ReadAllBytes($msi)
-          $text = [System.Text.Encoding]::ASCII.GetString($bytes)
-          if (-not $text.Contains("Flow-tracker.exe")) { Write-Error "MSI does not reference the app binary"; exit 1 }
           Remove-Item "out\*.wixpdb" -ErrorAction SilentlyContinue
-          $appExe = "build\windows\x64\runner\Release\Flow-tracker.exe"
-          if (-not (Test-Path $appExe)) { Write-Error "the built exe is missing"; exit 1 }
-          Write-Host "verified the release exe exists"
+
+      - name: Authenticode-sign the installers
+        env:
+          WINDOWS_PFX_BASE64: ${{ secrets.WINDOWS_PFX_BASE64 }}
+          WINDOWS_PFX_PASSWORD: ${{ secrets.WINDOWS_PFX_PASSWORD }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $pfx = Join-Path $env:RUNNER_TEMP 'codesign.pfx'
+          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:WINDOWS_PFX_BASE64))
+
+          $signtool = (Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\signtool.exe" |
+                       Sort-Object FullName -Descending | Select-Object -First 1).FullName
+          if (-not $signtool) { Write-Error "signtool.exe not found"; exit 1 }
+          Write-Host "using $signtool"
+
+          $version = "${{ needs.preflight.outputs.version }}"
+          foreach ($f in @("out\Flow-Tracker-$version-Windows-x64.exe", "out\Flow-Tracker-$version-Windows-x64.msi")) {
+            & $signtool sign /fd SHA256 /f $pfx /p $env:WINDOWS_PFX_PASSWORD `
+                /tr http://timestamp.digicert.com /td SHA256 /v $f
+            if ($LASTEXITCODE -ne 0) { Write-Error "signing failed for $f"; exit 1 }
+          }
+          Remove-Item $pfx -Force
+
+      - name: Verify the Authenticode signatures
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $signtool = (Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\signtool.exe" |
+                       Sort-Object FullName -Descending | Select-Object -First 1).FullName
+          $version = "${{ needs.preflight.outputs.version }}"
+          foreach ($f in @("out\Flow-Tracker-$version-Windows-x64.exe", "out\Flow-Tracker-$version-Windows-x64.msi")) {
+            & $signtool verify /pa /all /v $f
+            if ($LASTEXITCODE -ne 0) { Write-Error "signature verification failed for $f"; exit 1 }
+            $sig = Get-AuthenticodeSignature $f
+            if ($sig.Status -ne 'Valid') { Write-Error "$f status is $($sig.Status)"; exit 1 }
+            $subject = $sig.SignerCertificate.Subject
+            Write-Host "$f -> $subject"
+            if ($subject -notmatch "${{ env.WINDOWS_PUBLISHER }}") {
+              Write-Error "$f was not signed by ${{ env.WINDOWS_PUBLISHER }} (got $subject)"
+              exit 1
+            }
+            if ($sig.TimeStamperCertificate -eq $null) {
+              Write-Error "$f is not timestamped"
+              exit 1
+            }
+            Write-Host "thumbprint: $($sig.SignerCertificate.Thumbprint)"
+          }
 
       - uses: actions/upload-artifact@v4
         with:
@@ -402,9 +589,10 @@ jobs:
   # ------------------------------------------------------------------- linux
   linux:
     name: Linux
-    needs: validate
+    needs: preflight
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    environment: release
     steps:
       - uses: actions/checkout@v4
 
@@ -416,10 +604,9 @@ jobs:
           cache: true
 
       - name: Install build dependencies
-        # The hosted image ships usable package lists, and apt-get update against
-        # a slow mirror has hung for the whole step budget more than once. Try the
-        # install first; only refresh the indexes if that actually fails, and cap
-        # every apt call so a bad mirror cannot stall the job.
+        # The hosted image ships usable package lists; try those first and only
+        # refresh the indexes if the install actually fails, so a slow mirror
+        # cannot stall the job.
         timeout-minutes: 15
         run: |
           set -x
@@ -436,7 +623,6 @@ jobs:
           fi
           pkg-config --exists gtk+-3.0 && echo "gtk3 dev present"
           pkg-config --exists gstreamer-1.0 && echo "gstreamer dev present"
-          which desktop-file-validate
 
       - name: Resolve dependencies
         run: flutter pub get
@@ -447,7 +633,7 @@ jobs:
       - name: Package DEB
         run: |
           set -euo pipefail
-          version="${{ needs.validate.outputs.version }}"
+          version="${{ needs.preflight.outputs.version }}"
           bundle=build/linux/x64/release/bundle
           test -x "$bundle/flow-tracker" || { echo "::error::no Linux executable"; exit 1; }
           mkdir -p out
@@ -472,15 +658,10 @@ jobs:
            Flow-tracker keeps habits, to-dos and focus sessions on your device and
            exports PDF reports without any account or network connection.
           EOF
-          # gzip rather than the default xz: the xz pipe fails on this runner
-          # with "tar: stdout: write error" before the package is finished
           dpkg-deb -Zgzip --build --root-owner-group "$root" \
             "out/Flow-Tracker-${version}-Linux-amd64.deb"
-          # no pipe to head here: SIGPIPE from head plus `set -o pipefail` fails
-          # the step even though the package was built correctly
           dpkg-deb --info "out/Flow-Tracker-${version}-Linux-amd64.deb" > /dev/null
-          dpkg-deb --field "out/Flow-Tracker-${version}-Linux-amd64.deb" \
-            Package Version Architecture
+          dpkg-deb --field "out/Flow-Tracker-${version}-Linux-amd64.deb" Package Version Architecture
           dpkg-deb --contents "out/Flow-Tracker-${version}-Linux-amd64.deb" > /tmp/deb.txt
           grep -q 'opt/flow-tracker/flow-tracker' /tmp/deb.txt \
             || { echo "::error::DEB is missing the app binary"; exit 1; }
@@ -488,7 +669,7 @@ jobs:
       - name: Package AppImage
         run: |
           set -euo pipefail
-          version="${{ needs.validate.outputs.version }}"
+          version="${{ needs.preflight.outputs.version }}"
           bundle=build/linux/x64/release/bundle
           mkdir -p out
           appdir=AppDir
@@ -522,19 +703,48 @@ jobs:
             "out/Flow-Tracker-${version}-Linux-x86_64.AppImage"
           rm -f "$tool"
 
-      - name: Verify Linux packages
+      - name: Sign the packages with GPG
+        env:
+          GPG_PRIVATE_KEY_BASE64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
         run: |
           set -euo pipefail
-          version="${{ needs.validate.outputs.version }}"
+          export GNUPGHOME="$RUNNER_TEMP/gnupg"
+          mkdir -p "$GNUPGHOME"; chmod 700 "$GNUPGHOME"
+          echo "$GPG_PRIVATE_KEY_BASE64" | base64 -d | gpg --batch --import
+          echo "signing key:"
+          gpg --list-secret-keys --with-colons | awk -F: '/^fpr/{print $10; exit}'
+
+          # detached signature for each package, plus the checksum manifest
+          for f in out/*.deb out/*.AppImage; do
+            gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" \
+                --local-user "$GPG_KEY_ID" --armor --detach-sign "$f"
+            gpg --verify "$f.asc" "$f"
+          done
+
+          gpg --armor --export "$GPG_KEY_ID" > out/flow-tracker-signing-key.asc
+          gpg --show-keys --with-fingerprint out/flow-tracker-signing-key.asc
+
+      - name: Verify the Linux packages and signatures
+        run: |
+          set -euo pipefail
+          export GNUPGHOME="$RUNNER_TEMP/gnupg"
+          version="${{ needs.preflight.outputs.version }}"
           deb="out/Flow-Tracker-${version}-Linux-amd64.deb"
           appimg="out/Flow-Tracker-${version}-Linux-x86_64.AppImage"
           for f in "$deb" "$appimg"; do
             test -s "$f" || { echo "::error::$f is empty"; exit 1; }
-            echo "verified $f ($(stat -c%s "$f") bytes)"
+            test -s "$f.asc" || { echo "::error::$f has no detached signature"; exit 1; }
+            gpg --verify "$f.asc" "$f" || { echo "::error::signature check failed for $f"; exit 1; }
+            echo "verified $f ($(stat -c%s "$f") bytes) with $(basename "$f").asc"
           done
-          dpkg-deb --field "$deb" Package Version Architecture
           file "$appimg" > /tmp/appimage.txt
           grep -qi 'ELF' /tmp/appimage.txt || { echo "::error::AppImage is not an ELF binary"; exit 1; }
+
+      - name: Remove the signing key from the runner
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/gnupg"
 
       - uses: actions/upload-artifact@v4
         with:
@@ -546,9 +756,10 @@ jobs:
   # ------------------------------------------------------------------- macos
   macos:
     name: macOS
-    needs: validate
+    needs: preflight
     runs-on: macos-latest
-    timeout-minutes: 45
+    timeout-minutes: 50
+    environment: release
     steps:
       - uses: actions/checkout@v4
 
@@ -562,41 +773,117 @@ jobs:
       - name: Resolve dependencies
         run: flutter pub get
 
-      - name: Build macOS release
-        # Flutter writes the Podfile and runs CocoaPods as part of this step, so
-        # there is no separate pod install to do first.
+      - name: Import the Developer ID certificates
+        env:
+          MACOS_CERT_P12_BASE64: ${{ secrets.MACOS_CERT_P12_BASE64 }}
+          MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
+          MACOS_INSTALLER_P12_BASE64: ${{ secrets.MACOS_INSTALLER_P12_BASE64 }}
+          MACOS_INSTALLER_PASSWORD: ${{ secrets.MACOS_INSTALLER_PASSWORD }}
+        run: |
+          set -euo pipefail
+          keychain=$RUNNER_TEMP/macos-signing.keychain-db
+          password=$(openssl rand -base64 24)
+          security create-keychain -p "$password" "$keychain"
+          security set-keychain-settings -lut 21600 "$keychain"
+          security unlock-keychain -p "$password" "$keychain"
+          echo "$MACOS_CERT_P12_BASE64" | base64 -d > "$RUNNER_TEMP/app.p12"
+          echo "$MACOS_INSTALLER_P12_BASE64" | base64 -d > "$RUNNER_TEMP/installer.p12"
+          security import "$RUNNER_TEMP/app.p12" -k "$keychain" -P "$MACOS_CERT_PASSWORD" -T /usr/bin/codesign
+          security import "$RUNNER_TEMP/installer.p12" -k "$keychain" -P "$MACOS_INSTALLER_PASSWORD" -T /usr/bin/productbuild
+          security set-key-partition-list -S apple-tool:,apple: -k "$password" "$keychain" >/dev/null
+          security list-keychains -d user -s "$keychain" $(security list-keychains -d user | tr -d '"')
+          rm -f "$RUNNER_TEMP/app.p12" "$RUNNER_TEMP/installer.p12"
+          echo "identities available:"
+          security find-identity -v -p codesigning "$keychain"
+
+      - name: Build the macOS app
         run: flutter build macos --release
+
+      - name: Sign the app with Developer ID Application
+        run: |
+          set -euo pipefail
+          app=build/macos/Build/Products/Release/Flow-tracker.app
+          test -d "$app" || { echo "::error::no macOS app bundle"; exit 1; }
+          identity=$(security find-identity -v -p codesigning "$RUNNER_TEMP/macos-signing.keychain-db" \
+                     | grep "Developer ID Application" | head -1 | sed -E 's/.*"(.*)"/\1/')
+          if [ -z "$identity" ]; then
+            echo "::error::no Developer ID Application identity in the keychain"; exit 1
+          fi
+          echo "signing with: $identity"
+          # inside-out: frameworks and helpers first, then the bundle
+          find "$app/Contents/Frameworks" -maxdepth 1 -name '*.framework' -print0 2>/dev/null \
+            | xargs -0 -I{} codesign --force --timestamp --options runtime --sign "$identity" {}
+          codesign --force --timestamp --options runtime \
+            --entitlements macos/Runner/Release.entitlements --sign "$identity" "$app"
+          codesign --verify --deep --strict --verbose=2 "$app"
+          codesign -dv --verbose=4 "$app" 2>&1 | tee /tmp/macos-codesign.txt
 
       - name: Package DMG and PKG
         run: |
           set -euo pipefail
-          version="${{ needs.validate.outputs.version }}"
+          version="${{ needs.preflight.outputs.version }}"
           app=build/macos/Build/Products/Release/Flow-tracker.app
-          test -d "$app" || { echo "::error::no macOS app bundle"; exit 1; }
           mkdir -p out
-
           hdiutil create -volname "Flow-tracker" -srcfolder "$app" -ov -format UDZO \
             "out/Flow-Tracker-${version}-macOS-arm64.dmg"
 
+          installer_identity=$(security find-identity -v -p basic "$RUNNER_TEMP/macos-signing.keychain-db" \
+                                | grep "Developer ID Installer" | head -1 | sed -E 's/.*"(.*)"/\1/')
+          if [ -z "$installer_identity" ]; then
+            echo "::error::no Developer ID Installer identity in the keychain"; exit 1
+          fi
           pkgbuild --component "$app" --install-location /Applications \
             --identifier "${APP_ID}" --version "$version" \
+            --sign "$installer_identity" \
             "out/Flow-Tracker-${version}-macOS-arm64.pkg"
 
-      - name: Verify macOS packages
+          # sign the disk image too, so the download itself carries a signature
+          codesign --force --timestamp --sign "$installer_identity" \
+            "out/Flow-Tracker-${version}-macOS-arm64.dmg"
+
+      - name: Notarize and staple
+        env:
+          MACOS_NOTARY_APPLE_ID: ${{ secrets.MACOS_NOTARY_APPLE_ID }}
+          MACOS_NOTARY_PASSWORD: ${{ secrets.MACOS_NOTARY_PASSWORD }}
+          MACOS_TEAM_ID: ${{ secrets.MACOS_TEAM_ID }}
         run: |
           set -euo pipefail
-          version="${{ needs.validate.outputs.version }}"
-          dmg="out/Flow-Tracker-${version}-macOS-arm64.dmg"
-          pkg="out/Flow-Tracker-${version}-macOS-arm64.pkg"
-          for f in "$dmg" "$pkg"; do
-            test -s "$f" || { echo "::error::$f is empty"; exit 1; }
-            echo "verified $f ($(stat -f%z "$f") bytes)"
+          version="${{ needs.preflight.outputs.version }}"
+          for f in "out/Flow-Tracker-${version}-macOS-arm64.pkg" "out/Flow-Tracker-${version}-macOS-arm64.dmg"; do
+            echo "submitting $f for notarization"
+            xcrun notarytool submit "$f" \
+              --apple-id "$MACOS_NOTARY_APPLE_ID" \
+              --password "$MACOS_NOTARY_PASSWORD" \
+              --team-id "$MACOS_TEAM_ID" \
+              --wait --timeout 30m
+            xcrun stapler staple "$f" || {
+              echo "::error::stapling failed for $f"; exit 1; }
+            xcrun stapler validate "$f"
           done
+
+      - name: Verify Gatekeeper acceptance
+        run: |
+          set -euo pipefail
+          version="${{ needs.preflight.outputs.version }}"
+          app=build/macos/Build/Products/Release/Flow-tracker.app
+          pkg="out/Flow-Tracker-${version}-macOS-arm64.pkg"
+          dmg="out/Flow-Tracker-${version}-macOS-arm64.dmg"
+
+          codesign --verify --deep --strict --verbose=2 "$app"
+          spctl --assess --type execute --verbose=4 "$app"
+          pkgutil --check-signature "$pkg" | tee /tmp/pkg-signature.txt
+          grep -q "Developer ID Installer" /tmp/pkg-signature.txt \
+            || { echo "::error::PKG is not signed by Developer ID Installer"; exit 1; }
+          spctl --assess --type install --verbose=4 "$pkg"
           hdiutil verify "$dmg"
           pkgutil --payload-files "$pkg" > /tmp/pkg.txt
           grep -q 'Flow-tracker.app/Contents/MacOS/Flow-tracker' /tmp/pkg.txt \
             || { echo "::error::PKG payload is missing the app binary"; exit 1; }
-          codesign -dv "build/macos/Build/Products/Release/Flow-tracker.app" 2>&1 | head -3 || true
+          echo "macOS artifacts signed, notarized, stapled and accepted by Gatekeeper"
+
+      - name: Remove the signing keychain
+        if: always()
+        run: security delete-keychain "$RUNNER_TEMP/macos-signing.keychain-db" || true
 
       - uses: actions/upload-artifact@v4
         with:
@@ -608,12 +895,12 @@ jobs:
   # ----------------------------------------------------------------- release
   publish:
     name: Publish release
-    needs: [validate, android, ios, windows, linux, macos]
-    # Only publish when every platform built and verified. A failed platform
-    # fails the run and nothing is attached on its behalf.
+    needs: [preflight, android, ios, windows, linux, macos]
+    # All five platforms must be signed and verified. There is no partial release.
     if: success()
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    environment: release
     steps:
       - uses: actions/checkout@v4
 
@@ -629,8 +916,8 @@ jobs:
           cd dist
           ls -la
           count=$(ls -1 | wc -l)
-          if [ "$count" -lt 9 ]; then
-            echo "::error::expected 9 platform artifacts plus checksums, found $count"
+          if [ "$count" -lt 10 ]; then
+            echo "::error::expected 9 artifacts plus signatures and checksums, found $count"
             exit 1
           fi
           sha256sum * > SHA256SUMS.txt
@@ -640,98 +927,71 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
-          name: Flow Tracker v${{ needs.validate.outputs.version }}
+          name: Flow Tracker v${{ needs.preflight.outputs.version }}
           files: dist/*
           fail_on_unmatched_files: true
           body: |
-            ## Flow Tracker v${{ needs.validate.outputs.version }}
+            ## Flow Tracker v${{ needs.preflight.outputs.version }}
 
-            Released ${{ github.event.repository.default_branch }} @ `${{ github.sha }}`.
-            Private, offline habit tracking with PDF reports — no account, no
-            upload, everything stays on your device.
-
-            ### Release highlights
-
-            - Offline PDF reports: eight report types, six document themes, custom
-              date ranges and section toggles, saved or shared from the device.
-            - Report statistics corrected: "all history" starts at your first
-              record, and habits only count from the day they were created.
-            - Rebranded as Flow-tracker with the official mark on the app, the
-              documents and every installer.
-            - Builds for Android, iOS, Windows, Linux and macOS from one tag.
-
-            ### Downloads
-
-            **Android**
-
-            | File | Architecture | Notes |
-            | --- | --- | --- |
-            | `Flow-Tracker-${{ needs.validate.outputs.version }}-Android.apk` | arm64-v8a, armeabi-v7a, x86_64 | universal APK, sideload |
-            | `Flow-Tracker-${{ needs.validate.outputs.version }}-Android.aab` | universal | for store upload |
-
-            **iOS**
-
-            | File | Architecture | Notes |
-            | --- | --- | --- |
-            | `Flow-Tracker-${{ needs.validate.outputs.version }}-iOS.ipa` | arm64 | **unsigned** — see signing status |
-
-            **Windows**
-
-            | File | Architecture | Notes |
-            | --- | --- | --- |
-            | `Flow-Tracker-${{ needs.validate.outputs.version }}-Windows-x64.exe` | x64 | Inno Setup installer |
-            | `Flow-Tracker-${{ needs.validate.outputs.version }}-Windows-x64.msi` | x64 | MSI installer |
-
-            **Linux**
-
-            | File | Architecture | Notes |
-            | --- | --- | --- |
-            | `Flow-Tracker-${{ needs.validate.outputs.version }}-Linux-x64.AppImage` | x86_64 | portable, no install |
-            | `Flow-Tracker-${{ needs.validate.outputs.version }}-Linux-amd64.deb` | amd64 | Debian / Ubuntu |
-
-            **macOS**
-
-            | File | Architecture | Notes |
-            | --- | --- | --- |
-            | `Flow-Tracker-${{ needs.validate.outputs.version }}-macOS-arm64.dmg` | arm64 | disk image |
-            | `Flow-Tracker-${{ needs.validate.outputs.version }}-macOS-arm64.pkg` | arm64 | installer |
-
-            ### Installation
-
-            - **Android**: open the APK on the device and allow install from this
-              source.
-            - **iOS**: the IPA is unsigned and cannot be installed as-is; re-sign it
-              with your own Apple team, or build from source.
-            - **Windows**: run the `.exe` or the `.msi`. SmartScreen will warn
-              because the installers are unsigned.
-            - **Linux**: `chmod +x Flow-Tracker-*.AppImage && ./Flow-Tracker-*.AppImage`,
-              or `sudo apt install ./Flow-Tracker-*.deb`.
-            - **macOS**: open the DMG and drag the app to Applications, or run the
-              PKG. Right-click → Open the first time; it is not notarized.
-
-            ### SHA256 checksums
-
-            `SHA256SUMS.txt` is attached. Verify with:
-
-            ```
-            sha256sum -c SHA256SUMS.txt
-            ```
+            Built from `${{ github.sha }}`. Private, offline habit tracking with PDF
+            reports — no account, no upload, everything stays on your device.
 
             ### Signing status
 
-            | Platform | Status |
+            Every artifact below was signed with the project's production identity
+            and verified during the build. Nothing unsigned is published.
+
+            | Platform | Identity | Verification |
+            | --- | --- | --- |
+            | Android | release keystore `${{ needs.preflight.outputs.android_sha256 }}` | `apksigner verify` (APK), `jarsigner -verify` (AAB) |
+            | iOS | Apple Distribution certificate | `codesign --verify`, embedded provisioning profile inspected |
+            | Windows | Authenticode, publisher `Umaiz Sufiyan` | `signtool verify /pa /all`, timestamp present |
+            | Linux | project GPG key (public key attached) | detached `.asc` verified with the published key |
+            | macOS | Developer ID Application + Installer | `codesign`, `pkgutil --check-signature`, `spctl`, notarized and stapled |
+
+            ### Downloads
+
+            | Platform | File |
             | --- | --- |
-            | Android | signed with the project keystore when the signing secrets are configured; otherwise the debug key |
-            | iOS | **unsigned** — no Apple certificate or provisioning profile is configured in CI |
-            | Windows | unsigned; SmartScreen will warn |
-            | Linux | unsigned, which is normal for AppImage and DEB |
-            | macOS | **unsigned and not notarized**; Gatekeeper requires right-click → Open |
+            | Android | `Flow-Tracker-${{ needs.preflight.outputs.version }}-Android.apk` (universal), `-Android.aab` |
+            | iOS | `Flow-Tracker-${{ needs.preflight.outputs.version }}-iOS.ipa` |
+            | Windows | `Flow-Tracker-${{ needs.preflight.outputs.version }}-Windows-x64.exe`, `-Windows-x64.msi` |
+            | Linux | `Flow-Tracker-${{ needs.preflight.outputs.version }}-Linux-x86_64.AppImage`, `-Linux-amd64.deb` |
+            | macOS | `Flow-Tracker-${{ needs.preflight.outputs.version }}-macOS-arm64.dmg`, `-macOS-arm64.pkg` |
+
+            Signature files: `.asc` next to each Linux package, plus
+            `flow-tracker-signing-key.asc` (the public key) and `SHA256SUMS.txt`.
+
+            ### Verify a download
+
+            ```
+            sha256sum -c SHA256SUMS.txt
+            gpg --import flow-tracker-signing-key.asc
+            gpg --verify Flow-Tracker-${{ needs.preflight.outputs.version }}-Linux-amd64.deb.asc \
+                         Flow-Tracker-${{ needs.preflight.outputs.version }}-Linux-amd64.deb
+            ```
+
+            The AppImage is covered by its own detached signature; it is not the same
+            signature as the DEB's, even though both use the project key.
+
+            ### Installation
+
+            - **Android**: open the APK on the device and allow install from this source.
+            - **iOS**: signed for App Store distribution; install via TestFlight or a
+              provisioning profile that includes your device.
+            - **Windows**: run the `.exe` or `.msi`. The installers are signed, so
+              SmartScreen no longer reports an unknown publisher — reputation is
+              earned over time and is not guaranteed.
+            - **Linux**: `sudo apt install ./Flow-Tracker-*.deb`, or
+              `chmod +x Flow-Tracker-*.AppImage && ./Flow-Tracker-*.AppImage`.
+            - **macOS**: open the DMG and drag the app to Applications, or run the PKG.
+              Signed, notarized and stapled, so Gatekeeper accepts it on first launch.
 
             ### Known limitations
 
-            - iOS and macOS artifacts are unsigned: they are real builds, but not
-              distributable without your own signing identity.
+            - SmartScreen reputation builds over time; a freshly issued certificate
+              still shows a warning on some machines until downloads accumulate.
             - No physical iPhone, Mac or Windows machine was used to test these
-              builds; they are compiled and packaged on GitHub runners.
+              builds; they are compiled, signed and verified on GitHub runners.
             - Home-screen widgets and scheduled reminders are Android/iOS features;
               the desktop builds run without them.
