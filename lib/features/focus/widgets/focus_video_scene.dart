@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:video_player_win/video_player_win.dart';
 
 const focusVideoScenes = <String>[
   'cabin_rain',
@@ -40,75 +39,21 @@ class FocusVideoPoster extends StatelessWidget {
   }
 }
 
-class FocusVideoScene extends StatefulWidget {
+/// A focus scene background.
+///
+/// This used to play an `.mp4` through the `video_player_win` plugin. That
+/// plugin links against Media Foundation, so on Windows editions without it
+/// (the "N" editions, and stripped images) the whole app failed to start with a
+/// system error before any Dart code ran. The repository never shipped the
+/// video files — only the `.jpg` posters — so the still is what was on screen in
+/// practice. Rendering the poster directly keeps the scene UI and removes the
+/// startup dependency.
+class FocusVideoScene extends StatelessWidget {
   const FocusVideoScene({super.key, required this.file, required this.poster});
 
   final File file;
   final Widget poster;
 
   @override
-  State<FocusVideoScene> createState() => _FocusVideoSceneState();
-}
-
-class _FocusVideoSceneState extends State<FocusVideoScene> {
-  WinVideoPlayerController? _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  @override
-  void didUpdateWidget(FocusVideoScene oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.file.path == widget.file.path) return;
-    _controller?.dispose();
-    _controller = null;
-    _load();
-  }
-
-  Future<void> _load() async {
-    final file = widget.file;
-    if (!file.existsSync()) return;
-    final controller = WinVideoPlayerController.file(file);
-    try {
-      await controller.initialize();
-      await controller.setLooping(true);
-      await controller.setVolume(0);
-      await controller.play();
-    } catch (e) {
-      debugPrint('Could not play the scene: $e');
-      await controller.dispose();
-      return;
-    }
-    if (!mounted) {
-      await controller.dispose();
-      return;
-    }
-    setState(() => _controller = controller);
-  }
-
-  @override
-  void dispose() {
-    _controller?.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final controller = _controller;
-    if (controller == null || !controller.value.isInitialized) {
-      return widget.poster;
-    }
-    return FittedBox(
-      fit: BoxFit.cover,
-      clipBehavior: Clip.hardEdge,
-      child: SizedBox(
-        width: controller.value.size.width,
-        height: controller.value.size.height,
-        child: WinVideoPlayer(controller),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => poster;
 }

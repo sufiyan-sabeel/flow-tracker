@@ -33,6 +33,12 @@ The first release built and published for all five platforms from one tag.
 
 ### Fixed
 
+- **The Windows build no longer needs Media Foundation to start.** The
+  `video_player_win` plugin linked against `mfplat.dll`, which Windows "N"
+  editions do not ship; because plugins load before any Dart code runs, the app
+  died at launch with a system error dialog. The plugin is gone and focus scenes
+  render their poster stills, which is what shipped all along — no video files
+  were ever included in the build.
 - **Report statistics.** "All history" no longer starts in the year 2000 — it
   starts at your earliest record — and a habit is only counted from the day it
   was created, so one completion can no longer be divided by thousands of days
