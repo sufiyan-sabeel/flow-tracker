@@ -416,11 +416,14 @@ jobs:
           cache: true
 
       - name: Install build dependencies
+        # a hung apt on a hosted runner otherwise eats the whole job budget
+        timeout-minutes: 12
         run: |
-          sudo apt-get update
+          sudo apt-get update -o Acquire::Retries=3 -o Acquire::http::Timeout=30
           # gstreamer is required by the audio plugin on Linux; without these the
           # CMake configure step fails before a single line is compiled
           sudo apt-get install -y --no-install-recommends \
+            -o Acquire::Retries=3 -o Acquire::http::Timeout=30 \
             clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev \
             libstdc++-12-dev libfuse2 file \
             libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
