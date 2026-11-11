@@ -27,6 +27,9 @@ env:
   FLUTTER_VERSION: '3.41.9'
   JAVA_VERSION: '17'
   APP_ID: com.flowtracker.app
+  # Only this tag may publish. Bump it for the next release; any other tag is
+  # rejected in the validate job so a stray tag can never produce a release.
+  RELEASE_TAG: v1.5.0
 
 jobs:
   # ---------------------------------------------------------------- validate
@@ -63,6 +66,10 @@ jobs:
           want="v${{ steps.version.outputs.version }}"
           if [ "$TAG" != "$want" ]; then
             echo "::error::tag $TAG does not match pubspec version $want"
+            exit 1
+          fi
+          if [ "$TAG" != "${RELEASE_TAG}" ]; then
+            echo "::error::tag $TAG is not the release tag ${RELEASE_TAG}; refusing to publish"
             exit 1
           fi
           echo "tag and pubspec agree: $TAG"
@@ -142,7 +149,8 @@ jobs:
           fi
 
       - name: Build release APK
-        run: flutter build apk --release --split-per-abi
+        # universal APK: carries arm64-v8a, armeabi-v7a and x86_64 in one file
+        run: flutter build apk --release
 
       - name: Build release AAB
         run: flutter build appbundle --release
@@ -153,25 +161,24 @@ jobs:
           set -euo pipefail
           version="${{ needs.validate.outputs.version }}"
           mkdir -p out
-          shopt -s nullglob
-          apks=(build/app/outputs/flutter-apk/app-*-release.apk)
-          if [ ${#apks[@]} -eq 0 ]; then
-            echo "::error::no split APKs were produced"
-            exit 1
-          fi
-          for apk in "${apks[@]}"; do
-            abi=$(basename "$apk" | sed -E 's/app-(.*)-release\.apk/\1/')
-            name="Flow-Tracker-${version}-Android-${abi}.apk"
-            cp "$apk" "out/$name"
-            # structural checks: real APK, has a dex and the app's native lib
-            unzip -l "out/$name" | grep -q 'classes.dex' || { echo "::error::$name has no classes.dex"; exit 1; }
-            unzip -l "out/$name" | grep -q "lib/${abi}/libapp.so" || { echo "::error::$name has no libapp.so for ${abi}"; exit 1; }
-            # identity: the package id must be the one we ship
-            unzip -p "out/$name" AndroidManifest.xml > /tmp/manifest.bin
-            strings -e l /tmp/manifest.bin | grep -qx "${APP_ID}" || { echo "::error::$name is not ${APP_ID}"; exit 1; }
-            test -s "out/$name" || { echo "::error::$name is empty"; exit 1; }
-            echo "verified $name ($(stat -c%s "out/$name") bytes)"
+          apk=build/app/outputs/flutter-apk/app-release.apk
+          test -f "$apk" || { echo "::error::no release APK was produced"; exit 1; }
+          name="Flow-Tracker-${version}-Android.apk"
+          cp "$apk" "out/$name"
+
+          # structural checks: a real APK with a dex and every ABI we claim
+          unzip -l "out/$name" | grep -q 'classes.dex' || { echo "::error::$name has no classes.dex"; exit 1; }
+          for abi in arm64-v8a armeabi-v7a x86_64; do
+            unzip -l "out/$name" | grep -q "lib/${abi}/libapp.so" \
+              || { echo "::error::$name is missing libapp.so for ${abi}"; exit 1; }
+            echo "  contains ${abi}"
           done
+          # identity: the package id must be the one we ship
+          unzip -p "out/$name" AndroidManifest.xml > /tmp/manifest.bin
+          strings -e l /tmp/manifest.bin | grep -qx "${APP_ID}" || { echo "::error::$name is not ${APP_ID}"; exit 1; }
+          strings -e l /tmp/manifest.bin | grep -qx "${version}" || { echo "::error::$name is not version ${version}"; exit 1; }
+          test -s "out/$name" || { echo "::error::$name is empty"; exit 1; }
+          echo "verified $name ($(stat -c%s "out/$name") bytes)"
 
           aab=build/app/outputs/bundle/release/app-release.aab
           test -f "$aab" || { echo "::error::no AAB produced"; exit 1; }
@@ -547,18 +554,18 @@ jobs:
           mkdir -p out
 
           hdiutil create -volname "Flow-tracker" -srcfolder "$app" -ov -format UDZO \
-            "out/Flow-Tracker-${version}-macOS-universal.dmg"
+            "out/Flow-Tracker-${version}-macOS-arm64.dmg"
 
           pkgbuild --component "$app" --install-location /Applications \
             --identifier "${APP_ID}" --version "$version" \
-            "out/Flow-Tracker-${version}-macOS-universal.pkg"
+            "out/Flow-Tracker-${version}-macOS-arm64.pkg"
 
       - name: Verify macOS packages
         run: |
           set -euo pipefail
           version="${{ needs.validate.outputs.version }}"
-          dmg="out/Flow-Tracker-${version}-macOS-universal.dmg"
-          pkg="out/Flow-Tracker-${version}-macOS-universal.pkg"
+          dmg="out/Flow-Tracker-${version}-macOS-arm64.dmg"
+          pkg="out/Flow-Tracker-${version}-macOS-arm64.pkg"
           for f in "$dmg" "$pkg"; do
             test -s "$f" || { echo "::error::$f is empty"; exit 1; }
             echo "verified $f ($(stat -f%z "$f") bytes)"
@@ -599,8 +606,8 @@ jobs:
           cd dist
           ls -la
           count=$(ls -1 | wc -l)
-          if [ "$count" -lt 5 ]; then
-            echo "::error::expected at least 5 artifacts, found $count"
+          if [ "$count" -lt 9 ]; then
+            echo "::error::expected 9 platform artifacts plus checksums, found $count"
             exit 1
           fi
           sha256sum * > SHA256SUMS.txt
@@ -610,62 +617,98 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
-          name: Flow-tracker ${{ needs.validate.outputs.version }}
+          name: Flow Tracker v${{ needs.validate.outputs.version }}
           files: dist/*
           fail_on_unmatched_files: true
           body: |
-            ## Flow-tracker ${{ needs.validate.outputs.version }}
+            ## Flow Tracker v${{ needs.validate.outputs.version }}
 
-            Built from `${{ github.sha }}` on ${{ github.event.repository.default_branch }}.
-            Android · iOS · Windows · Linux · macOS. Everything is generated offline
-            from your own data.
+            Released ${{ github.event.repository.default_branch }} @ `${{ github.sha }}`.
+            Private, offline habit tracking with PDF reports — no account, no
+            upload, everything stays on your device.
+
+            ### Release highlights
+
+            - Offline PDF reports: eight report types, six document themes, custom
+              date ranges and section toggles, saved or shared from the device.
+            - Report statistics corrected: "all history" starts at your first
+              record, and habits only count from the day they were created.
+            - Rebranded as Flow-tracker with the official mark on the app, the
+              documents and every installer.
+            - Builds for Android, iOS, Windows, Linux and macOS from one tag.
 
             ### Downloads
 
-            | Platform | File | Notes |
+            **Android**
+
+            | File | Architecture | Notes |
             | --- | --- | --- |
-            | Android | `Flow-Tracker-${{ needs.validate.outputs.version }}-Android-arm64-v8a.apk` | phone / tablet, most devices |
-            | Android | `Flow-Tracker-${{ needs.validate.outputs.version }}-Android-armeabi-v7a.apk` | older 32-bit devices |
-            | Android | `Flow-Tracker-${{ needs.validate.outputs.version }}-Android-x86_64.apk` | emulators |
-            | Android | `Flow-Tracker-${{ needs.validate.outputs.version }}-Android.aab` | for store upload |
-            | iOS | `Flow-Tracker-${{ needs.validate.outputs.version }}-iOS-unsigned.ipa` | **unsigned**, CI validation only |
-            | Windows | `Flow-Tracker-${{ needs.validate.outputs.version }}-Windows-x64.exe` | installer |
-            | Windows | `Flow-Tracker-${{ needs.validate.outputs.version }}-Windows-x64.msi` | installer |
-            | Linux | `Flow-Tracker-${{ needs.validate.outputs.version }}-Linux-x86_64.AppImage` | portable |
-            | Linux | `Flow-Tracker-${{ needs.validate.outputs.version }}-Linux-amd64.deb` | Debian / Ubuntu |
-            | macOS | `Flow-Tracker-${{ needs.validate.outputs.version }}-macOS-universal.dmg` | disk image |
-            | macOS | `Flow-Tracker-${{ needs.validate.outputs.version }}-macOS-universal.pkg` | installer |
+            | `Flow-Tracker-${{ needs.validate.outputs.version }}-Android.apk` | arm64-v8a, armeabi-v7a, x86_64 | universal APK, sideload |
+            | `Flow-Tracker-${{ needs.validate.outputs.version }}-Android.aab` | universal | for store upload |
 
-            ### Signing status
+            **iOS**
 
-            - Android: signed with the project keystore when `ANDROID_KEYSTORE_BASE64`
-              is configured, otherwise the debug key. Check the CI log for the warning.
-            - iOS: **unsigned**. No provisioning profile is configured in CI, so this
-              IPA cannot be installed on a device as-is.
-            - macOS: **unsigned and not notarized**. Gatekeeper will ask for a
-              right-click → Open on first launch.
-            - Windows: **unsigned**. SmartScreen may warn; the installer is otherwise
-              a normal Inno Setup / MSI package.
-            - Linux: unsigned is normal for AppImage and DEB.
+            | File | Architecture | Notes |
+            | --- | --- | --- |
+            | `Flow-Tracker-${{ needs.validate.outputs.version }}-iOS.ipa` | arm64 | **unsigned** — see signing status |
 
-            ### Verify
+            **Windows**
+
+            | File | Architecture | Notes |
+            | --- | --- | --- |
+            | `Flow-Tracker-${{ needs.validate.outputs.version }}-Windows-x64.exe` | x64 | Inno Setup installer |
+            | `Flow-Tracker-${{ needs.validate.outputs.version }}-Windows-x64.msi` | x64 | MSI installer |
+
+            **Linux**
+
+            | File | Architecture | Notes |
+            | --- | --- | --- |
+            | `Flow-Tracker-${{ needs.validate.outputs.version }}-Linux-x64.AppImage` | x86_64 | portable, no install |
+            | `Flow-Tracker-${{ needs.validate.outputs.version }}-Linux-amd64.deb` | amd64 | Debian / Ubuntu |
+
+            **macOS**
+
+            | File | Architecture | Notes |
+            | --- | --- | --- |
+            | `Flow-Tracker-${{ needs.validate.outputs.version }}-macOS-arm64.dmg` | arm64 | disk image |
+            | `Flow-Tracker-${{ needs.validate.outputs.version }}-macOS-arm64.pkg` | arm64 | installer |
+
+            ### Installation
+
+            - **Android**: open the APK on the device and allow install from this
+              source.
+            - **iOS**: the IPA is unsigned and cannot be installed as-is; re-sign it
+              with your own Apple team, or build from source.
+            - **Windows**: run the `.exe` or the `.msi`. SmartScreen will warn
+              because the installers are unsigned.
+            - **Linux**: `chmod +x Flow-Tracker-*.AppImage && ./Flow-Tracker-*.AppImage`,
+              or `sudo apt install ./Flow-Tracker-*.deb`.
+            - **macOS**: open the DMG and drag the app to Applications, or run the
+              PKG. Right-click → Open the first time; it is not notarized.
+
+            ### SHA256 checksums
+
+            `SHA256SUMS.txt` is attached. Verify with:
 
             ```
             sha256sum -c SHA256SUMS.txt
             ```
 
-            ### Install
+            ### Signing status
 
-            - **Android**: open the APK on the device, allow install from this source.
-            - **iOS**: requires signing with your own team before installing.
-            - **Windows**: run the `.exe` or `.msi`.
-            - **Linux**: `chmod +x *.AppImage` and run, or `sudo apt install ./Flow-Tracker-*.deb`.
-            - **macOS**: open the DMG and drag the app to Applications, or run the PKG.
+            | Platform | Status |
+            | --- | --- |
+            | Android | signed with the project keystore when the signing secrets are configured; otherwise the debug key |
+            | iOS | **unsigned** — no Apple certificate or provisioning profile is configured in CI |
+            | Windows | unsigned; SmartScreen will warn |
+            | Linux | unsigned, which is normal for AppImage and DEB |
+            | macOS | **unsigned and not notarized**; Gatekeeper requires right-click → Open |
 
             ### Known limitations
 
-            - The iOS and macOS builds are unsigned; notarization is not configured.
-            - Widgets and background reminders are Android/iOS features; the desktop
-              builds run without them.
-            - iOS and macOS binaries are built and packaged in CI but have not been
-              installed on a physical device from this pipeline.
+            - iOS and macOS artifacts are unsigned: they are real builds, but not
+              distributable without your own signing identity.
+            - No physical iPhone, Mac or Windows machine was used to test these
+              builds; they are compiled and packaged on GitHub runners.
+            - Home-screen widgets and scheduled reminders are Android/iOS features;
+              the desktop builds run without them.

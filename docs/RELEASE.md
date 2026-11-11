@@ -23,7 +23,9 @@ Two workflows:
 
 ## Cutting a release
 
-1. Bump the version in `pubspec.yaml`, for example `version: 1.9.0+11`. The part
+1. Bump the version in `pubspec.yaml`, for example `version: 1.6.0+12`, and
+   update `RELEASE_TAG` in `.github/workflows/release.yml` — a tag that does not
+   match it is rejected before anything is built. The part
    before `+` is the release name; the part after is the Android version code and
    must increase on every release.
 2. Update `CHANGELOG.md` with a section for the new version.
@@ -31,8 +33,8 @@ Two workflows:
 4. Tag the same commit and push the tag:
 
    ```bash
-   git tag v1.9.0
-   git push origin v1.9.0
+   git tag v1.6.0
+   git push origin v1.6.0
    ```
 
 5. Watch the **Release** workflow. The `validate` job fails immediately if the
@@ -70,17 +72,15 @@ the workflow is structured so it can be added without touching the build steps.
 ## Artifact names
 
 ```
-Flow-Tracker-<version>-Android-arm64-v8a.apk
-Flow-Tracker-<version>-Android-armeabi-v7a.apk
-Flow-Tracker-<version>-Android-x86_64.apk
+Flow-Tracker-<version>-Android.apk      (universal: arm64-v8a + armeabi-v7a + x86_64)
 Flow-Tracker-<version>-Android.aab
-Flow-Tracker-<version>-iOS-unsigned.ipa
+Flow-Tracker-<version>-iOS.ipa          (unsigned unless Apple secrets are configured)
 Flow-Tracker-<version>-Windows-x64.exe
 Flow-Tracker-<version>-Windows-x64.msi
 Flow-Tracker-<version>-Linux-x86_64.AppImage
 Flow-Tracker-<version>-Linux-amd64.deb
-Flow-Tracker-<version>-macOS-universal.dmg
-Flow-Tracker-<version>-macOS-universal.pkg
+Flow-Tracker-<version>-macOS-arm64.dmg
+Flow-Tracker-<version>-macOS-arm64.pkg
 ```
 
 Architecture labels come from the actual build target: Android splits by ABI,
@@ -88,10 +88,10 @@ Windows and Linux build x64, macOS builds the default architecture of the runner
 
 ## What each build actually runs
 
-- **Android** — `flutter build apk --release --split-per-abi`,
-  `flutter build appbundle --release`. Verified: `classes.dex` present, a
-  `libapp.so` for the ABI in the file name, and the package id read out of the
-  binary manifest equals `com.flowtracker.app`.
+- **Android** — `flutter build apk --release` (one universal APK), `flutter build
+  appbundle --release`. Verified: `classes.dex` present, a `libapp.so` for each
+  of arm64-v8a, armeabi-v7a and x86_64, and the package id and version read out
+  of the binary manifest.
 - **iOS** — `pod install`, `flutter build ios --release --no-codesign`, then the
   `.app` is zipped into `Payload/` to form an IPA. Verified: the IPA contains
   `Payload/Runner.app/Runner`, and its bundle id and short version match the

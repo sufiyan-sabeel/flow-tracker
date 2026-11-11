@@ -3,111 +3,62 @@
 All notable changes to Flow-tracker are recorded here. Versions follow
 [Semantic Versioning](https://semver.org/), and each release is tagged `vX.Y.Z`.
 
-## 1.8.0 — multi-platform releases
+## 1.5.0 — multi-platform release
+
+The first release built and published for all five platforms from one tag.
 
 ### Added
 
-- **Five-platform release pipeline.** Tagging `vX.Y.Z` now builds Android (APK per
-  ABI plus an AAB), iOS (unsigned IPA), Windows (EXE and MSI installers), Linux
-  (AppImage and DEB) and macOS (DMG and PKG), verifies each artifact, and attaches
-  the verified set to a single GitHub release with `SHA256SUMS.txt`.
-- **A separate CI workflow** runs formatting, analysis and the full test suite on
-  every push and pull request, so the release pipeline is not the first place a
-  broken build is discovered.
-- **macOS support**, which the project did not have: the platform project is now
-  generated and configured with the Flow-tracker identity.
-- Windows installers: an Inno Setup script for the EXE and a WiX definition for
+- **Offline PDF reports.** Eight report types, six document themes that change
+  the actual document, eight date ranges including a validated custom range, ten
+  toggleable sections, and preview, save and share. Generated on the device from
+  local data only — no server, no account, no connection.
+- **A five-platform release pipeline.** Tagging `v1.5.0` builds Android (universal
+  APK and AAB), iOS (IPA), Windows (EXE and MSI installers), Linux (AppImage and
+  DEB) and macOS (DMG and PKG), verifies every artifact, and attaches the verified
+  set to one GitHub release with `SHA256SUMS.txt`.
+- **A CI workflow** runs formatting, static analysis and the full test suite on
+  every push and pull request, so a broken build is caught before a release.
+- **macOS support**, which the project did not have: the platform project is
+  configured with the Flow-tracker identity and a deployment target that its
+  plugins require.
+- Windows installers: Inno Setup for the EXE and a generated WiX definition for
   the MSI, both packaging the complete Flutter runtime rather than a lone binary.
+
+### Changed
+
+- PDF covers are redesigned around the official mark, with a documented type
+  scale, a metadata row, headline numbers, a contents strip and a note on how the
+  figures are calculated. Tables alternate row shading and repeat their headers.
 
 ### Fixed
 
+- **Report statistics.** "All history" no longer starts in the year 2000 — it
+  starts at your earliest record — and a habit is only counted from the day it
+  was created, so one completion can no longer be divided by thousands of days
+  and print 0%.
+- Completions logged on unscheduled days are reported as entries rather than
+  distorting the completion rate.
 - The iOS bundle identifier was still the upstream `com.streak.app`, and the App
-  Group shared with the widget extension still carried it. Both are now
+  Group shared with the widget extension carried the same value. Both are now
   `com.flowtracker.app`, matching Android.
 - The Windows executable's file properties credited the previous author; the
-  publisher is now Umaiz Sufiyan with the upstream notice retained in the
-  copyright string.
-- The Linux launcher entry still said "Streak" in its name, comment and Exec
-  line. It now says Flow-tracker and launches `flow-tracker`.
+  publisher is now Umaiz Sufiyan, with the upstream notice retained.
+- The Linux launcher entry still said "Streak" in its name, comment and Exec line.
+- Deep links now use the `flowtracker://` scheme instead of `streak://`.
+- A Swift compiler error in the iOS scene handler (`UISceneConnectionOptions` was
+  renamed to `UIScene.ConnectionOptions`).
 
 ### Notes
 
 - iOS and macOS artifacts are unsigned: no signing credentials are configured in
   CI, and the release notes say so rather than implying they are installable.
-- Release notes list signing status per platform and mark what is not notarized.
+- Versions 1.6.0, 1.7.0 and 1.8.0 were built during development but never shipped
+  as multi-platform releases; their work is included here. See
+  `docs/RELEASED_HISTORY.md` for the record of the releases and tags removed
+  during this correction.
 
-## 1.7.0 — brand identity and report corrections
-
-### Fixed
-
-- **The reported statistics are correct now.** "All history" no longer starts at
-  the year 2000: it starts at your earliest real record, so a report no longer
-  divides one completion by nine thousand scheduled days and prints 0%. A habit
-  is also only counted from the day it was created, so a habit added last week
-  is not marked down for the weeks before it existed.
-- Completions logged on a day a habit was not scheduled are reported as
-  *entries*, separately from scheduled wins, instead of distorting the rate.
-- The statistics labels no longer read "Best current streak"; the cards are
-  Current streak, Best streak, Scheduled days done, Completions logged, Days
-  tracked and Consistency.
-- The date range shown on the export screen no longer prints a placeholder year
-  for "all history".
-
-### Changed
-
-- **PDF covers are redesigned**: the official Flow-tracker mark, wordmark and a
-  report category chip at the top; a 30 pt title with a descriptive subtitle;
-  reporting period, generation time and design in a metadata row; headline
-  numbers; an "Inside this report" contents strip; a short note explaining how
-  the figures are calculated; and a footer with the creator credit and version.
-- **The real logo replaces the orange square** in every PDF, in the header of
-  every content page as well as the cover. The transparent mark is now bundled
-  with the app so the document can embed it offline.
-- **Typography and spacing follow a documented scale**: 30 pt cover title,
-  18.5 pt section titles, 13 pt subsections, 10 pt body, 8.5 pt tables, 8 pt
-  metadata, 7.5 pt footers, with 44 pt margins and consistent card and cell
-  padding.
-- **Tables alternate row shading and repeat their header** every 20 rows, so a
-  long table is readable across pages instead of continuing headless.
-- Charts gained a habit-completion bar set alongside daily activity and category
-  breakdowns.
-
-## 1.6.0 — offline PDF reports
-
-### Added
-
-- **PDF export, generated entirely on the device.** Settings → PDF Export &
-  Reports opens a dashboard where you choose the report, the date range, which
-  sections to include and the document design, then preview, share or save.
-- **Eight report types**: complete productivity report, habit progress, habit
-  history, statistics, to-do report, focus sessions, monthly summary and yearly
-  summary. Each one is built from the local database — no server, no account, no
-  connection.
-- **Six document themes** that change the real PDF: Executive (white, charcoal,
-  muted orange), Midnight (graphite pages, white type, amber), Minimal (plain
-  white, grey rules), Aurora (blue and violet), Botanical (soft greens) and
-  Custom brand (follows your app accent).
-- **A4 report design system**: cover with report identity and creator credit,
-  executive summary with calculated statistics, section headings, statistics
-  cards, tables, progress bars, a vector activity chart, a 16-week heatmap, and
-  a footer with the period and page numbers on every page.
-- **Eight date ranges** including a custom range that is validated, swapped when
-  entered backwards, and clamped to today.
-- **Ten toggleable sections**, so a report contains only what was asked for.
-- **Save** through Android's Storage Access Framework, **share** to any app
-  through the system share sheet, and **preview** the real PDF with paging and
-  zoom.
-- Meaningful file names such as `FlowTracker_Monthly_Summary_2026-11.pdf`.
-
-### Notes
-
-- Charts and the heatmap are drawn as vector containers, so they stay sharp when
-  printed and add no image weight.
-- Fonts are the app's own Figtree, embedded in the document.
-
-## 1.5.0 — creator identity and settings polish
-
-### Changed
+### Creator identity and settings
 
 - **Creator identity is now Umaiz Sufiyan throughout.** The About screen credits
   read "Created by Umaiz Sufiyan", the developer line shows the name rather than
@@ -118,13 +69,13 @@ All notable changes to Flow-tracker are recorded here. Versions follow
   The placeholder was dropped from the other locales rather than translated,
   because it was never a translation.
 
-### Fixed
+### Also fixed
 
 - Removed the last hardcoded occurrence of the previous author's name, which sat
   in the demo-seed test as a profile name. The profile name still defaults to
   empty and stays fully editable, independently of the developer credit.
 
-### Unchanged, on purpose
+### Unchanged, on purpose (licence obligation)
 
 - "Based on Streak by InlitX" stays on the About screen, in the licence notice,
   in `NOTICE.md` and in `ADDITIONAL_TERMS.md`. The GPL section 7 additional terms
