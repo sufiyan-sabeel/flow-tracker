@@ -993,9 +993,13 @@ jobs:
   publish:
     name: Publish release
     needs: [preflight, android, ios, windows, linux, macos]
-    # All five platforms must have built and passed their checks. There is no
-    # partial release, and in production mode every artifact must be signed.
-    if: success()
+    # Production: every platform must have built AND passed signature
+    # verification — no partial release. Unsigned test mode: publish whatever
+    # actually built, and the notes list what is missing. It is never silent.
+    if: |
+      always() && needs.preflight.result == 'success' &&
+      ((github.event.inputs.signing || 'required') == 'required' && success() ||
+       (github.event.inputs.signing || 'required') == 'unsigned')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -1007,15 +1011,42 @@ jobs:
           path: dist
           merge-multiple: true
 
+      - name: Summarise which platforms built
+        id: platforms
+        run: |
+          set -euo pipefail
+          built=""; missing=""
+          for pair in "android:${{ needs.android.result }}" "ios:${{ needs.ios.result }}" \
+                      "windows:${{ needs.windows.result }}" "linux:${{ needs.linux.result }}" \
+                      "macos:${{ needs.macos.result }}"; do
+            name=${pair%%:*}; result=${pair##*:}
+            if [ "$result" = "success" ]; then
+              built="$built $name"
+            else
+              missing="$missing $name ($result)"
+            fi
+          done
+          echo "built:$built"
+          echo "missing:$missing"
+          echo "built=${built# }" >> "$GITHUB_OUTPUT"
+          echo "missing=${missing# }" >> "$GITHUB_OUTPUT"
+
       - name: Checksums
         run: |
           set -euo pipefail
           cd dist
           ls -la
           count=$(ls -1 | wc -l)
-          if [ "${SIGNING_MODE}" = "required" ]; then want=13; else want=10; fi
+          if [ "${SIGNING_MODE}" = "required" ]; then
+            want=13
+          else
+            # 2 files per built platform, plus the checksum manifest itself
+            platforms=$(echo "${{ steps.platforms.outputs.built }}" | wc -w)
+            want=$(( platforms * 2 ))
+            [ "$platforms" -eq 1 ] && want=2
+          fi
           if [ "$count" -lt "$want" ]; then
-            echo "::error::expected at least $want files for ${SIGNING_MODE} signing, found $count"
+            echo "::error::expected at least $want files, found $count"
             exit 1
           fi
           sha256sum * > SHA256SUMS.txt
@@ -1109,6 +1140,9 @@ jobs:
             > publisher, and the Linux packages carry no GPG signature. Use them for
             > testing. The production release is built with `signing: required` once
             > the credentials in `docs/SIGNING.md` are configured.
+
+            **Platforms in this build:** ${{ steps.platforms.outputs.built }}
+            ${{ steps.platforms.outputs.missing != '' && format('**Not built in this run:** {0}', steps.platforms.outputs.missing) || '' }}
 
             Built from `${{ github.sha }}`. Private, offline habit tracking with PDF
             reports — no account, no upload, everything stays on your device.
