@@ -64,6 +64,10 @@ class SettingsController extends ChangeNotifier {
     );
     _profilePhoto = LocalStore.setting('profilePhoto', '');
     _appIcon = LocalStore.setting('appIcon', 0);
+    // The launcher component and this preference can disagree after a restore,
+    // a crash mid-switch, or an OS-level reset of component states. Re-align them
+    // once at start-up; it is a no-op when they already match.
+    unawaited(AppIconService.reconcile(_appIcon));
     _accentColor = LocalStore.setting(
       'accentColor',
       AppPalette.brand.toARGB32(),
@@ -1054,11 +1058,19 @@ class SettingsController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> setAppIcon(int index) async {
+  /// Applies a launcher icon and returns whether it took effect.
+  ///
+  /// The selection is only stored after the Android component was switched, so a
+  /// failed change can never leave the sheet claiming an icon the launcher is not
+  /// showing. On platforms without launcher switching this is a no-op that
+  /// reports success, which is the behaviour the setting had before.
+  Future<bool> setAppIcon(int index) async {
+    final applied = await AppIconService.apply(index);
+    if (AppIconService.supported && !applied) return false;
     _appIcon = index;
     await LocalStore.writeSetting('appIcon', index);
     notifyListeners();
-    await AppIconService.apply(index);
+    return true;
   }
 
   Color get widgetBgColor => Color(_widgetBgColor);

@@ -1282,6 +1282,7 @@
     }
   },
   "app_icon": "App icon",
+  "icon_switch_failed": "Could not change the launcher icon. Try again.",
   "icon_default": "Default",
   "icon_neutral": "Green",
   "icon_accent": "Tricolor",

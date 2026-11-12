@@ -38,9 +38,10 @@ class MainActivity : FlutterFragmentActivity() {
             setMethodCallHandler { call, result ->
                 when (call.method) {
                     "setIcon" -> {
-                        setIcon(call.argument<String>("icon") ?: "default")
-                        result.success(true)
+                        val ok = setIcon(call.argument<String>("icon") ?: "default")
+                        result.success(ok)
                     }
+                    "currentIcon" -> result.success(currentIcon())
                     "setSecure" -> {
                         setSecure(call.argument<Boolean>("secure") ?: false)
                         result.success(true)
@@ -149,18 +150,50 @@ class MainActivity : FlutterFragmentActivity() {
         return resources.openRawResource(shot).use { it.readBytes() }
     }
 
-    private fun setIcon(key: String) {
-        val pm = packageManager
-        val pkg = packageName
-        aliases.forEach { (name, suffix) ->
-            val enabled = name == key
-            pm.setComponentEnabledSetting(
-                ComponentName(pkg, pkg + suffix),
-                if (enabled) PackageManager.COMPONENT_ENABLED_STATE_ENABLED
-                else PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                PackageManager.DONT_KILL_APP,
-            )
+    /**
+     * Enables exactly one launcher alias and disables the rest.
+     *
+     * Returns false if the key is unknown or the package manager rejects the
+     * change, so the caller never records a selection that did not take effect.
+     */
+    private fun setIcon(key: String): Boolean {
+        if (key !in aliases) return false
+        return try {
+            aliases.forEach { (name, suffix) ->
+                packageManager.setComponentEnabledSetting(
+                    ComponentName(packageName, packageName + suffix),
+                    if (name == key) PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                    else PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                    PackageManager.DONT_KILL_APP,
+                )
+            }
+            true
+        } catch (e: IllegalArgumentException) {
+            false
+        } catch (e: SecurityException) {
+            false
         }
+    }
+
+    /**
+     * The alias that currently owns the launcher entry, or null when the state is
+     * ambiguous — which is exactly the case Flutter repairs on start-up.
+     *
+     * A component that was never toggled reports COMPONENT_ENABLED_STATE_DEFAULT,
+     * which means "as declared in the manifest"; only the default alias declares
+     * itself enabled there.
+     */
+    private fun currentIcon(): String? {
+        val live = aliases.filter { (key, suffix) ->
+            when (packageManager.getComponentEnabledSetting(
+                ComponentName(packageName, packageName + suffix),
+            )) {
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> true
+                PackageManager.COMPONENT_ENABLED_STATE_DEFAULT -> key == "default"
+                else -> false
+            }
+        }.keys
+        return live.singleOrNull()
     }
 
     companion object {

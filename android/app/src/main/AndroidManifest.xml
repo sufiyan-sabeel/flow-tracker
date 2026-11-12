@@ -53,8 +53,9 @@
               />
         </activity>
 
-        <!-- Launcher icon variants. Exactly one alias is enabled at a time;
-             switching is done at runtime via the streak/app_icon channel. -->
+        <!-- Launcher icon variants. Exactly one alias is enabled at a time, and
+             each one must point at its own icon resource or switching has no
+             visible effect. Runtime switching goes through the app_icon channel. -->
         <activity-alias
             android:name=".MainActivityDefault"
             android:targetActivity=".MainActivity"
@@ -73,7 +74,7 @@
             android:targetActivity=".MainActivity"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@mipmap/ic_launcher_neutral"
             android:label="Flow-tracker">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -86,7 +87,7 @@
             android:targetActivity=".MainActivity"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@mipmap/ic_launcher_accent"
             android:label="Flow-tracker">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

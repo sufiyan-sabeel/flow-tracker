@@ -54,6 +54,14 @@ The first release built and published for all five platforms from one tag.
 
 ### Fixed
 
+- **The App icon setting now actually changes the launcher icon.** All three
+  launcher aliases pointed at the same icon resource, so switching between them
+  had no visible effect. Each alias now carries its own icon, the native side
+  reports whether the component change succeeded, and a failed switch is no longer
+  recorded or shown as selected. The launcher is re-aligned with the saved
+  preference on start-up if the two ever disagree.
+- **The timer notification uses the Flow-tracker glyph** instead of a generic grid
+  of squares, and carries a slim session-progress bar that tracks the real timer.
 - **The Windows build no longer needs Media Foundation to start.** The
   `video_player_win` plugin linked against `mfplat.dll`, which Windows "N"
   editions do not ship; because plugins load before any Dart code runs, the app

@@ -1,55 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Ongoing focus notification, collapsed and expanded.
+     Kept to views RemoteViews supports: LinearLayout, TextView, Chronometer and
+     ProgressBar. All existing ids are preserved so FocusService keeps working. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:paddingVertical="4dp">
+    android:orientation="vertical"
+    android:paddingTop="6dp"
+    android:paddingBottom="2dp">
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/focus_title"
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/focus_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/focus_state"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:includeFontPadding="false"
+                android:letterSpacing="0.01"
+                android:maxLines="1"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <Chronometer
+            android:id="@+id/focus_clock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:layout_marginStart="12dp"
+            android:fontFamily="sans-serif-medium"
+            android:includeFontPadding="false"
+            android:textSize="27sp" />
 
         <TextView
-            android:id="@+id/focus_state"
+            android:id="@+id/focus_frozen"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textSize="13sp"
-            android:textStyle="bold" />
+            android:layout_marginStart="12dp"
+            android:fontFamily="sans-serif-medium"
+            android:includeFontPadding="false"
+            android:textSize="27sp"
+            android:visibility="gone" />
     </LinearLayout>
 
-    <Chronometer
-        android:id="@+id/focus_clock"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:fontFamily="sans-serif-medium"
-        android:includeFontPadding="false"
-        android:textSize="30sp" />
-
-    <TextView
-        android:id="@+id/focus_frozen"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:fontFamily="sans-serif-medium"
-        android:includeFontPadding="false"
-        android:textSize="30sp"
+    <!-- Session progress. Tinted and driven from FocusService; hidden when the
+         session is open-ended rather than countdown. -->
+    <ProgressBar
+        android:id="@+id/focus_progress"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_marginTop="9dp"
+        android:layout_marginBottom="3dp"
+        android:max="100"
+        android:progress="0"
         android:visibility="gone" />
-
 </LinearLayout>

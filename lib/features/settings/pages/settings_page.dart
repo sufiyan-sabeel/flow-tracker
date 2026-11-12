@@ -274,7 +274,14 @@ class _ClassicAppearancePage extends StatelessWidget {
               title: context.l10n.app_icon,
               options: icons,
               index: settings.appIcon,
-              onSelected: settings.setAppIcon,
+              onSelected: (index) async {
+                final applied = await settings.setAppIcon(index);
+                if (!applied && context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(context.l10n.icon_switch_failed)),
+                  );
+                }
+              },
             ),
           ),
         ],
