@@ -54,6 +54,10 @@ The first release built and published for all five platforms from one tag.
 
 ### Added
 
+- **An Android keystore guide and checker.** `docs/KEYSTORE-SETUP.md` walks through
+  generating the permanent release keystore, the base64 step, and the four secrets;
+  `tool/verify-keystore.sh` opens a keystore locally and prints its format, alias
+  and SHA-256 before anything is uploaded.
 - **A signing credential probe** (`Signing check` workflow): reports which
   secrets are configured and opens the Android keystore to show its alias,
   subject and SHA-256, without building anything or printing a secret.

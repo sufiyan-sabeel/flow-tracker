@@ -1,8 +1,11 @@
 # Signing Flow-tracker releases
 
 New to this? Start with **[SIGNING-SETUP.md](SIGNING-SETUP.md)** — it walks through
-obtaining each certificate, exporting it, and adding the secrets, in order. This
-file is the reference: what each secret is and what the pipeline verifies.
+obtaining each certificate, exporting it, and adding the secrets, in order. For
+Android alone, **[KEYSTORE-SETUP.md](KEYSTORE-SETUP.md)** is the shorter path: one
+keystore, four secrets, and a checker (`tool/verify-keystore.sh`) to run before
+uploading anything. This file is the reference: what each secret is and what the
+pipeline verifies.
 
 
 The release pipeline signs every artifact with a production identity and verifies
