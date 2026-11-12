@@ -59,3 +59,10 @@ jobs:
 
       - name: Test
         run: flutter test --reporter=compact
+
+      # Dart analysis and widget tests do not compile the Kotlin sources or the
+      # Android resources, so a broken manifest alias, notification layout or
+      # native channel handler would slip through. A debug build compiles all of
+      # it and needs no signing credentials.
+      - name: Compile the Android app
+        run: flutter build apk --debug
