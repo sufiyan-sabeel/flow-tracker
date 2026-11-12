@@ -357,9 +357,9 @@ class _ClassicWidgetsPage extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(4, 0, 4, 16),
             child: Text(
               context.l10n.widgets_hint,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: context.tokens.muted,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: context.tokens.muted),
             ),
           ),
           const WidgetStyleList(),
@@ -422,14 +422,12 @@ class _ClassicPreferencesPage extends StatelessWidget {
                         7 => 2,
                         _ => 0,
                       },
-                      onChanged: (i) => SettingsActions.setWeekStart(
-                        context,
-                        switch (i) {
-                          1 => 6,
-                          2 => 7,
-                          _ => 1,
-                        },
-                      ),
+                      onChanged: (i) =>
+                          SettingsActions.setWeekStart(context, switch (i) {
+                            1 => 6,
+                            2 => 7,
+                            _ => 1,
+                          }),
                     ),
                   ),
                   settingsDivider(context),
@@ -883,9 +881,7 @@ class _ClassicDataPage extends StatelessWidget {
     return _ClassicSection(
       title: context.l10n.data,
       label: context.l10n.data_sub,
-      lead: ImportAppsCard(
-        onTap: () => SettingsActions.importFromApp(context),
-      ),
+      lead: ImportAppsCard(onTap: () => SettingsActions.importFromApp(context)),
       children: [
         NavRow(
           icon: LucideIcons.upload,

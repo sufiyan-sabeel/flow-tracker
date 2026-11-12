@@ -79,12 +79,15 @@ void main() {
     expect(calls.map((c) => c.method), ['currentIcon']);
   });
 
-  test('reconcile repairs a launcher that drifted from the preference', () async {
-    mock((call) async => call.method == 'currentIcon' ? 'default' : true);
-    expect(await AppIconService.reconcile(2), isTrue);
-    expect(calls.map((c) => c.method), ['currentIcon', 'setIcon']);
-    expect(calls.last.arguments, {'icon': 'accent'});
-  });
+  test(
+    'reconcile repairs a launcher that drifted from the preference',
+    () async {
+      mock((call) async => call.method == 'currentIcon' ? 'default' : true);
+      expect(await AppIconService.reconcile(2), isTrue);
+      expect(calls.map((c) => c.method), ['currentIcon', 'setIcon']);
+      expect(calls.last.arguments, {'icon': 'accent'});
+    },
+  );
 
   test('reconcile repairs an ambiguous component state', () async {
     // null means several aliases are enabled, or none
