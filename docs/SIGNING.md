@@ -1,5 +1,10 @@
 # Signing Flow-tracker releases
 
+New to this? Start with **[SIGNING-SETUP.md](SIGNING-SETUP.md)** — it walks through
+obtaining each certificate, exporting it, and adding the secrets, in order. This
+file is the reference: what each secret is and what the pipeline verifies.
+
+
 The release pipeline signs every artifact with a production identity and verifies
 the signature with the platform's own tool. There is no unsigned path and no
 debug-key fallback: if a credential is missing, `preflight` fails in about a

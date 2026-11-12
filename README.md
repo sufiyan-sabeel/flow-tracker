@@ -94,8 +94,9 @@ the same app rather than a stranger wearing its clothes.
 | macOS | builds in CI, **unsigned and not notarized** | DMG and PKG |
 
 Every tag builds all five platforms and publishes one release with checksums.
-See [docs/RELEASE.md](docs/RELEASE.md) for how the pipeline works and which
-secrets enable signed builds.
+See [docs/RELEASE.md](docs/RELEASE.md) for how the pipeline works,
+[docs/SIGNING-SETUP.md](docs/SIGNING-SETUP.md) to set up signing from
+scratch, and [docs/SIGNING.md](docs/SIGNING.md) for the credential reference.
 
 ## Install
 

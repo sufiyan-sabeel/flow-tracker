@@ -33,6 +33,12 @@ The first release built and published for all five platforms from one tag.
 
 ### Added
 
+- **A signing audit that runs on every push** (`tool/check_signing.py`): it fails
+  if a secret is used but not gated in preflight, documented but unused, or if a
+  path exists by which a tag push could publish something unsigned.
+- **A beginner-friendly signing guide** (`docs/SIGNING-SETUP.md`): obtaining each
+  certificate, exporting it, the base64 commands, creating the protected
+  `release` environment, and what each failure message means.
 - **Production signing across all five platforms.** Android is signed with the
   release keystore and checked with `apksigner` and `jarsigner`; iOS with an Apple
   Distribution certificate and an App Store profile; Windows with Authenticode and
