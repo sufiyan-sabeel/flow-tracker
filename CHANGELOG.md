@@ -52,6 +52,15 @@ The first release built and published for all five platforms from one tag.
   same five platforms, clearly labelled as unsigned. A tag push can never select
   it, so a production release cannot silently downgrade.
 
+### Added
+
+- **A signing credential probe** (`Signing check` workflow): reports which
+  secrets are configured and opens the Android keystore to show its alias,
+  subject and SHA-256, without building anything or printing a secret.
+- **Android-only releases.** A dispatch can now build and publish just the signed
+  APK and AAB, gated on the four Android secrets alone. A tag push still produces
+  the full five-platform release.
+
 ### Fixed
 
 - **The App icon setting now actually changes the launcher icon.** All three

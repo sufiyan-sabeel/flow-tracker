@@ -146,6 +146,22 @@ installer.
    `SHA256SUMS.txt`, and its notes carry the signing status per platform.
 
 
+## Android-only releases
+
+A manual dispatch takes a `scope` input:
+
+- **`android`** (default for a dispatch) — builds, signs and publishes the APK and
+  AAB only. It needs the four Android secrets and nothing else; the Apple,
+  Windows and GPG credentials are not checked, because nothing uses them. The
+  iOS/Windows/Linux/macOS assets already on the release are left alone, and their
+  checksums are preserved in `SHA256SUMS.txt`.
+- **`all`** — the full five-platform release. A tag push always uses this, and it
+  needs all twenty secrets.
+
+The `Signing check` workflow answers "what is configured here?" without building
+anything: dispatch it and it prints present/missing per secret, plus the Android
+keystore's alias, subject and SHA-256 fingerprint when the keystore opens.
+
 ## Two modes: signed and explicitly unsigned
 
 The workflow has a `signing` input with two values.

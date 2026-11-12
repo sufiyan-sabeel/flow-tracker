@@ -31,6 +31,12 @@ on:
         default: required
         type: choice
         options: [required, unsigned]
+      scope:
+        description: 'android = build and publish Android only; all = every platform'
+        required: true
+        default: android
+        type: choice
+        options: [android, all]
 
 permissions:
   contents: write
@@ -42,6 +48,9 @@ env:
   # default applies. Only a manual dispatch can ask for an unsigned build, and
   # the release notes then say so in the first line.
   SIGNING_MODE: ${{ github.event.inputs.signing || 'required' }}
+  # A tag push is a full release. A manual dispatch can ask for Android alone,
+  # which must not depend on Apple, Windows or GPG credentials it does not use.
+  RELEASE_SCOPE: ${{ github.event.inputs.scope || 'all' }}
   APP_ID: com.flowtracker.app
   # Only this tag may publish. Bump it for the next release.
   RELEASE_TAG: v1.5.0
@@ -118,26 +127,30 @@ jobs:
           set -euo pipefail
           missing=()
           check() { if [ -z "${2:-}" ]; then missing+=("$1"); fi; }
+          # Android credentials are required for any signed release.
           check ANDROID_KEYSTORE_BASE64       "${ANDROID_KEYSTORE_BASE64:-}"
           check ANDROID_KEYSTORE_PASSWORD     "${ANDROID_KEYSTORE_PASSWORD:-}"
           check ANDROID_KEY_ALIAS             "${ANDROID_KEY_ALIAS:-}"
           check ANDROID_KEY_PASSWORD          "${ANDROID_KEY_PASSWORD:-}"
-          check IOS_CERT_P12_BASE64           "${IOS_CERT_P12_BASE64:-}"
-          check IOS_CERT_PASSWORD             "${IOS_CERT_PASSWORD:-}"
-          check IOS_PROVISION_PROFILE_BASE64  "${IOS_PROVISION_PROFILE_BASE64:-}"
-          check IOS_TEAM_ID                   "${IOS_TEAM_ID:-}"
-          check WINDOWS_PFX_BASE64            "${WINDOWS_PFX_BASE64:-}"
-          check WINDOWS_PFX_PASSWORD          "${WINDOWS_PFX_PASSWORD:-}"
-          check GPG_PRIVATE_KEY_BASE64        "${GPG_PRIVATE_KEY_BASE64:-}"
-          check GPG_PASSPHRASE                "${GPG_PASSPHRASE:-}"
-          check GPG_KEY_ID                    "${GPG_KEY_ID:-}"
-          check MACOS_CERT_P12_BASE64         "${MACOS_CERT_P12_BASE64:-}"
-          check MACOS_CERT_PASSWORD           "${MACOS_CERT_PASSWORD:-}"
-          check MACOS_INSTALLER_P12_BASE64    "${MACOS_INSTALLER_P12_BASE64:-}"
-          check MACOS_INSTALLER_PASSWORD      "${MACOS_INSTALLER_PASSWORD:-}"
-          check MACOS_TEAM_ID                 "${MACOS_TEAM_ID:-}"
-          check MACOS_NOTARY_APPLE_ID         "${MACOS_NOTARY_APPLE_ID:-}"
-          check MACOS_NOTARY_PASSWORD         "${MACOS_NOTARY_PASSWORD:-}"
+          # The rest only matter when every platform is being released.
+          if [ "${RELEASE_SCOPE}" = "all" ]; then
+            check IOS_CERT_P12_BASE64           "${IOS_CERT_P12_BASE64:-}"
+            check IOS_CERT_PASSWORD             "${IOS_CERT_PASSWORD:-}"
+            check IOS_PROVISION_PROFILE_BASE64  "${IOS_PROVISION_PROFILE_BASE64:-}"
+            check IOS_TEAM_ID                   "${IOS_TEAM_ID:-}"
+            check WINDOWS_PFX_BASE64            "${WINDOWS_PFX_BASE64:-}"
+            check WINDOWS_PFX_PASSWORD          "${WINDOWS_PFX_PASSWORD:-}"
+            check GPG_PRIVATE_KEY_BASE64        "${GPG_PRIVATE_KEY_BASE64:-}"
+            check GPG_PASSPHRASE                "${GPG_PASSPHRASE:-}"
+            check GPG_KEY_ID                    "${GPG_KEY_ID:-}"
+            check MACOS_CERT_P12_BASE64         "${MACOS_CERT_P12_BASE64:-}"
+            check MACOS_CERT_PASSWORD           "${MACOS_CERT_PASSWORD:-}"
+            check MACOS_INSTALLER_P12_BASE64    "${MACOS_INSTALLER_P12_BASE64:-}"
+            check MACOS_INSTALLER_PASSWORD      "${MACOS_INSTALLER_PASSWORD:-}"
+            check MACOS_TEAM_ID                 "${MACOS_TEAM_ID:-}"
+            check MACOS_NOTARY_APPLE_ID         "${MACOS_NOTARY_APPLE_ID:-}"
+            check MACOS_NOTARY_PASSWORD         "${MACOS_NOTARY_PASSWORD:-}"
+          fi
           if [ ${#missing[@]} -gt 0 ]; then
             echo "::error::refusing to build an unsigned release — missing credentials:"
             for m in "${missing[@]}"; do echo "::error::  $m"; done
@@ -344,6 +357,7 @@ jobs:
   ios:
     name: iOS
     needs: preflight
+    if: (github.event.inputs.scope || 'all') == 'all'
     runs-on: macos-latest
     timeout-minutes: 50
     environment: release
@@ -489,6 +503,7 @@ jobs:
   windows:
     name: Windows
     needs: preflight
+    if: (github.event.inputs.scope || 'all') == 'all'
     runs-on: windows-latest
     timeout-minutes: 50
     environment: release
@@ -667,6 +682,7 @@ jobs:
   linux:
     name: Linux
     needs: preflight
+    if: (github.event.inputs.scope || 'all') == 'all'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     environment: release
@@ -839,6 +855,7 @@ jobs:
   macos:
     name: macOS
     needs: preflight
+    if: (github.event.inputs.scope || 'all') == 'all'
     runs-on: macos-latest
     timeout-minutes: 50
     environment: release
@@ -997,9 +1014,13 @@ jobs:
     # verification — no partial release. Unsigned test mode: publish whatever
     # actually built, and the notes list what is missing. It is never silent.
     if: |
-      always() && needs.preflight.result == 'success' &&
-      ((github.event.inputs.signing || 'required') == 'required' && success() ||
-       (github.event.inputs.signing || 'required') == 'unsigned')
+      always() && needs.preflight.result == 'success' && (
+        ((github.event.inputs.scope || 'all') == 'android' && needs.android.result == 'success') ||
+        ((github.event.inputs.scope || 'all') == 'all' &&
+         (github.event.inputs.signing || 'required') == 'required' && success()) ||
+        ((github.event.inputs.scope || 'all') == 'all' &&
+         (github.event.inputs.signing || 'required') == 'unsigned')
+      )
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -1032,15 +1053,20 @@ jobs:
           echo "missing=${missing# }" >> "$GITHUB_OUTPUT"
 
       - name: Checksums
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
         run: |
           set -euo pipefail
           cd dist
           ls -la
-          # Counted before SHA256SUMS.txt is written, so the manifest is not in
-          # the number. Production: 9 artifacts + 2 .asc + public key = 12.
-          # Unsigned: two files per platform except iOS, which is one.
           count=$(ls -1 | wc -l)
-          if [ "${SIGNING_MODE}" = "required" ]; then
+
+          if [ "${RELEASE_SCOPE}" = "android" ]; then
+            # Android ships two files; the other platforms are untouched.
+            want=2
+          elif [ "${SIGNING_MODE}" = "required" ]; then
+            # 9 artifacts + 2 .asc + public key, before this manifest is written
             want=12
           else
             platforms=$(echo "${{ steps.platforms.outputs.built }}" | wc -w)
@@ -1051,11 +1077,71 @@ jobs:
             echo "::error::expected at least $want files, found $count"
             exit 1
           fi
-          sha256sum * > SHA256SUMS.txt
+
+          if [ "${RELEASE_SCOPE}" = "android" ]; then
+            # Replacing the Android assets must not drop the checksums of the
+            # iOS/Windows/Linux/macOS files that stay on the release.
+            mkdir -p /tmp/old
+            gh release download "$TAG" --pattern SHA256SUMS.txt --dir /tmp/old --clobber 2>/dev/null || true
+            python3 - <<'EOF'
+          import hashlib, pathlib
+          old = pathlib.Path('/tmp/old/SHA256SUMS.txt')
+          previous = old.read_text().splitlines() if old.exists() else []
+          mine = sorted(
+              p for p in pathlib.Path('.').iterdir()
+              if p.is_file() and p.suffix in ('.apk', '.aab')
+          )
+          names = {p.name for p in mine}
+          kept = [line for line in previous if line.split() and line.split()[-1] not in names]
+          for path in mine:
+              digest = hashlib.sha256(path.read_bytes()).hexdigest()
+              kept.append(f"{digest}  {path.name}")
+          pathlib.Path('SHA256SUMS.txt').write_text("\n".join(kept) + "\n")
+          print(f"manifest covers {len(kept)} files")
+          EOF
+          else
+            sha256sum * > SHA256SUMS.txt
+          fi
           cat SHA256SUMS.txt
 
+      - name: Publish the Android assets
+        if: env.SIGNING_MODE == 'required' && env.RELEASE_SCOPE == 'android'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+          name: Flow Tracker v${{ needs.preflight.outputs.version }}
+          files: dist/*
+          fail_on_unmatched_files: true
+          body: |
+            ## Flow Tracker v${{ needs.preflight.outputs.version }} — Android
+
+            Production-signed Android build from `${{ github.sha }}`.
+
+            | File | Identity | Verification |
+            | --- | --- | --- |
+            | `Flow-Tracker-${{ needs.preflight.outputs.version }}-Android.apk` | release keystore `${{ needs.preflight.outputs.android_sha256 }}` | `apksigner verify` (v2, fingerprint matched) |
+            | `Flow-Tracker-${{ needs.preflight.outputs.version }}-Android.aab` | same keystore | `jarsigner -verify` + `keytool -printcert` |
+
+            The iOS, Windows, Linux and macOS files on this release are unchanged
+            from the previous build; only the Android assets were replaced. Their
+            checksums are preserved in `SHA256SUMS.txt`.
+
+            ### Install
+
+            Open the APK on the device and allow install from this source. This
+            build is signed with the permanent release key, so it updates the
+            previously installed debug-signed copy only after an uninstall —
+            Android refuses a signature change in place.
+
+            ### Verify
+
+            ```
+            sha256sum -c SHA256SUMS.txt
+            apksigner verify --print-certs Flow-Tracker-${{ needs.preflight.outputs.version }}-Android.apk
+            ```
+
       - name: Publish the signed release
-        if: env.SIGNING_MODE == 'required'
+        if: env.SIGNING_MODE == 'required' && env.RELEASE_SCOPE == 'all'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
@@ -1125,7 +1211,7 @@ jobs:
               the desktop builds run without them.
 
       - name: Publish the unsigned test build
-        if: env.SIGNING_MODE == 'unsigned'
+        if: env.SIGNING_MODE == 'unsigned' && env.RELEASE_SCOPE == 'all'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
