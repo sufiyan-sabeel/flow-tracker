@@ -7,7 +7,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
-import android.content.res.ColorStateList
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.graphics.Bitmap
@@ -210,11 +209,6 @@ class FocusService : Service() {
                 val elapsed = (total - seconds).coerceIn(0, total)
                 setViewVisibility(R.id.focus_progress, View.VISIBLE)
                 setProgressBar(R.id.focus_progress, total, elapsed, false)
-                setProgressTintList(R.id.focus_progress, ColorStateList.valueOf(accent))
-                setProgressBackgroundTintList(
-                    R.id.focus_progress,
-                    ColorStateList.valueOf(accent and 0x33FFFFFF),
-                )
             } else {
                 setViewVisibility(R.id.focus_progress, View.GONE)
             }

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Session progress bar: a translucent track with a green fill.
+     The colour is fixed here rather than tinted at runtime because RemoteViews
+     cannot call setProgressTintList; a restrained green is also what the
+     notification should read as, whatever phase the session is in. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <shape android:shape="rectangle">
+            <corners android:radius="2dp" />
+            <solid android:color="#3315803D" />
+        </shape>
+    </item>
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape android:shape="rectangle">
+                <corners android:radius="2dp" />
+                <solid android:color="@color/focus_running" />
+            </shape>
+        </clip>
+    </item>
+</layer-list>
