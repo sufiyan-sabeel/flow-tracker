@@ -1,0 +1,130 @@
+name: Signing check
+
+# Answers one question without building anything: which signing credentials are
+# configured on this repository, and does the Android keystore actually open?
+#
+# It prints present/missing per secret and, when the keystore is present, its
+# alias, validity and SHA-256 fingerprint. It never prints a secret value.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    name: Probe signing credentials
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Which secrets are configured
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          IOS_CERT_P12_BASE64: ${{ secrets.IOS_CERT_P12_BASE64 }}
+          IOS_CERT_PASSWORD: ${{ secrets.IOS_CERT_PASSWORD }}
+          IOS_PROVISION_PROFILE_BASE64: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
+          IOS_TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
+          WINDOWS_PFX_BASE64: ${{ secrets.WINDOWS_PFX_BASE64 }}
+          WINDOWS_PFX_PASSWORD: ${{ secrets.WINDOWS_PFX_PASSWORD }}
+          GPG_PRIVATE_KEY_BASE64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+          MACOS_CERT_P12_BASE64: ${{ secrets.MACOS_CERT_P12_BASE64 }}
+          MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
+          MACOS_INSTALLER_P12_BASE64: ${{ secrets.MACOS_INSTALLER_P12_BASE64 }}
+          MACOS_INSTALLER_PASSWORD: ${{ secrets.MACOS_INSTALLER_PASSWORD }}
+          MACOS_TEAM_ID: ${{ secrets.MACOS_TEAM_ID }}
+          MACOS_NOTARY_APPLE_ID: ${{ secrets.MACOS_NOTARY_APPLE_ID }}
+          MACOS_NOTARY_PASSWORD: ${{ secrets.MACOS_NOTARY_PASSWORD }}
+        run: |
+          set -uo pipefail
+          {
+            echo "| Secret | Status |"
+            echo "| --- | --- |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          for name in \
+            ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD \
+            IOS_CERT_P12_BASE64 IOS_CERT_PASSWORD IOS_PROVISION_PROFILE_BASE64 IOS_TEAM_ID \
+            WINDOWS_PFX_BASE64 WINDOWS_PFX_PASSWORD \
+            GPG_PRIVATE_KEY_BASE64 GPG_PASSPHRASE GPG_KEY_ID \
+            MACOS_CERT_P12_BASE64 MACOS_CERT_PASSWORD MACOS_INSTALLER_P12_BASE64 \
+            MACOS_INSTALLER_PASSWORD MACOS_TEAM_ID MACOS_NOTARY_APPLE_ID MACOS_NOTARY_PASSWORD
+          do
+            value="${!name:-}"
+            if [ -n "$value" ]; then
+              echo "| $name | configured |" >> "$GITHUB_STEP_SUMMARY"
+              echo "$name: configured"
+            else
+              echo "| $name | **missing** |" >> "$GITHUB_STEP_SUMMARY"
+              echo "$name: missing"
+            fi
+          done
+
+      - name: Does the Android keystore open
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          set -uo pipefail
+          if [ -z "${ANDROID_KEYSTORE_BASE64:-}" ]; then
+            echo "### Android keystore: not configured" >> "$GITHUB_STEP_SUMMARY"
+            echo "No keystore secret; there is nothing to inspect."
+            exit 0
+          fi
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > /tmp/probe.jks 2>/dev/null || {
+            echo "### Android keystore: **not valid base64**" >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::ANDROID_KEYSTORE_BASE64 does not decode as base64"
+            exit 1
+          }
+          echo "decoded keystore size: $(stat -c%s /tmp/probe.jks) bytes"
+          if ! keytool -list -keystore /tmp/probe.jks \
+                 -storepass "${ANDROID_KEYSTORE_PASSWORD:-}" > /tmp/list.txt 2>&1; then
+            echo "### Android keystore: **will not open with the stored password**" >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::the keystore does not open with ANDROID_KEYSTORE_PASSWORD"
+            sed 's/^/  /' /tmp/list.txt | head -5
+            exit 1
+          fi
+          echo "aliases in the keystore:"
+          grep -E '^[a-zA-Z0-9._-]+,|PrivateKeyEntry' /tmp/list.txt | head -10
+
+          alias="${ANDROID_KEY_ALIAS:-}"
+          if [ -n "$alias" ] && ! grep -q "$alias" /tmp/list.txt; then
+            echo "### Android keystore: **alias not found**" >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::ANDROID_KEY_ALIAS ($alias) is not in the keystore"
+            exit 1
+          fi
+
+          keytool -list -v -keystore /tmp/probe.jks \
+            -storepass "${ANDROID_KEYSTORE_PASSWORD:-}" ${alias:+-alias "$alias"} > /tmp/detail.txt 2>&1 || true
+          sha=$(grep -m1 'SHA256:' /tmp/detail.txt | sed 's/.*SHA256: //' | tr -d ':' | tr 'A-F' 'a-f')
+          subject=$(grep -m1 'Owner:' /tmp/detail.txt | sed 's/.*Owner: //')
+          valid=$(grep -m1 'Valid from:' /tmp/detail.txt | sed 's/^[[:space:]]*//')
+          {
+            echo ""
+            echo "### Android keystore"
+            echo "- alias: \`${alias:-<none given>}\`"
+            echo "- subject: \`${subject}\`"
+            echo "- validity: ${valid}"
+            echo "- SHA-256: \`${sha}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "subject: $subject"
+          echo "SHA-256: $sha"
+          echo "$valid"
+          if echo "$subject" | grep -qi 'CN=Android Debug'; then
+            echo "::error::this keystore holds the Android DEBUG certificate, not a release identity"
+            exit 1
+          fi
+          shred -u /tmp/probe.jks
