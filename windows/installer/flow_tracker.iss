@@ -69,9 +69,9 @@ Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchProgram,{#AppName}}"; Flags
 
 [Code]
 { Flow-tracker links the audioplayers plugin, which uses Windows Media
-  Foundation. On editions without it (Windows "N", some stripped images) the
-  process cannot start at all, and Windows shows only "MFPlat.dll was not
-  found". Check here so the user gets an explanation instead of a dead icon. }
+  Foundation. On an edition without it (Windows "N", some stripped images) the
+  process cannot start at all, and Windows shows only "MFPlat.dll was not found".
+  Check here so the user gets an explanation instead of a dead shortcut. }
 
 function MediaFoundationPresent: Boolean;
 begin
@@ -80,23 +80,25 @@ end;
 
 function InitializeSetup: Boolean;
 var
-  Message: String;
+  Msg: String;
+  NL: String;
 begin
   Result := True;
   if MediaFoundationPresent then
     Exit;
 
-  Message :=
-    'Flow-tracker needs Windows Media Foundation for its focus sounds, and this ' +
-    'edition of Windows does not include it.' + #13#10#13#10 +
-    'Without it the app cannot start. To enable it:' + #13#10#13#10 +
-    '  1. Open Settings > Apps > Optional features > Add a feature' + #13#10 +
-    '  2. Tick "Media Feature Pack" and install it' + #13#10#13#10 +
-    'Or run this in an administrator PowerShell:' + #13#10 +
-    '  DISM /Online /Add-Capability /CapabilityName:Media.MediaFeaturePack~~~~0.0.1.0' +
-    #13#10#13#10 +
-    'You can continue installing now and add the feature afterwards.';
+  { Inno's preprocessor treats a line starting with # as a directive, so the
+    newline escape lives in a variable rather than at the start of a line. }
+  NL := #13#10;
 
-  if MsgBox(Message, mbConfirmation, MB_YESNO) = IDNO then
+  Msg := 'Flow-tracker needs Windows Media Foundation for its focus sounds, and this edition of Windows does not include it.' + NL + NL;
+  Msg := Msg + 'Without it the app cannot start. To enable it:' + NL + NL;
+  Msg := Msg + '  1. Open Settings > Apps > Optional features > Add a feature' + NL;
+  Msg := Msg + '  2. Tick "Media Feature Pack" and install it' + NL + NL;
+  Msg := Msg + 'Or run this in an administrator PowerShell:' + NL;
+  Msg := Msg + '  DISM /Online /Add-Capability /CapabilityName:Media.MediaFeaturePack~~~~0.0.1.0' + NL + NL;
+  Msg := Msg + 'You can continue installing now and add the feature afterwards.';
+
+  if MsgBox(Msg, mbConfirmation, MB_YESNO) = IDNO then
     Result := False;
 end;
