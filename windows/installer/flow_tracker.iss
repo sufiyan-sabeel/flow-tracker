@@ -66,3 +66,37 @@ Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExe}"; Tasks: desktopico
 
 [Run]
 Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchProgram,{#AppName}}"; Flags: nowait postinstall skipifsilent
+
+[Code]
+{ Flow-tracker links the audioplayers plugin, which uses Windows Media
+  Foundation. On editions without it (Windows "N", some stripped images) the
+  process cannot start at all, and Windows shows only "MFPlat.dll was not
+  found". Check here so the user gets an explanation instead of a dead icon. }
+
+function MediaFoundationPresent: Boolean;
+begin
+  Result := FileExists(ExpandConstant('{sys}\mfplat.dll'));
+end;
+
+function InitializeSetup: Boolean;
+var
+  Message: String;
+begin
+  Result := True;
+  if MediaFoundationPresent then
+    Exit;
+
+  Message :=
+    'Flow-tracker needs Windows Media Foundation for its focus sounds, and this ' +
+    'edition of Windows does not include it.' + #13#10#13#10 +
+    'Without it the app cannot start. To enable it:' + #13#10#13#10 +
+    '  1. Open Settings > Apps > Optional features > Add a feature' + #13#10 +
+    '  2. Tick "Media Feature Pack" and install it' + #13#10#13#10 +
+    'Or run this in an administrator PowerShell:' + #13#10 +
+    '  DISM /Online /Add-Capability /CapabilityName:Media.MediaFeaturePack~~~~0.0.1.0' +
+    #13#10#13#10 +
+    'You can continue installing now and add the feature afterwards.';
+
+  if MsgBox(Message, mbConfirmation, MB_YESNO) = IDNO then
+    Result := False;
+end;

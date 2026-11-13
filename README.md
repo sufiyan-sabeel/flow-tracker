@@ -89,7 +89,7 @@ the same app rather than a stranger wearing its clothes.
 | --- | --- | --- |
 | Android | released, signed with the project key when configured | APK per ABI, AAB |
 | iOS | builds in CI, **unsigned** | IPA for validation, needs your team to install |
-| Windows | builds in CI, unsigned | EXE and MSI installers |
+| Windows | builds in CI, unsigned; needs the Media Feature Pack on "N" editions ([install guide](docs/INSTALL-WINDOWS.md)) | EXE and MSI installers |
 | Linux | builds in CI | AppImage and DEB |
 | macOS | builds in CI, **unsigned and not notarized** | DMG and PKG |
 

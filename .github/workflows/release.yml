@@ -577,6 +577,18 @@ jobs:
                      Manufacturer="Umaiz Sufiyan" UpgradeCode="7C1D2A6E-9B34-4C7A-9F2E-6E0B1D5A8C11">
               <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" />
               <MajorUpgrade DowngradeErrorMessage="A newer version of Flow-tracker is already installed." />
+
+              <!-- The audioplayers plugin uses Windows Media Foundation. On an
+                   edition without it the app cannot start at all, so refuse the
+                   install with an explanation rather than leaving a dead icon. -->
+              <Property Id="MFPLAT_DLL">
+                <DirectorySearch Id="SystemDirSearch" Path="[System64Folder]">
+                  <FileSearch Id="mfplatSearch" Name="mfplat.dll" />
+                </DirectorySearch>
+              </Property>
+              <Condition Message="Flow-tracker needs Windows Media Foundation for its focus sounds, and this edition of Windows does not include it. Install the Media Feature Pack (Settings &gt; Apps &gt; Optional features &gt; Add a feature), then run this installer again. PowerShell: DISM /Online /Add-Capability /CapabilityName:Media.MediaFeaturePack~~~~0.0.1.0">
+                <![CDATA[MFPLAT_DLL]]>
+              </Condition>
               <MediaTemplate EmbedCab="yes" />
               <Directory Id="TARGETDIR" Name="SourceDir">
                 <Directory Id="ProgramFiles64Folder">

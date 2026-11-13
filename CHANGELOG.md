@@ -67,6 +67,12 @@ The first release built and published for all five platforms from one tag.
 
 ### Fixed
 
+- **Windows no longer fails with an unexplained "MFPlat.dll was not found".**
+  The `audioplayers` plugin uses Windows Media Foundation and is loaded before
+  any app code runs, so on editions without it (Windows "N") the process could
+  not start at all. Both installers now detect the missing component and explain
+  exactly how to add the Media Feature Pack, and `docs/INSTALL-WINDOWS.md`
+  documents the requirement and the packaging contents.
 - **The App icon setting now actually changes the launcher icon.** All three
   launcher aliases pointed at the same icon resource, so switching between them
   had no visible effect. Each alias now carries its own icon, the native side
